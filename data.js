@@ -25,7 +25,7 @@ const initialData = {
         gimbal: "Shyam Davit",
         liveSystem: "Anand",
         spotEdit: "Joshua",
-        charging: "Yashwant & Sam Davit",
+        charging: "Yashwanth & Sam Davit",
         outsideTv: "Franklin"
       },
       {
@@ -33,19 +33,19 @@ const initialData = {
         cam1: "Andrew & Franklin",
         cam2: "Shyam Davit",
         gimbal: "Lokesh",
-        liveSystem: "Yashwant",
+        liveSystem: "Yashwanth",
         spotEdit: "Joshua",
-        charging: "Yashwant & Sam Davit",
+        charging: "Yashwanth & Sam Davit",
         outsideTv: "Balaji"
       },
       {
         date: "18 Oct 2026",
-        cam1: "Yashwant",
+        cam1: "Yashwanth",
         cam2: "Balaji",
         gimbal: "Lokesh",
         liveSystem: "Shyam Davit",
         spotEdit: "Joshua",
-        charging: "Yashwant & Sam Davit",
+        charging: "Yashwanth & Sam Davit",
         outsideTv: "Anand"
       },
       {
@@ -53,9 +53,9 @@ const initialData = {
         cam1: "Balaji & Andrew",
         cam2: "Anand",
         gimbal: "Lokesh",
-        liveSystem: "Yashwant & Franklin",
+        liveSystem: "Yashwanth & Franklin",
         spotEdit: "Joshua",
-        charging: "Yashwant & Sam Davit",
+        charging: "Yashwanth & Sam Davit",
         outsideTv: "Sam Davit"
       }
     ],

@@ -94,66 +94,43 @@ Switch to the **Service Checklists** tab for control over weekly Sunday service 
 * **Studio-Quality Graphic:** Uses a client-side HTML5 canvas to generate a 1200px wide, high-resolution graphic card complete with official church Dove branding, active month badge, 1st/2nd/3rd/Friday service tables, call times, and scripture (*Colossians 3:23*).
 * **WhatsApp Status & Story Ready:** Perfect for sharing in the church media WhatsApp group, Instagram stories, or saving to phones.
 
-### 12. 💾 JSON Backup & Restore
-* In the **Admin Console** under **Backup & Restore**, click **`💾 Download Full Backup (.JSON)`** to download your full schedules and member directories as a file.
+### 12. ☁️ Live Multi-Device Cloud Sync (Firebase Realtime Database)
+* **Real-Time Cross-Device Sync:** When deployed to Netlify or opened across multiple volunteers' phones, changes made by Admin Lokesh sync across all devices in real time.
+* **Powered by Google Firebase Realtime Database (100% Free):** Zero server maintenance, free forever for church team sizes.
+* **Instant 1-Click WhatsApp Team Sync Link:** Admin can generate a 1-click sync link that encodes the latest roster into WhatsApp—volunteers tap the link on their phones to instantly update their schedules!
+
+### 13. 📊 Team Serving Analytics & Workload Balancer
+* **Roster Health Metrics:** View Total Serving Slots, Active Volunteers, and Average Slots per volunteer in the Admin Console.
+* **Visual Workload Bars:** Color-coded progress bars (Optimal, Heavy, Light, Resting) to ensure balanced, fair scheduling across all 10 crew members.
+* **Role Demand Breakdown:** Live count of demand across 1st Cam, 2nd Cam, Gimble, Live System, Spot Editing, and Charging.
+
+### 14. 🛠️ Equipment Maintenance & Gear Issue Log
+* **Fault Tracker:** Log faulty cables, battery health, camera firmware, or switcher issues before Sunday service.
+* **Direct WhatsApp Dispatch:** One-click WhatsApp alert formatted directly to Equipment Incharges (**Yashwanth & Sam Davit** at `7010368793`).
+* **Lifecycle Tracking:** Cycle issue status smoothly between `Open` ➔ `In Progress` ➔ `Resolved`.
+
+### 15. 💾 JSON Backup & Restore
+* In the **Admin Console** under **Cloud Sync & Backup**, click **`💾 Download Full Backup (.JSON)`** to download your full schedules, gear logs, and member directories as a file.
 * Click **`📂 Restore Backup from File`** anytime to load it onto another church computer or laptop!
 
 ---
 
 ## 📚 Master Church Operational Documentation
 
-All operational standards are documented in detail in your workspace:
+All operational standards are organized inside the [docs/](docs/) folder:
 
 | Document | Description |
 | :--- | :--- |
 | 🕊️ [logo.png](logo.png) | Official Full Life Centre AG Church Dove Logo |
-| 📋 [FLAG_Sunday_Service_Cue_Sheet.md](docs/FLAG_Sunday_Service_Cue_Sheet.md) | Minute-by-minute Sunday run-sheet (07:00 AM to 08:56 AM) |
-| 📋 [FLAG_Indoor_Media_Operations_Manual.md](docs/FLAG_Indoor_Media_Operations_Manual.md) | Standard Operating Procedures, pre/in/post-service timelines |
-| 🎥 [Camera_Framing_and_Switching_Guide.md](docs/Camera_Framing_and_Switching_Guide.md) | Rules of thirds, headroom, and director "Ready... Take" comms |
-| 🎙️ [Broadcast_Audio_Mixing_Guide.md](docs/Broadcast_Audio_Mixing_Guide.md) | Dedicated broadcast aux mix, room mics, and lip-sync calibration |
-| 💻 [Streaming_PC_and_Switcher_Configuration.md](docs/Streaming_PC_and_Switcher_Configuration.md) | OBS/vMix 1080p60 encoding, bitrate, and dual local recording |
-| ⚡ [Camera_Charging_and_Gear_Maintenance_SOP.md](docs/Camera_Charging_and_Gear_Maintenance_SOP.md) | Battery charging schedules, lens cleaning, and SD formatting |
-| ✂️ [Spot_Editing_and_Social_Clips_Guide.md](docs/Spot_Editing_and_Social_Clips_Guide.md) | Rapid workflow for cutting 9:16 vertical sermon reels with captions |
-| 📦 [FLAG_Equipment_Inventory_and_Signout_Log.md](docs/FLAG_Equipment_Inventory_and_Signout_Log.md) | Equipment inventory and borrow register for Outdoor Media |
-| 🤝 [Inter_Department_Workflow_FLAG.md](docs/Inter_Department_Workflow_FLAG.md) | Handoff protocols to Outdoor and Web Media teams |
-| 🎓 [Indoor_Media_Cross_Training_Plan.md](docs/Indoor_Media_Cross_Training_Plan.md) | 4-week volunteer cross-training plan to prevent burnout |
-| 🗣️ [Indoor_Media_Team_Meeting_Agenda.md](docs/Indoor_Media_Team_Meeting_Agenda.md) | Agenda for your first team meeting as new leader |
-| 📅 [FLAG_October_Media_Roster.md](docs/FLAG_October_Media_Roster.md) | Detailed October 2026 serving roster and team contacts |
-| ✅ [Indoor_Media_Team_Checklists.md](docs/Indoor_Media_Team_Checklists.md) | Sunday service pre/in/post checklists & charging tasks |
-| 🗓️ [Monthly_Service_Schedule_Template.md](docs/Monthly_Service_Schedule_Template.md) | Monthly service scheduling template & guidelines |
-| ⚡ [Media_Desk_Quick_Reference_Cards.md](docs/Media_Desk_Quick_Reference_Cards.md) | Printable laminated booth cards for camera & audio operators |
-
----
-
-## 📁 Clean Directory Structure
-
-```
-Media-Loki/
-├── index.html                   # Main Web Portal Application
-├── styles.css                   # Portal Modern CSS Styling
-├── app.js                       # Core Application Engine & Handlers
-├── data.js                      # Default State & Initial Data
-├── logo.png                     # Official Church Dove Logo
-├── manifest.json                # PWA Web App Manifest (Standalone mobile)
-├── sw.js                        # Offline Caching Service Worker
-├── run_localhost.bat            # 1-Click Launch Server (Port 8000)
-├── start_dashboard.bat          # 1-Click Alternative Launcher
-├── README.md                    # Master Hub & Navigation Guide
-│
-└── docs/                        # Church Master SOPs, Guides, Rosters & Checklists
-    ├── Broadcast_Audio_Mixing_Guide.md
-    ├── Camera_Charging_and_Gear_Maintenance_SOP.md
-    ├── Camera_Framing_and_Switching_Guide.md
-    ├── FLAG_Equipment_Inventory_and_Signout_Log.md
-    ├── FLAG_Indoor_Media_Operations_Manual.md
-    ├── FLAG_October_Media_Roster.md
-    ├── FLAG_Sunday_Service_Cue_Sheet.md
-    ├── Indoor_Media_Cross_Training_Plan.md
-    ├── Indoor_Media_Team_Checklists.md
-    ├── Indoor_Media_Team_Meeting_Agenda.md
-    ├── Inter_Department_Workflow_FLAG.md
-    ├── Media_Desk_Quick_Reference_Cards.md
-    ├── Monthly_Service_Schedule_Template.md
-    ├── Spot_Editing_and_Social_Clips_Guide.md
-    └── Streaming_PC_and_Switcher_Configuration.md
-```
+| 📖 [docs/README.md](docs/README.md) | Master Table of Contents & Operations Index |
+| 📋 [docs/FLAG_Sunday_Service_Cue_Sheet.md](docs/FLAG_Sunday_Service_Cue_Sheet.md) | Minute-by-minute Sunday run-sheet (07:00 AM to 08:56 AM) |
+| 📋 [docs/FLAG_Indoor_Media_Operations_Manual.md](docs/FLAG_Indoor_Media_Operations_Manual.md) | Standard Operating Procedures, pre/in/post-service timelines |
+| 🎥 [docs/Camera_Framing_and_Switching_Guide.md](docs/Camera_Framing_and_Switching_Guide.md) | Rules of thirds, headroom, and director "Ready... Take" comms |
+| 🎙️ [docs/Broadcast_Audio_Mixing_Guide.md](docs/Broadcast_Audio_Mixing_Guide.md) | Dedicated broadcast aux mix, room mics, and lip-sync calibration |
+| 💻 [docs/Streaming_PC_and_Switcher_Configuration.md](docs/Streaming_PC_and_Switcher_Configuration.md) | OBS/vMix 1080p60 encoding, bitrate, and dual local recording |
+| ⚡ [docs/Camera_Charging_and_Gear_Maintenance_SOP.md](docs/Camera_Charging_and_Gear_Maintenance_SOP.md) | Battery charging schedules, lens cleaning, and SD formatting |
+| ✂️ [docs/Spot_Editing_and_Social_Clips_Guide.md](docs/Spot_Editing_and_Social_Clips_Guide.md) | Rapid workflow for cutting 9:16 vertical sermon reels with captions |
+| 📦 [docs/FLAG_Equipment_Inventory_and_Signout_Log.md](docs/FLAG_Equipment_Inventory_and_Signout_Log.md) | Equipment inventory and borrow register for Outdoor Media |
+| 🤝 [docs/Inter_Department_Workflow_FLAG.md](docs/Inter_Department_Workflow_FLAG.md) | Handoff protocols to Outdoor and Web Media teams |
+| 🎓 [docs/Indoor_Media_Cross_Training_Plan.md](docs/Indoor_Media_Cross_Training_Plan.md) | 4-week volunteer cross-training plan to prevent burnout |
+| 🗣️ [docs/Indoor_Media_Team_Meeting_Agenda.md](docs/Indoor_Media_Team_Meeting_Agenda.md) | Agenda for your first team meeting as new leader |

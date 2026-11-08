@@ -132,6 +132,26 @@ const defaultState = {
         { id: "p8", text: "Post-Service: Transfer raw file to Joshua & pack down equipment", done: false }
       ]
     }
+  ],
+  gearIssues: [
+    {
+      id: 1,
+      item: "HDMI Cable / Video Sender (Hollyland)",
+      urgency: "Medium",
+      reporter: "Yashwanth",
+      desc: "Transmitter battery plate loose, test with NP-F970 before Sunday service",
+      date: "02 Oct 2026",
+      status: "Open"
+    },
+    {
+      id: 2,
+      item: "Microphone Lapel / Headset Batteries",
+      urgency: "Low",
+      reporter: "Sam Davit",
+      desc: "Restocked 8 fresh rechargeable AA batteries for Pastor mic",
+      date: "01 Oct 2026",
+      status: "Resolved"
+    }
   ]
 };
 
@@ -252,8 +272,10 @@ function calculateDatesInMonth(year, monthIndex, targetDay) {
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
+  checkUrlForRosterSync();
   loadState();
   initCalendarSelectors();
+  initCloudSync();
   renderAll();
 });
 
@@ -268,6 +290,30 @@ function loadState() {
     }
   } else {
     appState = JSON.parse(JSON.stringify(defaultState));
+  }
+
+  // Ensure gearIssues array exists
+  if (!appState.gearIssues || !Array.isArray(appState.gearIssues)) {
+    appState.gearIssues = [
+      {
+        id: 1,
+        item: "HDMI Cable / Video Sender (Hollyland)",
+        urgency: "Medium",
+        reporter: "Yashwanth",
+        desc: "Transmitter battery plate loose, test with NP-F970 before Sunday service",
+        date: "02 Oct 2026",
+        status: "Open"
+      },
+      {
+        id: 2,
+        item: "Microphone Lapel / Headset Batteries",
+        urgency: "Low",
+        reporter: "Sam Davit",
+        desc: "Restocked 8 fresh rechargeable AA batteries for Pastor mic",
+        date: "01 Oct 2026",
+        status: "Resolved"
+      }
+    ];
   }
 
   // Ensure specialMeetings and morningPrayer exist
@@ -382,7 +428,7 @@ function loadState() {
   saveState();
 }
 
-function saveState() {
+function saveState(skipCloud = false) {
   // Sync active schedule back to archive
   const currentKey = `${appState.selectedYear}-${appState.selectedMonth}`;
   if (!appState.schedules) appState.schedules = {};
@@ -397,6 +443,10 @@ function saveState() {
 
   localStorage.setItem("FLAG_MEDIA_PORTAL_STATE", JSON.stringify(appState));
   updateBadges();
+
+  if (!skipCloud) {
+    saveToCloud(appState);
+  }
 }
 
 // Manual Save Handler for Admin Console Button
@@ -409,7 +459,11 @@ function manualSaveSchedule() {
 
   const statusEl = document.getElementById("saveStatusIndicator");
   if (statusEl) {
-    statusEl.innerHTML = `✅ All changes successfully saved at <strong>${timeStr}</strong>!`;
+    if (cloudSyncConnected) {
+      statusEl.innerHTML = `✅ Saved locally &amp; ☁️ Synced to Cloud at <strong>${timeStr}</strong>!`;
+    } else {
+      statusEl.innerHTML = `✅ All changes successfully saved locally at <strong>${timeStr}</strong>!`;
+    }
   }
 
   const saveBtns = document.querySelectorAll(".btn-save-schedule");
@@ -423,7 +477,11 @@ function manualSaveSchedule() {
     }, 1200);
   });
 
-  showToast(`💾 Schedule saved successfully at ${timeStr}!`);
+  if (cloudSyncConnected) {
+    showToast(`💾 Schedule saved & ☁️ synced to Cloud at ${timeStr}!`);
+  } else {
+    showToast(`💾 Schedule saved locally at ${timeStr}!`);
+  }
 }
 
 function getMonthName(mIndex) {
@@ -719,6 +777,8 @@ function renderAll() {
   renderSpecialMeetings();
   renderMorningPrayer();
   renderMembers();
+  renderWorkloadAnalytics();
+  renderGearIssues();
   renderChecklists();
   updateBadges();
   populateWhatsAppDateSelect();
@@ -3429,4 +3489,693 @@ function exportScheduleImagePNG() {
     logoImg.onload = renderContent;
     logoImg.onerror = renderContent;
   }
+}
+
+// ================= CLOUD SYNC (FIREBASE REALTIME DATABASE) =================
+let firebaseApp = null;
+let firebaseDb = null;
+let isSyncingFromCloud = false;
+let cloudSyncConnected = false;
+const DEFAULT_FIREBASE_DB_URL = "https://flag-church-media-default-rtdb.firebaseio.com";
+const FIREBASE_CONFIG_KEY = "FLAG_FIREBASE_DB_URL";
+const FIREBASE_DB_NODE = "flag_church_media_portal/state";
+
+function initCloudSync() {
+  const savedSetting = localStorage.getItem(FIREBASE_CONFIG_KEY);
+  let activeUrl = DEFAULT_FIREBASE_DB_URL;
+
+  if (savedSetting === "OFF") {
+    activeUrl = "";
+  } else if (savedSetting) {
+    activeUrl = savedSetting;
+  }
+
+  const inputEl = document.getElementById("firebaseDbUrlInput");
+  if (inputEl) {
+    inputEl.value = activeUrl || DEFAULT_FIREBASE_DB_URL;
+  }
+
+  if (activeUrl) {
+    connectFirebaseWithUrl(activeUrl, false);
+  } else {
+    updateCloudSyncUI(false);
+  }
+}
+
+function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
+  let dbUrl = (rawUrl || "").trim();
+  if (!dbUrl) {
+    alert("Please enter a valid Firebase Realtime Database URL.");
+    return;
+  }
+
+  // Auto-correct missing https:// or trailing slashes
+  if (!dbUrl.startsWith("http://") && !dbUrl.startsWith("https://")) {
+    dbUrl = "https://" + dbUrl;
+  }
+  dbUrl = dbUrl.replace(/\/+$/, "");
+
+  try {
+    // Check if Firebase Compat SDK is loaded
+    if (typeof firebase === "undefined") {
+      console.warn("Firebase SDK not loaded yet.");
+      updateCloudSyncUI(false, "Firebase library loading...");
+      return;
+    }
+
+    // Initialize or reuse default app
+    if (!firebase.apps.length) {
+      firebaseApp = firebase.initializeApp({ databaseURL: dbUrl });
+    } else {
+      firebaseApp = firebase.app();
+    }
+
+    firebaseDb = firebase.database();
+    localStorage.setItem(FIREBASE_CONFIG_KEY, dbUrl);
+
+    // Attach Realtime Listener
+    const ref = firebaseDb.ref(FIREBASE_DB_NODE);
+    
+    // Check connection state via Firebase .info/connected
+    firebaseDb.ref(".info/connected").on("value", snap => {
+      const isOnline = snap.val() === true;
+      if (isOnline) {
+        cloudSyncConnected = true;
+        updateCloudSyncUI(true);
+      }
+    });
+
+    ref.on("value", snapshot => {
+      const cloudState = snapshot.val();
+      if (cloudState && !isSyncingFromCloud) {
+        console.log("☁️ Real-time cloud sync received:", cloudState);
+        isSyncingFromCloud = true;
+        // Merge received cloud state into appState
+        appState = cloudState;
+        // Cache to local storage
+        localStorage.setItem("FLAG_MEDIA_PORTAL_STATE", JSON.stringify(appState));
+        // Re-render whole portal
+        renderAll();
+        updateCloudSyncUI(true);
+        isSyncingFromCloud = false;
+        showToast("☁️ Real-time schedule updated from Cloud!");
+      } else if (!cloudState) {
+        // First time cloud initialization - push current local state to cloud!
+        ref.set(appState).catch(err => console.warn("Init cloud error:", err));
+      }
+    }, err => {
+      console.error("Firebase sync error:", err);
+      updateCloudSyncUI(false, err.message);
+    });
+
+    cloudSyncConnected = true;
+    updateCloudSyncUI(true);
+    if (showToastNotice) {
+      showToast("🟢 Connected to Firebase! Cloud Sync is now active across all devices.");
+    }
+  } catch (err) {
+    console.error("Firebase init failed:", err);
+    alert("Failed to connect to Firebase: " + err.message);
+    updateCloudSyncUI(false, err.message);
+  }
+}
+
+function saveAndConnectFirebase() {
+  const inputEl = document.getElementById("firebaseDbUrlInput");
+  const url = inputEl ? inputEl.value.trim() : "";
+  if (!url) {
+    alert("Please paste your Firebase Database URL (e.g. https://flag-media-default-rtdb.firebaseio.com).");
+    return;
+  }
+  connectFirebaseWithUrl(url, true);
+  // Also push current state immediately
+  setTimeout(() => {
+    saveToCloud(appState);
+  }, 800);
+}
+
+function syncLocalToCloudNow() {
+  if (!firebaseDb) {
+    alert("Firebase is not connected yet.");
+    return;
+  }
+  saveToCloud(appState);
+  showToast("☁️ Pushed local roster to Cloud! All volunteers will see this immediately.");
+}
+
+function disconnectFirebase() {
+  if (confirm("Disconnect Cloud Sync? Your edits will only save locally to this browser until reconnected.")) {
+    if (firebaseDb) {
+      try {
+        firebaseDb.ref(FIREBASE_DB_NODE).off();
+      } catch (e) {}
+    }
+    firebaseDb = null;
+    cloudSyncConnected = false;
+    localStorage.setItem(FIREBASE_CONFIG_KEY, "OFF");
+    const inputEl = document.getElementById("firebaseDbUrlInput");
+    if (inputEl) inputEl.value = "";
+    updateCloudSyncUI(false);
+    showToast("🔌 Cloud Sync disconnected. Running in Local Mode.");
+  }
+}
+
+function saveToCloud(state) {
+  if (!firebaseDb || !cloudSyncConnected || isSyncingFromCloud) return;
+  try {
+    firebaseDb.ref(FIREBASE_DB_NODE).set(state).then(() => {
+      console.log("☁️ Successfully saved to Firebase Cloud!");
+    }).catch(err => {
+      console.warn("☁️ Failed to push to Firebase Cloud:", err);
+    });
+  } catch (e) {
+    console.warn("saveToCloud error:", e);
+  }
+}
+
+function updateCloudSyncUI(isConnected, errorMsg) {
+  const badge = document.getElementById("cloudStatusBadge");
+  const text = document.getElementById("cloudStatusText");
+  const navBadge = document.getElementById("navCloudSyncBadge");
+  const navText = document.getElementById("navCloudSyncText");
+  const btnSync = document.getElementById("btnSyncCloudNow");
+  const btnDisc = document.getElementById("btnDisconnectCloud");
+
+  if (isConnected) {
+    if (badge) {
+      badge.className = "header-tag tag-emerald";
+    }
+    if (text) text.textContent = "🟢 Live Cloud Connected & Syncing";
+    if (navBadge) {
+      navBadge.classList.add("connected");
+    }
+    if (navText) navText.textContent = "☁️ Cloud Synced";
+    if (btnSync) btnSync.style.display = "inline-flex";
+    if (btnDisc) btnDisc.style.display = "inline-flex";
+  } else {
+    if (badge) {
+      badge.className = "header-tag tag-amber";
+    }
+    if (text) text.textContent = errorMsg ? `⚠️ Error: ${errorMsg}` : "🟡 Local Mode (Ready to Connect)";
+    if (navBadge) {
+      navBadge.classList.remove("connected");
+    }
+    if (navText) navText.textContent = "☁️ Local Mode";
+    if (btnSync) btnSync.style.display = "none";
+    if (btnDisc) btnDisc.style.display = "none";
+  }
+}
+
+function quickOpenCloudSync() {
+  if (isAdminLoggedIn) {
+    switchView("adminView");
+    const backupTabBtn = document.querySelectorAll(".admin-pill-btn")[4];
+    switchAdminTab("adminBackupTab", backupTabBtn);
+  } else {
+    openAdminPinModal();
+    window.postLoginRedirectTab = "adminBackupTab";
+  }
+}
+
+// 1-Click WhatsApp Team Sync Link & URL Hash Sync
+function generateSyncHash(state) {
+  try {
+    const jsonStr = JSON.stringify(state);
+    return encodeURIComponent(btoa(unescape(encodeURIComponent(jsonStr))));
+  } catch (e) {
+    console.error("Error generating sync hash", e);
+    return "";
+  }
+}
+
+function parseSyncHash(hash) {
+  try {
+    const raw = hash.replace(/^#sync=/, "");
+    const jsonStr = decodeURIComponent(escape(atob(decodeURIComponent(raw))));
+    return JSON.parse(jsonStr);
+  } catch (e) {
+    console.error("Error parsing sync hash", e);
+    return null;
+  }
+}
+
+function getRosterSyncUrl() {
+  const hash = generateSyncHash(appState);
+  const base = window.location.origin + window.location.pathname;
+  return `${base}#sync=${hash}`;
+}
+
+function copyRosterSyncLink() {
+  const url = getRosterSyncUrl();
+  navigator.clipboard.writeText(url).then(() => {
+    showToast("📋 1-Click Team Sync Link copied to clipboard!");
+  }).catch(() => {
+    prompt("Copy this 1-click sync link:", url);
+  });
+}
+
+function shareRosterSyncWhatsApp() {
+  const url = getRosterSyncUrl();
+  const mName = getMonthName(appState.selectedMonth);
+  const msg = `🕊️ *Full Life Centre AG Church — Media Roster Update*\n\nAdmin Lokesh has updated the ${mName} ${appState.selectedYear} media schedule!\n\n📲 *Tap this link to sync the latest roster onto your phone:*\n${url}\n\n_(Opening the link will instantly save the latest duty assignments to your phone)_`;
+  const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl, "_blank");
+}
+
+function checkUrlForRosterSync() {
+  if (window.location.hash && window.location.hash.startsWith("#sync=")) {
+    const syncedState = parseSyncHash(window.location.hash);
+    if (syncedState && syncedState.firstService) {
+      appState = syncedState;
+      localStorage.setItem("FLAG_MEDIA_PORTAL_STATE", JSON.stringify(appState));
+      // Clean up hash from URL bar cleanly
+      history.replaceState(null, "", window.location.pathname);
+      showToast("🎉 Successfully synced latest schedule from Admin Lokesh!");
+    }
+  }
+}
+
+// ================= TEAM SERVING ANALYTICS & WORKLOAD BALANCER =================
+function renderWorkloadAnalytics() {
+  const container = document.getElementById("workloadBarsList");
+  const demandContainer = document.getElementById("roleDemandPills");
+  if (!container || !appState.members) return;
+
+  const currentYear = appState.selectedYear || 2026;
+  const currentMonth = appState.selectedMonth !== undefined ? appState.selectedMonth : 9;
+  const mName = getMonthName(currentMonth);
+
+  const monthBadge = document.getElementById("workloadMonthBadge");
+  if (monthBadge) monthBadge.textContent = `${mName} ${currentYear}`;
+
+  const totalMembersEl = document.getElementById("workloadTotalMembers");
+  if (totalMembersEl) totalMembersEl.textContent = appState.members.length;
+
+  // Track duties per member
+  const memberDutyCounts = {};
+  appState.members.forEach(m => {
+    memberDutyCounts[m.name] = 0;
+  });
+
+  // Track demand per role
+  const roleDemand = {
+    "1st Cam": 0,
+    "2nd Cam": 0,
+    "Gimble": 0,
+    "Live in System": 0,
+    "Spot Editing": 0,
+    "Charging Incharge": 0
+  };
+
+  let totalSlotsAssigned = 0;
+
+  function countPerson(name, roleKey) {
+    if (!name) return;
+    // Handle combined names like "Balaji & Andrew" or "Andrew & Franklin"
+    const splitNames = name.split(/\s*&\s*|\s+and\s+/i);
+    splitNames.forEach(n => {
+      const clean = n.trim();
+      if (clean && clean !== "—" && clean !== "--") {
+        if (memberDutyCounts[clean] !== undefined) {
+          memberDutyCounts[clean]++;
+        } else {
+          // If member not in members list, still initialize
+          memberDutyCounts[clean] = (memberDutyCounts[clean] || 0) + 1;
+        }
+        totalSlotsAssigned++;
+        if (roleKey && roleDemand[roleKey] !== undefined) {
+          roleDemand[roleKey]++;
+        }
+      }
+    });
+  }
+
+  // 1st Service
+  if (appState.firstService) {
+    appState.firstService.forEach(row => {
+      countPerson(row.cam1, "1st Cam");
+      countPerson(row.cam2, "2nd Cam");
+      countPerson(row.gimble, "Gimble");
+      countPerson(row.live, "Live in System");
+      countPerson(row.spot, "Spot Editing");
+      countPerson(row.charging, "Charging Incharge");
+    });
+  }
+
+  // 2nd Service
+  if (appState.secondService) {
+    appState.secondService.forEach(row => {
+      countPerson(row.operator, "2nd Cam");
+    });
+  }
+
+  // 3rd Service
+  if (appState.thirdService) {
+    appState.thirdService.forEach(row => {
+      countPerson(row.operator, "2nd Cam");
+    });
+  }
+
+  // Friday Fasting Prayer
+  if (appState.fridayPrayer) {
+    appState.fridayPrayer.forEach(row => {
+      countPerson(row.cam1, "1st Cam");
+      countPerson(row.live, "Live in System");
+    });
+  }
+
+  // Special Meetings
+  if (appState.specialMeetings) {
+    appState.specialMeetings.forEach(row => {
+      countPerson(row.cam1, "1st Cam");
+      countPerson(row.cam2, "2nd Cam");
+      countPerson(row.gimble, "Gimble");
+      countPerson(row.live, "Live in System");
+      countPerson(row.spot, "Spot Editing");
+    });
+  }
+
+  // Early Morning Prayer (if enabled)
+  if (appState.morningPrayer && appState.morningPrayer.enabled && appState.morningPrayer.days) {
+    appState.morningPrayer.days.forEach(row => {
+      countPerson(row.cam1, "1st Cam");
+      countPerson(row.cam2, "2nd Cam");
+      countPerson(row.gimbal, "Gimble");
+      countPerson(row.liveEditor, "Live in System");
+      countPerson(row.socialMedia, "Spot Editing");
+    });
+  }
+
+  // Summary Metrics Calculation
+  const activeVolunteersCount = Object.values(memberDutyCounts).filter(c => c > 0).length;
+  const avgSlots = activeVolunteersCount > 0 ? (totalSlotsAssigned / activeVolunteersCount).toFixed(1) : "0.0";
+
+  // Balance status
+  const counts = Object.values(memberDutyCounts);
+  const maxDuties = Math.max(...counts, 0);
+  const minDuties = Math.min(...counts, 0);
+  const diff = maxDuties - minDuties;
+  let fairnessLabel = "Balanced";
+  let fairnessColor = "#10b981";
+
+  if (diff <= 2) {
+    fairnessLabel = "Very Fair (≤2 diff)";
+    fairnessColor = "#10b981";
+  } else if (diff <= 4) {
+    fairnessLabel = "Moderate (3-4 diff)";
+    fairnessColor = "#f59e0b";
+  } else {
+    fairnessLabel = "Uneven (Check Load)";
+    fairnessColor = "#ef4444";
+  }
+
+  // Update Summary DOM
+  const elTotalSlots = document.getElementById("ambTotalSlots");
+  if (elTotalSlots) elTotalSlots.textContent = totalSlotsAssigned;
+
+  const elActiveVol = document.getElementById("ambActiveVolunteers");
+  if (elActiveVol) elActiveVol.textContent = `${activeVolunteersCount} / ${appState.members.length}`;
+
+  const elAvgSlots = document.getElementById("ambAvgSlots");
+  if (elAvgSlots) elAvgSlots.textContent = avgSlots;
+
+  const elHealth = document.getElementById("ambRosterHealth");
+  if (elHealth) {
+    elHealth.textContent = fairnessLabel;
+    elHealth.style.color = fairnessColor;
+  }
+
+  // Render Member Workload Bars
+  // Sort members by duty count descending
+  const sortedMembers = [...appState.members].sort((a, b) => {
+    return (memberDutyCounts[b.name] || 0) - (memberDutyCounts[a.name] || 0);
+  });
+
+  const maxPossible = Math.max(maxDuties, 5);
+
+  container.innerHTML = sortedMembers.map(m => {
+    const count = memberDutyCounts[m.name] || 0;
+    const pct = Math.min(100, Math.round((count / maxPossible) * 100));
+
+    let statusTag = "";
+    let barColor = "#10b981"; // green
+    if (count >= 4) {
+      statusTag = `<span class="wb-status-tag" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4);">Heavy (${count})</span>`;
+      barColor = "linear-gradient(90deg, #f59e0b, #d97706)";
+    } else if (count >= 2) {
+      statusTag = `<span class="wb-status-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);">Optimal (${count})</span>`;
+      barColor = "linear-gradient(90deg, #10b981, #059669)";
+    } else if (count === 1) {
+      statusTag = `<span class="wb-status-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">Light (1)</span>`;
+      barColor = "linear-gradient(90deg, #38bdf8, #0284c7)";
+    } else {
+      statusTag = `<span class="wb-status-tag" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.4);">Resting (0)</span>`;
+      barColor = "#475569";
+    }
+
+    return `
+      <div class="workload-bar-item">
+        <div class="wb-header">
+          <div class="wb-name-wrap">
+            <span class="wb-name">${m.name}</span>
+            <span style="font-size: 0.72rem; color: #94a3b8;">(${m.role || 'Member'})</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            ${statusTag}
+            <span class="wb-count">${count} slots</span>
+          </div>
+        </div>
+        <div class="wb-track">
+          <div class="wb-fill" style="width: ${pct}%; background: ${barColor};"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  // Render Role Demand Breakdown
+  if (demandContainer) {
+    demandContainer.innerHTML = Object.entries(roleDemand).map(([role, count]) => {
+      return `
+        <div class="role-demand-pill">
+          <span>${role}:</span>
+          <strong>${count} services</strong>
+        </div>
+      `;
+    }).join("");
+  }
+}
+
+// ================= GEAR & EQUIPMENT ISSUE TRACKER =================
+let currentGearFilter = "all";
+
+function populateGearReportVolunteers() {
+  const sel = document.getElementById("gearReporterSelect");
+  if (!sel || !appState.members) return;
+  sel.innerHTML = appState.members.map(m => `<option value="${m.name}">${m.name} (${m.role})</option>`).join("");
+}
+
+function checkGearCustomItem(val) {
+  const customInput = document.getElementById("gearCustomItemInput");
+  if (!customInput) return;
+  if (val === "Other / Custom Gear") {
+    customInput.style.display = "block";
+    customInput.focus();
+  } else {
+    customInput.style.display = "none";
+  }
+}
+
+function submitGearIssue() {
+  const itemSelect = document.getElementById("gearItemSelect");
+  const customInput = document.getElementById("gearCustomItemInput");
+  const urgencySelect = document.getElementById("gearUrgencySelect");
+  const reporterSelect = document.getElementById("gearReporterSelect");
+  const descInput = document.getElementById("gearDescInput");
+
+  let item = itemSelect ? itemSelect.value : "";
+  if (item === "Other / Custom Gear" && customInput && customInput.value.trim()) {
+    item = customInput.value.trim();
+  }
+
+  const urgency = urgencySelect ? urgencySelect.value : "Medium";
+  const reporter = reporterSelect ? reporterSelect.value : "Lokesh";
+  const desc = descInput ? descInput.value.trim() : "";
+
+  if (!desc) {
+    alert("Please enter a brief description of the equipment problem and required action.");
+    return;
+  }
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+
+  const newIssue = {
+    id: Date.now(),
+    item,
+    urgency,
+    reporter,
+    desc,
+    date: dateStr,
+    status: "Open"
+  };
+
+  if (!appState.gearIssues) appState.gearIssues = [];
+  appState.gearIssues.unshift(newIssue);
+
+  saveState();
+  renderGearIssues();
+
+  if (descInput) descInput.value = "";
+  if (customInput) customInput.value = "";
+  if (itemSelect) itemSelect.value = "Main Camera 1 (Sony A7 / FX3)";
+  checkGearCustomItem("Main Camera 1 (Sony A7 / FX3)");
+
+  showToast(`🛠️ Equipment issue logged! Click "Alert Yashwanth" to send WhatsApp message.`);
+}
+
+function setGearFilter(filter, btn) {
+  currentGearFilter = filter;
+  const buttons = document.querySelectorAll(".gear-filter-btn");
+  buttons.forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderGearIssues();
+}
+
+function toggleGearIssueStatus(id) {
+  if (!appState.gearIssues) return;
+  const issue = appState.gearIssues.find(i => i.id === id);
+  if (!issue) return;
+
+  if (issue.status === "Open") {
+    issue.status = "In Progress";
+  } else if (issue.status === "In Progress") {
+    issue.status = "Resolved";
+  } else {
+    issue.status = "Open";
+  }
+
+  saveState();
+  renderGearIssues();
+  showToast(`Gear status updated to: ${issue.status}`);
+}
+
+function deleteGearIssue(id) {
+  if (!confirm("Are you sure you want to delete this equipment issue log?")) return;
+  appState.gearIssues = appState.gearIssues.filter(i => i.id !== id);
+  saveState();
+  renderGearIssues();
+  showToast("Equipment issue log deleted.");
+}
+
+function sendGearIssueWhatsApp(id) {
+  if (!appState.gearIssues) return;
+  const issue = appState.gearIssues.find(i => i.id === id);
+  if (!issue) return;
+
+  const phone = "917010368793"; // Yashwanth
+  const urgencyIcon = issue.urgency === "Critical" ? "🚨 CRITICAL FAULT" : (issue.urgency === "Medium" ? "⚠️ MEDIUM ATTENTION" : "ℹ️ ROUTINE MAINTENANCE");
+
+  const msg = `🛠️ *FLAG CHURCH MEDIA — GEAR MAINTENANCE ALERT*\n\n` +
+    `To: *Yashwanth & Sam Davit* (Equipment Incharge)\n` +
+    `Status Alert: *${urgencyIcon}*\n\n` +
+    `📦 *Equipment:* ${issue.item}\n` +
+    `📅 *Logged Date:* ${issue.date}\n` +
+    `👤 *Reported By:* ${issue.reporter}\n` +
+    `📝 *Issue & Action Needed:*\n${issue.desc}\n\n` +
+    `Current Status: *${issue.status.toUpperCase()}*\n\n` +
+    `_Please check and test this before next Sunday service. Thank you!_`;
+
+  const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
+  window.open(waUrl, "_blank");
+}
+
+function renderGearIssues() {
+  const container = document.getElementById("gearIssuesList");
+  const badge = document.getElementById("adminGearIssueBadge");
+  const openCountBadge = document.getElementById("gearOpenCountBadge");
+  populateGearReportVolunteers();
+
+  if (!appState.gearIssues) {
+    appState.gearIssues = [];
+  }
+
+  const openCount = appState.gearIssues.filter(i => i.status !== "Resolved").length;
+  if (badge) badge.textContent = openCount;
+  if (openCountBadge) openCountBadge.textContent = `${openCount} Open`;
+
+  if (!container) return;
+
+  let filtered = appState.gearIssues;
+  if (currentGearFilter === "open") {
+    filtered = filtered.filter(i => i.status === "Open");
+  } else if (currentGearFilter === "progress") {
+    filtered = filtered.filter(i => i.status === "In Progress");
+  } else if (currentGearFilter === "resolved") {
+    filtered = filtered.filter(i => i.status === "Resolved");
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 32px 16px; color: var(--text-muted); background: rgba(15, 23, 42, 0.4); border-radius: 8px;">
+        <span style="font-size: 2rem; display: block; margin-bottom: 8px;">🎉</span>
+        <strong style="color: #f1f5f9; font-size: 0.95rem;">No equipment issues logged in this view!</strong>
+        <p style="font-size: 0.8rem; margin-top: 4px;">All media gear is in top shape or no matching issues found.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map(issue => {
+    let urgencyClass = "urgency-medium";
+    let urgencyChipStyle = "background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4);";
+    if (issue.urgency === "Critical") {
+      urgencyClass = "urgency-critical";
+      urgencyChipStyle = "background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);";
+    } else if (issue.urgency === "Low") {
+      urgencyClass = "urgency-low";
+      urgencyChipStyle = "background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);";
+    }
+
+    let statusChipStyle = "background: #2563eb; color: #fff;";
+    if (issue.status === "In Progress") {
+      statusChipStyle = "background: #d97706; color: #fff;";
+    } else if (issue.status === "Resolved") {
+      statusChipStyle = "background: #059669; color: #fff;";
+    }
+
+    const isResolved = issue.status === "Resolved";
+
+    return `
+      <div class="gear-issue-card ${urgencyClass} ${isResolved ? 'status-resolved' : ''}">
+        <div class="gear-card-top">
+          <div class="gear-card-title-wrap">
+            <span class="gear-urgency-chip" style="${urgencyChipStyle}">${issue.urgency}</span>
+            <span class="gear-card-item-title">${issue.item}</span>
+            <span class="gear-status-chip" style="${statusChipStyle}">${issue.status}</span>
+          </div>
+          <div class="gear-card-meta">
+            📅 ${issue.date} &bull; Reported by <strong style="color: #38bdf8;">${issue.reporter}</strong>
+          </div>
+        </div>
+
+        <div class="gear-card-desc">
+          ${issue.desc}
+        </div>
+
+        <div class="gear-card-actions">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="toggleGearIssueStatus(${issue.id})" title="Click to cycle status: Open -> In Progress -> Resolved">
+              🔄 Status: <strong>${issue.status}</strong>
+            </button>
+            <button class="btn btn-whatsapp btn-sm" onclick="sendGearIssueWhatsApp(${issue.id})" title="Send WhatsApp alert to Yashwanth (7010368793)">
+              💬 Alert Incharge (Yashwanth)
+            </button>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="color: #ef4444;" onclick="deleteGearIssue(${issue.id})" title="Delete issue">
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("");
 }

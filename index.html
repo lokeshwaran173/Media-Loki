@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FLAG Media">
   <link rel="apple-touch-icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2.1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -49,6 +49,10 @@
       </nav>
 
       <div class="nav-actions">
+        <span id="navCloudSyncBadge" class="cloud-sync-badge-pill" onclick="quickOpenCloudSync()" title="Multi-Device Cloud Sync Status &bull; Click to configure sync across all phones">
+          <span class="sync-dot"></span>
+          <span id="navCloudSyncText">☁️ Cloud Sync</span>
+        </span>
         <button class="btn btn-secondary" onclick="exportScheduleImagePNG()" title="Export Schedule as High-Res PNG Image for WhatsApp Status / Instagram">
           📸 Export Image
         </button>
@@ -517,11 +521,14 @@
         <button class="admin-pill-btn" onclick="switchAdminTab('adminMembersTab', this)">
           👥 Team Members & Workload (<span id="adminMemberCountBadge">10</span>)
         </button>
+        <button class="admin-pill-btn" onclick="switchAdminTab('adminGearTab', this)">
+          🛠️ Gear & Issue Log (<span id="adminGearIssueBadge">0</span>)
+        </button>
         <button class="admin-pill-btn" onclick="switchAdminTab('adminChecklistsTab', this)">
           ✅ Customize Checklists
         </button>
         <button class="admin-pill-btn" onclick="switchAdminTab('adminBackupTab', this)">
-          💾 Backup & Restore
+          ☁️ Cloud Sync &amp; Backup
         </button>
       </div>
 
@@ -775,8 +782,163 @@
           </div>
         </div>
 
+        <!-- Team Serving Analytics & Workload Balancer Card -->
+        <div id="adminWorkloadAnalyticsCard" class="card card-accent-blue" style="margin-bottom: 24px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="header-tag tag-blue">📊 Serving Analytics &amp; Workload Balancer</span>
+              <span class="call-time-badge" id="workloadMonthBadge">Active Month</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">
+              Keeps scheduling fair across all <span id="workloadTotalMembers" style="color: #38bdf8; font-weight: 700;">10</span> volunteers
+            </div>
+          </div>
+
+          <!-- 4 Summary Metric Boxes -->
+          <div class="analytics-metrics-grid">
+            <div class="analytics-metric-box">
+              <span class="amb-val" id="ambTotalSlots" style="color: #38bdf8;">0</span>
+              <span class="amb-lbl">Total Serving Slots</span>
+            </div>
+            <div class="analytics-metric-box">
+              <span class="amb-val" id="ambActiveVolunteers" style="color: #10b981;">0</span>
+              <span class="amb-lbl">Active Volunteers</span>
+            </div>
+            <div class="analytics-metric-box">
+              <span class="amb-val" id="ambAvgSlots" style="color: #f59e0b;">0.0</span>
+              <span class="amb-lbl">Avg Slots / Person</span>
+            </div>
+            <div class="analytics-metric-box">
+              <span class="amb-val" id="ambRosterHealth" style="color: #a855f7;">Balanced</span>
+              <span class="amb-lbl">Roster Fairness</span>
+            </div>
+          </div>
+
+          <!-- Member Workload Balancer Progress Bars -->
+          <div style="margin-top: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+              <h4 style="font-size: 0.95rem; font-weight: 700; color: #f1f5f9;">Volunteer Duty Load This Month:</h4>
+              <div style="display: flex; gap: 10px; font-size: 0.75rem; color: var(--text-muted); flex-wrap: wrap;">
+                <span><span style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 2px;"></span> Optimal (2-3)</span>
+                <span><span style="display: inline-block; width: 10px; height: 10px; background: #f59e0b; border-radius: 2px;"></span> Heavy (4+)</span>
+                <span><span style="display: inline-block; width: 10px; height: 10px; background: #38bdf8; border-radius: 2px;"></span> Light (1)</span>
+                <span><span style="display: inline-block; width: 10px; height: 10px; background: #64748b; border-radius: 2px;"></span> Resting (0)</span>
+              </div>
+            </div>
+            <div class="workload-bars-grid" id="workloadBarsList">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Role Distribution Pill Breakdown -->
+          <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border);">
+            <div style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+              Role Demand Breakdown Across All Services:
+            </div>
+            <div class="role-distribution-pills" id="roleDemandPills">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
         <div class="member-grid" id="memberGrid">
           <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- SUB-TAB 3: GEAR & EQUIPMENT ISSUE LOG -->
+      <div id="adminGearTab" class="admin-tab-content">
+        <!-- Equipment Incharge Callout Card -->
+        <div class="card card-accent-amber" style="margin-bottom: 20px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="badge-icon-chip" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🛠️</div>
+              <div>
+                <h3 class="section-title" style="font-size: 1.15rem;">Equipment Maintenance &amp; Fault Log</h3>
+                <p class="section-desc">Track broken cables, battery health, camera firmware, switcher issues, and send instant WhatsApp repair alerts.</p>
+              </div>
+            </div>
+            <div class="gear-incharge-badge">
+              <span style="font-size: 0.78rem; color: #94a3b8; display: block;">Equipment Incharge:</span>
+              <strong style="color: #f59e0b; font-size: 0.95rem;">Yashwanth &amp; Sam Davit</strong>
+              <a href="https://wa.me/917010368793" target="_blank" rel="noopener" class="gear-phone-pill" title="WhatsApp Yashwanth">
+                📱 7010368793
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Log New Gear Issue Form -->
+        <div class="card" style="margin-bottom: 24px;">
+          <h3 class="card-inner-title">+ Report Equipment Issue or Maintenance Need</h3>
+          <p class="section-desc" style="margin-bottom: 14px;">Log any gear issue noticed during rehearsal or Sunday service so the team can fix it before next Sunday.</p>
+
+          <div class="gear-form-grid">
+            <div>
+              <label class="gear-form-label">Equipment Item / Gear:</label>
+              <select id="gearItemSelect" class="role-select" style="width: 100%;" onchange="checkGearCustomItem(this.value)">
+                <option value="Main Camera 1 (Sony A7 / FX3)">Main Camera 1 (Sony A7 / FX3)</option>
+                <option value="Camera 2 (Sony A6400 / A7)">Camera 2 (Sony A6400 / A7)</option>
+                <option value="3-Axis Motorized Gimbal (Ronin)">3-Axis Motorized Gimbal (Ronin)</option>
+                <option value="Camera NP-F970 / F750 Batteries">Camera NP-F970 / F750 Batteries</option>
+                <option value="Microphone Lapel / Headset Batteries">Microphone Lapel / Headset Batteries</option>
+                <option value="HDMI Cable / Video Sender (Hollyland)">HDMI Cable / Video Sender (Hollyland)</option>
+                <option value="SD Cards (128GB High Speed V30/V60)">SD Cards (128GB High Speed V30/V60)</option>
+                <option value="Switcher PC / OBS / vMix / Replay">Switcher PC / OBS / vMix / Replay</option>
+                <option value="Tripod Fluid Head / Quick Release Plate">Tripod Fluid Head / Quick Release Plate</option>
+                <option value="Director Field Monitor / Power Cable">Director Field Monitor / Power Cable</option>
+                <option value="Other / Custom Gear">Other / Custom Gear...</option>
+              </select>
+              <input type="text" id="gearCustomItemInput" class="input-text" style="width: 100%; margin-top: 6px; display: none;" placeholder="Specify equipment name...">
+            </div>
+
+            <div>
+              <label class="gear-form-label">Urgency / Severity:</label>
+              <select id="gearUrgencySelect" class="role-select" style="width: 100%;">
+                <option value="Critical">🔴 Critical (Service Impaired / Must Fix for Sunday)</option>
+                <option value="Medium" selected>🟡 Medium (Needs Attention / Testing)</option>
+                <option value="Low">🟢 Low (Routine Maintenance / Spare Needed)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="gear-form-label">Reported By:</label>
+              <select id="gearReporterSelect" class="role-select" style="width: 100%;">
+                <!-- Populated dynamically with team members -->
+              </select>
+            </div>
+
+            <div style="grid-column: 1 / -1;">
+              <label class="gear-form-label">Problem Description &amp; Action Required:</label>
+              <input type="text" id="gearDescInput" class="input-text" style="width: 100%;" placeholder="e.g. HDMI port loose on Cam 2, needs new heavy duty braided micro-HDMI cable before Sunday morning">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
+            <button class="btn btn-primary" onclick="submitGearIssue()">
+              🛠️ Log Equipment Issue
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter & Issues List -->
+        <div class="card">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="header-tag tag-blue">📋 Equipment Issue Tracker</span>
+              <span class="call-time-badge" id="gearOpenCountBadge">0 Open</span>
+            </div>
+            <div class="gear-filter-pills" id="gearFilterPills">
+              <button class="gear-filter-btn active" onclick="setGearFilter('all', this)">All</button>
+              <button class="gear-filter-btn" onclick="setGearFilter('open', this)">Open (Needs Fix)</button>
+              <button class="gear-filter-btn" onclick="setGearFilter('progress', this)">In Progress</button>
+              <button class="gear-filter-btn" onclick="setGearFilter('resolved', this)">Resolved</button>
+            </div>
+          </div>
+
+          <div id="gearIssuesList" class="gear-issues-container">
+            <!-- Rendered dynamically -->
+          </div>
         </div>
       </div>
 
@@ -820,11 +982,191 @@
         </div>
       </div>
 
-      <!-- SUB-TAB 4: BACKUP & RESTORE -->
+      <!-- SUB-TAB 5: CLOUD SYNC, BACKUP & RESTORE -->
       <div id="adminBackupTab" class="admin-tab-content">
+        <!-- ☁️ Multi-Device Live Cloud Sync (Firebase Realtime Database) -->
+        <div class="card card-accent-blue" style="margin-bottom: 24px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="badge-icon-chip" style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">☁️</div>
+              <div>
+                <h3 class="section-title" style="font-size: 1.15rem;">Live Multi-Device Cloud Sync (Netlify &amp; Mobile)</h3>
+                <p class="section-desc">Connect free Google Firebase Realtime Database so changes saved by Admin instantly sync to all team members' phones across Netlify.</p>
+              </div>
+            </div>
+            <div id="cloudStatusBadge" class="header-tag tag-amber" style="font-size: 0.82rem; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+              <span class="sync-dot"></span>
+              <span id="cloudStatusText">🟡 Local Mode (Ready to Connect)</span>
+            </div>
+          </div>
+
+          <div style="margin: 16px 0;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9; display: block; margin-bottom: 6px;">
+              Firebase Realtime Database URL:
+            </label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="url" id="firebaseDbUrlInput" class="input-text" style="flex: 1; min-width: 260px;" value="https://flag-church-media-default-rtdb.firebaseio.com" placeholder="https://your-church-app-default-rtdb.firebaseio.com">
+              <button class="btn btn-primary" onclick="saveAndConnectFirebase()" title="Connect to Firebase Realtime Database">
+                🔗 Connect &amp; Enable Cloud Sync
+              </button>
+              <button class="btn btn-save-schedule" onclick="syncLocalToCloudNow()" id="btnSyncCloudNow" style="display: none;" title="Push current roster to Cloud immediately">
+                🔄 Sync Now
+              </button>
+              <button class="btn btn-secondary" onclick="disconnectFirebase()" id="btnDisconnectCloud" style="display: none;" title="Disconnect from Firebase">
+                🔌 Disconnect
+              </button>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
+              💡 Once connected, clicking <strong>💾 Save Schedule</strong> will automatically push updates to the cloud and refresh every volunteer's phone in real time!
+            </p>
+          </div>
+
+          <!-- Free Firebase Quick Setup Guide Accordion -->
+          <div class="cloud-setup-accordion">
+            <details style="background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;">
+              <summary style="font-weight: 700; color: #38bdf8; cursor: pointer; font-size: 0.9rem;">
+                👉 How to get your FREE Firebase Database URL in 2 minutes (Step-by-Step Guide)
+              </summary>
+              <div style="margin-top: 12px; font-size: 0.83rem; color: #cbd5e1; line-height: 1.6;">
+                <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                  <li>
+                    Open <strong><a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: underline;">Firebase Console</a></strong> (sign in with any free Google account).
+                  </li>
+                  <li>
+                    Click <strong>+ Add project</strong>, enter a name (e.g. <code>flag-church-media</code>), and click Continue until the project is created.
+                  </li>
+                  <li>
+                    In the left navigation menu, click <strong>Build</strong> ➔ <strong>Realtime Database</strong> ➔ click <strong>Create Database</strong>.
+                  </li>
+                  <li>
+                    Select your nearest region (e.g. <em>Singapore</em> or <em>United States</em>), click <strong>Next</strong>, then choose <strong>"Start in test mode"</strong> (allows read &amp; write) and click <strong>Enable</strong>.
+                  </li>
+                  <li>
+                    Copy the Database URL displayed at the top of your database page (it looks like: <code>https://flag-church-media-default-rtdb.asia-southeast1.firebasedatabase.app</code> or <code>https://flag-church-media-default-rtdb.firebaseio.com</code>).
+                  </li>
+                  <li>
+                    Paste that URL into the box above and click <strong>🔗 Connect &amp; Enable Cloud Sync</strong>. That's it!
+                  </li>
+                </ol>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- 🔗 Instant WhatsApp Team Sync Link (Works Right Now with 0 Setup!) -->
+        <div class="card card-accent-emerald" style="margin-bottom: 24px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="header-tag tag-emerald">🔗 1-Click WhatsApp Team Sync Link (Instant Fallback)</span>
+            </div>
+          </div>
+          <p class="section-desc" style="margin-bottom: 12px;">
+            Want to sync your current roster immediately without setting up Firebase? Generate a 1-click sync link! When volunteers tap the link in WhatsApp, their phones will automatically update to your latest schedule.
+          </p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-whatsapp" onclick="shareRosterSyncWhatsApp()">
+              💬 Share Sync Link on WhatsApp
+            </button>
+            <button class="btn btn-secondary" onclick="copyRosterSyncLink()">
+              📋 Copy Sync Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Full File JSON Backup & Restore -->
+        <!-- ☁️ Multi-Device Live Cloud Sync (Firebase Realtime Database) -->
+        <div class="card card-accent-blue" style="margin-bottom: 24px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div class="badge-icon-chip" style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">☁️</div>
+              <div>
+                <h3 class="section-title" style="font-size: 1.15rem;">Live Multi-Device Cloud Sync (Netlify &amp; Mobile)</h3>
+                <p class="section-desc">Connect free Google Firebase Realtime Database so changes saved by Admin instantly sync to all team members' phones across Netlify.</p>
+              </div>
+            </div>
+            <div id="cloudStatusBadge" class="header-tag tag-amber" style="font-size: 0.82rem; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+              <span class="sync-dot"></span>
+              <span id="cloudStatusText">🟡 Local Mode (Ready to Connect)</span>
+            </div>
+          </div>
+
+          <div style="margin: 16px 0;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9; display: block; margin-bottom: 6px;">
+              Firebase Realtime Database URL:
+            </label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <input type="url" id="firebaseDbUrlInput" class="input-text" style="flex: 1; min-width: 260px;" value="https://flag-church-media-default-rtdb.firebaseio.com" placeholder="https://your-church-app-default-rtdb.firebaseio.com">
+              <button class="btn btn-primary" onclick="saveAndConnectFirebase()" title="Connect to Firebase Realtime Database">
+                🔗 Connect &amp; Enable Cloud Sync
+              </button>
+              <button class="btn btn-save-schedule" onclick="syncLocalToCloudNow()" id="btnSyncCloudNow" style="display: none;" title="Push current roster to Cloud immediately">
+                🔄 Sync Now
+              </button>
+              <button class="btn btn-secondary" onclick="disconnectFirebase()" id="btnDisconnectCloud" style="display: none;" title="Disconnect from Firebase">
+                🔌 Disconnect
+              </button>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
+              💡 Once connected, clicking <strong>💾 Save Schedule</strong> will automatically push updates to the cloud and refresh every volunteer's phone in real time!
+            </p>
+          </div>
+
+          <!-- Free Firebase Quick Setup Guide Accordion -->
+          <div class="cloud-setup-accordion">
+            <details style="background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;">
+              <summary style="font-weight: 700; color: #38bdf8; cursor: pointer; font-size: 0.9rem;">
+                👉 How to get your FREE Firebase Database URL in 2 minutes (Step-by-Step Guide)
+              </summary>
+              <div style="margin-top: 12px; font-size: 0.83rem; color: #cbd5e1; line-height: 1.6;">
+                <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
+                  <li>
+                    Open <strong><a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: underline;">Firebase Console</a></strong> (sign in with any free Google account).
+                  </li>
+                  <li>
+                    Click <strong>+ Add project</strong>, enter a name (e.g. <code>flag-church-media</code>), and click Continue until the project is created.
+                  </li>
+                  <li>
+                    In the left navigation menu, click <strong>Build</strong> ➔ <strong>Realtime Database</strong> ➔ click <strong>Create Database</strong>.
+                  </li>
+                  <li>
+                    Select your nearest region (e.g. <em>Singapore</em> or <em>United States</em>), click <strong>Next</strong>, then choose <strong>"Start in test mode"</strong> (allows read &amp; write) and click <strong>Enable</strong>.
+                  </li>
+                  <li>
+                    Copy the Database URL displayed at the top of your database page (it looks like: <code>https://flag-church-media-default-rtdb.asia-southeast1.firebasedatabase.app</code> or <code>https://flag-church-media-default-rtdb.firebaseio.com</code>).
+                  </li>
+                  <li>
+                    Paste that URL into the box above and click <strong>🔗 Connect &amp; Enable Cloud Sync</strong>. That's it!
+                  </li>
+                </ol>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- 🔗 Instant WhatsApp Team Sync Link (Works Right Now with 0 Setup!) -->
+        <div class="card card-accent-emerald" style="margin-bottom: 24px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="header-tag tag-emerald">🔗 1-Click WhatsApp Team Sync Link (Instant Fallback)</span>
+            </div>
+          </div>
+          <p class="section-desc" style="margin-bottom: 12px;">
+            Want to sync your current roster immediately without setting up Firebase? Generate a 1-click sync link! When volunteers tap the link in WhatsApp, their phones will automatically update to your latest schedule.
+          </p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn btn-whatsapp" onclick="shareRosterSyncWhatsApp()">
+              💬 Share Sync Link on WhatsApp
+            </button>
+            <button class="btn btn-secondary" onclick="copyRosterSyncLink()">
+              📋 Copy Sync Link
+            </button>
+          </div>
+        </div>
+
+        <!-- Full File JSON Backup & Restore -->
         <div class="card">
-          <h3 class="card-inner-title">Data Backup & Restore</h3>
-          <p class="section-desc" style="margin-bottom: 16px;">Download a complete backup of your schedules, team members, and checklists to move between computers or save as safe backup.</p>
+          <h3 class="card-inner-title">Data Backup &amp; Restore (JSON File)</h3>
+          <p class="section-desc" style="margin-bottom: 16px;">Download a complete offline backup file of your schedules, team members, gear issues, and checklists to move between computers or save as safe backup.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
             <button class="btn btn-primary" onclick="exportDataJSON()">
               💾 Download Full Backup (.JSON)
@@ -1047,6 +1389,10 @@
     <span id="toastMsg">Schedule copied!</span>
   </div>
 
-  <script src="app.js"></script>
+  <!-- Firebase Realtime Database SDK (Compat for Netlify Static Hosting & Multi-Device Live Sync) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script src="app.js?v=2.1"></script>
 </body>
 </html>

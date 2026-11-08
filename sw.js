@@ -1,9 +1,9 @@
-const CACHE_NAME = 'flag-media-cache-v1';
+const CACHE_NAME = 'flag-media-cache-v2';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
-  'styles.css',
-  'app.js',
+  'styles.css?v=2.1',
+  'app.js?v=2.1',
   'data.js',
   'logo.png',
   'manifest.json'
@@ -28,6 +28,15 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Only handle http/https GET requests
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
+    return;
+  }
+  // Bypass cache for Firebase Realtime Database & WebSocket endpoints
+  if (event.request.url.includes('firebaseio.com') || event.request.url.includes('firebasedatabase.app')) {
+    return;
+  }
+
   // Network first with cache fallback
   event.respondWith(
     fetch(event.request)
