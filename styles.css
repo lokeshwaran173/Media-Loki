@@ -2451,17 +2451,18 @@ body {
 .cloud-sync-badge-pill {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
   background: rgba(30, 41, 59, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.35);
-  color: #e2e8f0;
-  font-size: 0.78rem;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #cbd5e1;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 6px 12px;
+  padding: 3px 8px;
   border-radius: 9999px;
   cursor: pointer;
   transition: all 0.2s ease;
   user-select: none;
+  line-height: 1;
 }
 
 .cloud-sync-badge-pill:hover {
@@ -2471,23 +2472,24 @@ body {
 }
 
 .cloud-sync-badge-pill.connected {
-  border-color: rgba(16, 185, 129, 0.5);
-  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.1);
   color: #6ee7b7;
 }
 
 .sync-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #f59e0b;
   display: inline-block;
-  box-shadow: 0 0 6px rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 5px rgba(245, 158, 11, 0.6);
+  flex-shrink: 0;
 }
 
 .sync-dot.connected {
   background: #10b981;
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
   animation: syncPulse 2s infinite ease-in-out;
 }
 

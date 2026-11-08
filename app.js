@@ -3562,6 +3562,9 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
       if (isOnline) {
         cloudSyncConnected = true;
         updateCloudSyncUI(true);
+      } else {
+        cloudSyncConnected = false;
+        updateCloudSyncUI(false, "Reconnecting to Cloud...");
       }
     });
 
@@ -3669,7 +3672,7 @@ function updateCloudSyncUI(isConnected, errorMsg) {
     if (navBadge) {
       navBadge.classList.add("connected");
     }
-    if (navText) navText.textContent = "☁️ Cloud Synced";
+    if (navText) navText.textContent = "☁️ Synced";
     if (btnSync) btnSync.style.display = "inline-flex";
     if (btnDisc) btnDisc.style.display = "inline-flex";
   } else {
@@ -3680,7 +3683,7 @@ function updateCloudSyncUI(isConnected, errorMsg) {
     if (navBadge) {
       navBadge.classList.remove("connected");
     }
-    if (navText) navText.textContent = "☁️ Local Mode";
+    if (navText) navText.textContent = "☁️ Local";
     if (btnSync) btnSync.style.display = "none";
     if (btnDisc) btnDisc.style.display = "none";
   }
