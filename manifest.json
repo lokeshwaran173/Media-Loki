@@ -1,0 +1,26 @@
+{
+  "name": "Full Life Centre AG Church - Indoor Media Operations",
+  "short_name": "FLAG Media",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0f1d",
+  "theme_color": "#0f172a",
+  "description": "Church broadcast schedule, volunteer rosters, checklists, and announcements for Full Life Centre Assembly of God Church.",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

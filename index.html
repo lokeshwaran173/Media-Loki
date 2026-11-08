@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLAG Church - Indoor Media Scheduling & Checklist Portal</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FLAG Media">
+  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <img src="logo.png" alt="Full Life Centre AG Church Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <div class="brand-title-row">
+            <h1>Full Life Centre AG Church</h1>
+          </div>
+          <p>Indoor Media Operations &amp; Roster</p>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" onclick="switchView('scheduleView', this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <span class="nav-label-long">Service Schedule</span>
+          <span class="nav-label-short">Schedule</span>
+        </button>
+        <button class="nav-btn" onclick="switchView('checklistsView', this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <span class="nav-label-long">Service Checklists</span>
+          <span class="nav-label-short">Checklists</span> (<span id="checklistProgressBadge">0/34</span>)
+        </button>
+        <button id="adminNavBtn" class="nav-btn btn-admin-nav" onclick="handleAdminNavClick(this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <span id="adminNavText">Admin Console</span>
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn btn-secondary" onclick="exportScheduleImagePNG()" title="Export Schedule as High-Res PNG Image for WhatsApp Status / Instagram">
+          📸 Export Image
+        </button>
+        <button class="btn btn-secondary" onclick="window.print()" title="Print clean schedule">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          Print Schedule
+        </button>
+        <button class="btn btn-whatsapp" onclick="copyWhatsAppSchedule()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.059-2.072-.511-1.636-.68-2.684-2.339-2.766-2.449-.081-.11-.659-.877-.659-1.674 0-.797.417-1.19.565-1.353.148-.162.324-.203.432-.203.109 0 .217.001.312.006.101.005.234-.038.366.279.135.324.461 1.123.502 1.205.041.082.069.177.014.286-.055.109-.083.177-.164.273-.082.095-.172.213-.246.286-.082.081-.168.17-.072.335.096.164.428.706.918 1.142.631.562 1.163.736 1.328.818.164.082.261.071.358-.041.097-.112.417-.487.528-.654.111-.167.222-.139.373-.083.151.056.955.451 1.12.533.165.082.275.123.316.192.041.069.041.401-.103.806z"/></svg>
+          Copy WhatsApp
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="main-container">
+
+    <!-- ================= PRINT-ONLY OFFICIAL HEADER ================= -->
+    <div class="print-only-header">
+      <img src="logo.png" alt="Full Life Centre AG Church Logo" class="print-logo">
+      <div class="print-header-text">
+        <h1 class="print-church-title">Full Life Centre Assembly of God Church</h1>
+        <h2 class="print-roster-title">Indoor Media Team &bull; Broadcast Schedule Roster &mdash; <span id="printActiveMonthYear">October 2026</span></h2>
+        <p class="print-meta-info">⏰ Call Times &mdash; 1st Service: 05:30 AM (Prayer: 05:45 AM) &bull; 2nd Service: 08:00 AM &bull; 3rd Service: 10:30 AM &bull; Friday Fasting: 09:30 AM</p>
+      </div>
+    </div>
+
+    <!-- ================= PWA MOBILE APP INSTALL BANNER ================= -->
+    <div id="pwaInstallBanner" class="pwa-install-card" style="display: none;">
+      <div class="pwa-install-content">
+        <img src="logo.png" alt="App Logo" class="pwa-app-icon">
+        <div class="pwa-text-wrap">
+          <strong class="pwa-app-title">FLAG Media App</strong>
+          <span class="pwa-app-sub">Add to your phone Home Screen for instant 1-tap offline access!</span>
+        </div>
+      </div>
+      <div class="pwa-actions-wrap">
+        <button id="pwaInstallBtn" class="btn btn-primary btn-sm" onclick="triggerPWAInstall()">
+          📲 Install App
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="dismissPWABanner()" title="Dismiss">
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= VIEW 1: SCHEDULE BUILDER ================= -->
+    <section id="scheduleView" class="view-panel active">
+      
+      <!-- ================= ANIMATED HERO COMMAND CENTER ================= -->
+      <div class="hero-banner">
+        <!-- Floating Ambient Light Orbs -->
+        <div class="hero-ambient-orb orb-1"></div>
+        <div class="hero-ambient-orb orb-2"></div>
+        <div class="hero-ambient-orb orb-3"></div>
+
+        <div class="hero-header-row">
+          <div class="hero-branding-wrapper">
+            <img src="logo.png" alt="Full Life Centre AG Church Logo" class="hero-brand-logo">
+            <div class="hero-content">
+              <div class="hero-welcome-text">
+                <span>Welcome to Full Life Centre Assembly of God Church</span>
+                <span class="hero-welcome-icon">🕊️</span>
+              </div>
+
+              <h1 class="hero-title">
+                <span class="gradient-text">Indoor Media Team</span>
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Colorful Animated Metric Overview Cards -->
+        <div class="hero-stats-grid">
+          <div class="hero-stat-card stat-blue">
+            <div class="stat-top-bar bar-blue"></div>
+            <div class="stat-content">
+              <div class="stat-icon-wrapper blue-glow">🎥</div>
+              <div class="stat-info">
+                <span class="stat-label">1st Service</span>
+                <strong class="stat-value">05:30 AM Call</strong>
+                <span class="stat-sub">1st &amp; 2nd Cam, Gimble, Live, Spot</span>
+              </div>
+            </div>
+            <div class="stat-status-pill blue-pill">
+              <span class="beacon-dot blue-beacon"></span>
+              <span>1st Service</span>
+            </div>
+          </div>
+
+          <div class="hero-stat-card stat-amber">
+            <div class="stat-top-bar bar-amber"></div>
+            <div class="stat-content">
+              <div class="stat-icon-wrapper amber-glow">👥</div>
+              <div class="stat-info">
+                <span class="stat-label">Active Media Crew</span>
+                <strong class="stat-value" id="heroMemberCount">10 Crew Members</strong>
+                <span class="stat-sub">Assigned across Sunday &amp; Friday</span>
+              </div>
+            </div>
+            <div class="stat-status-pill amber-pill">
+              <span class="beacon-dot amber-beacon"></span>
+              <span>Ready to Serve</span>
+            </div>
+          </div>
+
+          <div class="hero-stat-card stat-emerald">
+            <div class="stat-top-bar bar-emerald"></div>
+            <div class="stat-content">
+              <div class="stat-icon-wrapper emerald-glow">✅</div>
+              <div class="stat-info">
+                <span class="stat-label">Sunday Readiness Checklist</span>
+                <strong class="stat-value" id="heroChecklistProgress">0/34 Tasks Done</strong>
+                <span class="stat-sub">Audio, Video, Mic &amp; Battery Ready</span>
+              </div>
+            </div>
+            <div class="stat-status-pill emerald-pill">
+              <span class="beacon-dot emerald-beacon"></span>
+              <span>Live Status</span>
+            </div>
+          </div>
+
+          <div class="hero-stat-card stat-purple">
+            <div class="stat-top-bar bar-purple"></div>
+            <div class="stat-content">
+              <div class="stat-icon-wrapper purple-glow">📅</div>
+              <div class="stat-info">
+                <span class="stat-label">Active Schedule Month</span>
+                <strong class="stat-value" id="heroActiveMonth">October 2026</strong>
+                <span class="stat-sub">Sundays &amp; Fridays Auto-Synced</span>
+              </div>
+            </div>
+            <div class="stat-status-pill purple-pill">
+              <span class="beacon-dot purple-beacon"></span>
+              <span>Auto-Synced</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public Schedule Active Period Banner (Admin Controlled) -->
+      <div class="card header-card card-accent-blue">
+        <div class="card-row">
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <div class="badge-icon-chip">🗓️</div>
+            <div>
+              <h2 class="section-title">Schedule Template &amp; Roster</h2>
+              <p class="section-desc">Broadcast volunteer roster for all Sunday and Friday services.</p>
+            </div>
+          </div>
+          <div class="active-month-display-wrap">
+            <div class="active-month-pill">
+              <span class="active-month-dot"></span>
+              <span class="active-month-label">ACTIVE SCHEDULE:</span>
+              <strong id="publicActiveMonthBadge" class="active-month-name">October 2026</strong>
+            </div>
+            <button class="btn btn-primary" onclick="exportScheduleImagePNG()" style="padding: 6px 14px; font-size: 0.82rem; background: linear-gradient(135deg, #0284c7, #0f766e); font-weight: 700; gap: 6px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);" title="Download High-Res PNG Schedule Image">
+              📸 Download Image (PNG)
+            </button>
+            <span class="header-tag tag-emerald" style="font-size: 0.8rem; padding: 6px 12px;">
+              ✓ Auto-Generated Dates
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= VOLUNTEER PERSONAL FILTER & ACTIONS ================= -->
+      <div class="card my-schedule-card card-accent-amber">
+        <div class="my-schedule-header">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div class="badge-icon-chip" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">👤</div>
+            <div>
+              <h3 class="section-title" style="font-size: 1.15rem; color: #fff;">My Serving Schedule (Personal Filter)</h3>
+              <p class="section-desc">Select your name to see your personal duties, call times, export to calendar, or request a swap.</p>
+            </div>
+          </div>
+          <div class="volunteer-filter-controls">
+            <select id="volunteerFilterSelect" class="role-select" style="min-width: 175px; font-weight: 700; border-color: rgba(245, 158, 11, 0.5); background-color: #10192e;" onchange="onVolunteerFilterChange(this.value)">
+              <option value="">👤 Select Your Name...</option>
+              <!-- Dynamically populated with team members -->
+            </select>
+            <button id="clearVolunteerFilterBtn" class="btn btn-secondary" style="display: none; padding: 7px 12px; font-size: 0.82rem;" onclick="clearVolunteerFilter()">
+              ✕ Show All
+            </button>
+          </div>
+        </div>
+
+        <!-- Personal Summary Box (Appears when a volunteer is selected) -->
+        <div id="volunteerPersonalBox" class="volunteer-personal-box" style="display: none;">
+          <!-- Dynamically populated via app.js -->
+        </div>
+      </div>
+
+      <!-- 1st Service Table (Public / Team View) -->
+      <div class="card card-accent-blue">
+        <div class="card-header">
+          <div class="header-tag tag-blue">1st Service</div>
+          <span class="call-time-badge">⏰ Call Time: 05:30 AM | Prayer: 05:45 AM</span>
+        </div>
+
+        <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
+        <div class="table-wrap">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th style="width: 130px;">📅 Date</th>
+                <th>🎥 1st Cam</th>
+                <th>📹 2nd Cam</th>
+                <th>🎯 Gimble</th>
+                <th>💻 Live in System</th>
+                <th>✂️ Spot Editing</th>
+                <th>🔋 Camera &amp; Battery</th>
+              </tr>
+            </thead>
+            <tbody id="publicTbody1stService">
+              <!-- Rendered cleanly as badges -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Compact WhatsApp Announcement Bar -->
+      <div class="card whatsapp-compact-card card-accent-whatsapp">
+        <div class="whatsapp-compact-bar">
+          <div class="whatsapp-mini-brand">
+            <span class="whatsapp-dot-pulse"></span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#22c55e"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.059-2.072-.511-1.636-.68-2.684-2.339-2.766-2.449-.081-.11-.659-.877-.659-1.674 0-.797.417-1.19.565-1.353.148-.162.324-.203.432-.203.109 0 .217.001.312.006.101.005.234-.038.366.279.135.324.461 1.123.502 1.205.041.082.069.177.014.286-.055.109-.083.177-.164.273-.082.095-.172.213-.246.286-.082.081-.168.17-.072.335.096.164.428.706.918 1.142.631.562 1.163.736 1.328.818.164.082.261.071.358-.041.097-.112.417-.487.528-.654.111-.167.222-.139.373-.083.151.056.955.451 1.12.533.165.082.275.123.316.192.041.069.041.401-.103.806z"/></svg>
+            <strong style="color: #fff; font-size: 0.88rem;">WhatsApp Announcement</strong>
+          </div>
+
+          <div class="whatsapp-compact-controls">
+            <select id="waModeSelect" class="role-select wa-mini-select" onchange="onWhatsAppModeChange()" title="Filter single date or full month">
+              <option value="single" selected>Specific Date</option>
+              <option value="full">Full Month</option>
+            </select>
+
+            <select id="waDayTypeSelect" class="role-select wa-mini-select" onchange="onWhatsAppDayTypeChange()" title="Select service type">
+              <option value="sunday" selected>Sunday Service</option>
+              <option value="friday">Friday Fasting</option>
+              <option value="special">Special Meeting</option>
+              <option value="morning" id="waMorningOption" style="display: none;">Early Morning Prayer</option>
+            </select>
+
+            <select id="waDateSelect" class="role-select wa-mini-select" onchange="updateWhatsAppPreview()" title="Select date">
+              <!-- Populated dynamically with dates -->
+            </select>
+
+            <button class="btn btn-whatsapp wa-mini-btn" onclick="copyWhatsAppSchedule()" title="Copy formatted WhatsApp text">
+              📋 Copy
+            </button>
+            <button class="btn btn-whatsapp wa-mini-btn" style="background: #15803d;" onclick="openWhatsAppDirect()" title="Open directly in WhatsApp Web/App">
+              💬 Open
+            </button>
+            <button id="waTogglePreviewBtn" class="btn btn-secondary wa-mini-btn" onclick="toggleWhatsAppPreview()" title="Show/hide live message preview">
+              👁️ Preview
+            </button>
+          </div>
+        </div>
+
+        <!-- Collapsible Compact Preview Drawer (default collapsed) -->
+        <div id="waPreviewDrawer" class="whatsapp-compact-drawer" style="display: none;">
+          <pre id="whatsappLivePreview" class="whatsapp-bubble-mini"></pre>
+        </div>
+      </div>
+
+      <!-- 2nd & 3rd Service Grid -->
+      <div class="grid-2col">
+        <!-- 2nd Service -->
+        <div class="card card-accent-amber">
+          <div class="card-header">
+            <div class="header-tag tag-amber">2nd Service</div>
+            <span class="call-time-badge">⏰ Call Time: 08:00 AM</span>
+          </div>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th style="width: 140px;">📅 Date</th>
+                  <th>🎥 Cam &amp; Live Operator</th>
+                </tr>
+              </thead>
+              <tbody id="publicTbody2ndService"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3rd Service -->
+        <div class="card card-accent-purple">
+          <div class="card-header">
+            <div class="header-tag tag-purple">3rd Service</div>
+            <span class="call-time-badge">⏰ Call Time: 10:30 AM</span>
+          </div>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th style="width: 140px;">📅 Date</th>
+                  <th>🎥 Cam &amp; Live Operator</th>
+                </tr>
+              </thead>
+              <tbody id="publicTbody3rdService"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Friday Fasting Prayer -->
+      <div class="card card-accent-emerald">
+        <div class="card-header">
+          <div class="header-tag tag-emerald">Friday Fasting Prayer Schedule</div>
+          <span class="call-time-badge">⏰ Call Time: 09:30 AM</span>
+        </div>
+        <div class="table-wrap">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th style="width: 140px;">📅 Date</th>
+                <th>🎥 1st Cam</th>
+                <th>💻 Live in System</th>
+              </tr>
+            </thead>
+            <tbody id="publicTbodyFridayService"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Special Meetings / Conferences Schedule -->
+      <div class="card card-accent-special">
+        <div class="card-header">
+          <div class="header-tag tag-purple">🌟 Special Meetings & Conferences</div>
+        </div>
+        <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
+        <div class="table-wrap">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th style="width: 180px;">🌟 Meeting Title</th>
+                <th style="width: 130px;">📅 Date</th>
+                <th>🎥 1st Cam</th>
+                <th>📹 2nd Cam</th>
+                <th>🎯 Gimble</th>
+                <th>💻 Live in System</th>
+                <th>✂️ Spot Editing</th>
+              </tr>
+            </thead>
+            <tbody id="publicTbodySpecialMeetings"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Early Morning Prayer Schedule (Seasonal: Monday to Saturday) -->
+      <div id="publicMorningPrayerCard" class="card card-accent-morning" style="display: none;">
+        <div class="card-header">
+          <div id="publicMorningPrayerTitle" class="header-tag tag-amber">🌅 Early Morning Prayer Schedule</div>
+          <span class="call-time-badge">⏰ Call Time: 05:00 AM Sharp</span>
+        </div>
+        <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
+        <div class="table-wrap">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th style="width: 140px;">📅 Day</th>
+                <th>🎥 1st Cam</th>
+                <th>📹 2nd Cam</th>
+                <th>🎯 Gimbal</th>
+                <th>💻 Live Editor</th>
+                <th>📱 Social Media</th>
+              </tr>
+            </thead>
+            <tbody id="publicTbodyMorningPrayer"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ================= VIEW 2: CHECKLISTS (PUBLIC & VOLUNTEERS) ================= -->
+    <section id="checklistsView" class="view-panel">
+      <!-- Weekly Service Checklist Command Bar -->
+      <div class="card week-checklist-banner card-accent-emerald">
+        <div class="week-banner-top">
+          <div class="week-banner-info">
+            <div class="week-live-indicator">
+              <span class="beacon-dot emerald-beacon"></span>
+              <span id="weekLiveBadgeText" class="week-live-text">SERVICE IN PROGRESS</span>
+            </div>
+            <h2 class="week-banner-title" id="activeWeekBannerTitle">
+              📅 Sunday Checklist: Week 1 (04 Oct 2026)
+            </h2>
+            <p class="week-banner-sub" id="activeWeekBannerSub">
+              Sunday operational checklists. Volunteers can check off completed tasks during service. Week is configured in Admin Console.
+            </p>
+          </div>
+
+          <div class="week-banner-stats">
+            <div class="week-stat-box">
+              <span class="week-stat-num" id="weekProgressText">0 / 34</span>
+              <span class="week-stat-label">Tasks Done</span>
+            </div>
+            <div class="week-progress-circle-wrap">
+              <span class="week-pct-badge" id="weekProgressPct">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-track" style="margin: 12px 0 16px 0; height: 10px;">
+          <div class="progress-fill" id="weekBannerProgressBar" style="width: 0%;"></div>
+        </div>
+
+        <!-- Week Action Controls -->
+        <div class="week-selector-ribbon">
+          <div class="week-pills-wrap" id="weekPillsWrap">
+            <!-- Dynamic active week pill rendered by app.js -->
+          </div>
+
+          <div class="week-actions-wrap">
+            <button class="btn btn-secondary btn-sm" onclick="resetChecklists()" title="Reset all checkmarks for this week">
+              🔄 Reset Checks
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="markAllChecklistsDone()" title="Mark all tasks done for this week">
+              ✅ Mark All Done
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6 Checklists Container -->
+      <div class="checklists-container" id="checklistsContainer">
+        <!-- Rendered dynamically via app.js -->
+      </div>
+    </section>
+
+    <!-- ================= VIEW 3: ADMIN CONSOLE (LEADER ONLY) ================= -->
+    <section id="adminView" class="view-panel">
+      <!-- Admin Header Bar -->
+      <div class="card header-card" style="border-left: 5px solid #f59e0b; background: linear-gradient(180deg, #1e2638 0%, #121a29 100%);">
+        <div class="card-row">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="header-tag tag-amber" style="font-weight: 800;">👑 ADMIN CONSOLE ACTIVE</span>
+              <span class="call-time-badge">Leader: Lokesh</span>
+            </div>
+            <h2 class="section-title" style="margin-top: 6px;">Management & Edit Portal</h2>
+            <p class="section-desc">Change who does what, select role dropdowns, add/remove dates, manage team members, and customize checklists.</p>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-save-schedule" onclick="manualSaveSchedule()" title="Save all changes to browser storage">
+              💾 Save Schedule
+            </button>
+            <button class="btn btn-secondary" onclick="openChangePinModal()">
+              🔑 Change PIN
+            </button>
+            <button class="btn btn-danger" onclick="lockAdminConsole()">
+              🔒 Lock Admin Mode
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Sub-Navigation Bar -->
+      <div class="admin-subnav-bar">
+        <button class="admin-pill-btn active" onclick="switchAdminTab('adminScheduleTab', this)">
+          ✏️ Edit Schedules (Dropdown Selectors)
+        </button>
+        <button class="admin-pill-btn" onclick="switchAdminTab('adminMembersTab', this)">
+          👥 Team Members & Workload (<span id="adminMemberCountBadge">10</span>)
+        </button>
+        <button class="admin-pill-btn" onclick="switchAdminTab('adminChecklistsTab', this)">
+          ✅ Customize Checklists
+        </button>
+        <button class="admin-pill-btn" onclick="switchAdminTab('adminBackupTab', this)">
+          💾 Backup & Restore
+        </button>
+      </div>
+
+      <!-- SUB-TAB 1: SCHEDULE EDITOR (DROPDOWNS) -->
+      <div id="adminScheduleTab" class="admin-tab-content active">
+        <!-- Dedicated Green Save Action Bar -->
+        <div class="admin-save-bar">
+          <div class="save-status-info">
+            <span class="save-dot"></span>
+            <span id="saveStatusIndicator">Auto-save active &bull; Click <strong>Save Schedule</strong> to lock in changes</span>
+          </div>
+          <button class="btn btn-save-schedule" onclick="manualSaveSchedule()" title="Save all changes to schedule">
+            💾 Save Schedule Now
+          </button>
+        </div>
+
+        <!-- Month & Year Controls Bar (Admin Only Access) -->
+        <div class="card header-card card-accent-amber" style="margin-bottom: 20px;">
+          <div class="card-row">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+              <div class="badge-icon-chip" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🗓️</div>
+              <div>
+                <h3 class="section-title" style="font-size: 1.15rem;">Set Active Schedule Month (Admin Access)</h3>
+                <p class="section-desc">Select Month &amp; Year to configure and display on the public schedule. All Sunday and Friday dates will automatically generate.</p>
+              </div>
+            </div>
+            <div class="month-selector-wrapper">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <select id="selectMonth" class="role-select" style="min-width: 140px; font-weight: 700;" onchange="onMonthYearChange()">
+                  <option value="0">January</option>
+                  <option value="1">February</option>
+                  <option value="2">March</option>
+                  <option value="3">April</option>
+                  <option value="4">May</option>
+                  <option value="5">June</option>
+                  <option value="6">July</option>
+                  <option value="7">August</option>
+                  <option value="8">September</option>
+                  <option value="9" selected>October</option>
+                  <option value="10">November</option>
+                  <option value="11">December</option>
+                </select>
+
+                <select id="selectYear" class="role-select" style="min-width: 100px; font-weight: 700;" onchange="onMonthYearChange()">
+                  <option value="2025">2025</option>
+                  <option value="2026" selected>2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+              </div>
+
+              <span id="autoDatePill" class="header-tag tag-emerald" style="font-size: 0.8rem; padding: 6px 12px;">
+                Auto-Generated Dates
+              </span>
+
+              <button class="btn btn-secondary" onclick="regenerateCurrentMonthDates()" title="Re-calculate all Sundays & Fridays for this month">
+                🔄 Sync Dates
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1st Service Table (Admin Dropdowns) -->
+        <div class="card">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div class="header-tag tag-blue">1st Service Assignment Editor (Dropdowns)</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;" onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-primary" onclick="addNewSundayRow()">+ Add Sunday Date</button>
+            </div>
+          </div>
+          <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th style="width: 130px;">Date</th>
+                  <th>1st Cam</th>
+                  <th>2nd Cam</th>
+                  <th>Gimble</th>
+                  <th>Live in System</th>
+                  <th>Spot Editing</th>
+                  <th>Camera Charging Incharge</th>
+                  <th style="width: 60px;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbody1stService"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2nd & 3rd Service Grid (Admin Dropdowns) -->
+        <div class="grid-2col">
+          <div class="card">
+            <div class="card-header">
+              <div class="header-tag tag-amber">2nd Service (Select Operator)</div>
+            </div>
+            <div class="table-wrap">
+              <table class="schedule-table">
+                <thead>
+                  <tr>
+                    <th style="width: 130px;">Date</th>
+                    <th>Cam and Live (Select Member)</th>
+                    <th style="width: 60px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody2ndService"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="header-tag tag-purple">3rd Service (Select Operator)</div>
+            </div>
+            <div class="table-wrap">
+              <table class="schedule-table">
+                <thead>
+                  <tr>
+                    <th style="width: 130px;">Date</th>
+                    <th>Cam and Live (Select Member)</th>
+                    <th style="width: 60px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody3rdService"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Friday Fasting Prayer (Admin Dropdowns) -->
+        <div class="card">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div class="header-tag tag-emerald">Friday Fasting Prayer Assignment Editor</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;" onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-secondary" onclick="addNewFridayRow()">+ Add Friday Date</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th style="width: 140px;">Date</th>
+                  <th>1st Cam (Select Member)</th>
+                  <th>Live in System (Select Member)</th>
+                  <th style="width: 60px;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyFridayService"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Special Meetings (Admin Dropdowns) -->
+        <div class="card">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div class="header-tag tag-purple">🌟 Special Meetings & Conferences Editor</div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;" onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-primary" onclick="addSpecialMeetingRow()">+ Add Special Meeting</button>
+            </div>
+          </div>
+          <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th style="width: 180px;">Meeting Title</th>
+                  <th style="width: 120px;">Date</th>
+                  <th>1st Cam</th>
+                  <th>2nd Cam</th>
+                  <th>Gimble</th>
+                  <th>Live in System</th>
+                  <th>Spot Editing</th>
+                  <th style="width: 50px;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbodySpecialMeetings"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Early Morning Prayer (Admin Dropdowns) -->
+        <div class="card">
+          <!-- Seasonal Visibility Toggle Banner -->
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 12px 16px; background: rgba(15, 23, 42, 0.75); border-radius: 8px; border: 1px solid var(--border);">
+            <div style="flex: 1; min-width: 250px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <strong style="color: #fff; font-size: 0.95rem;">Early Morning Prayer Schedule</strong>
+                <span id="morningPrayerStatusBadge" class="header-tag tag-amber" style="font-size: 0.75rem;">🔴 Inactive (Hidden on Public Roster)</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+                Seasonal schedule (Monday – Saturday). When turned OFF, it is completely hidden from the public roster. Turn it ON only when prayer campaign is active.
+              </p>
+            </div>
+            <button id="toggleMorningPrayerBtn" class="btn btn-primary" onclick="toggleMorningPrayerVisibility()">
+              👁️ Enable & Show on Schedule
+            </button>
+          </div>
+
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 260px;">
+              <span class="header-tag tag-amber" style="white-space: nowrap;">Campaign Name:</span>
+              <input type="text" id="morningPrayerTitle" class="input-text" style="flex: 1; font-weight: 700; color: #38bdf8;" placeholder="Campaign Name (e.g. 21 Days Early Morning Prayer)" oninput="updateMorningTitle(this.value)">
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
+              <span style="font-size: 0.75rem; color: var(--text-dim); margin-right: 2px;">Title Presets:</span>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="setMorningPrayerCampaign('21 Days Early Morning Prayer')">21 Days</button>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="setMorningPrayerCampaign('40 Days Early Morning Prayer')">40 Days</button>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="setMorningPrayerCampaign('14 Days Early Morning Prayer')">14 Days</button>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="resetMorningPrayerToWeekdays()">🔄 Reset Mon - Sat</button>
+              <button class="btn btn-save-schedule" style="padding: 5px 10px; font-size: 0.75rem;" onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="addMorningPrayerRow()">+ Add Day</button>
+            </div>
+          </div>
+          <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
+          <div class="table-wrap">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th style="width: 140px;">Day</th>
+                  <th>1st Cam</th>
+                  <th>2nd Cam</th>
+                  <th>Gimbal</th>
+                  <th>Live Editor</th>
+                  <th>Social Media</th>
+                  <th style="width: 50px;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyMorningPrayer"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB 2: TEAM MEMBERS MANAGER -->
+      <div id="adminMembersTab" class="admin-tab-content">
+        <div class="card">
+          <h3 class="card-inner-title">Add New Team Member</h3>
+          <p class="section-desc" style="margin-bottom: 14px;">Any new member added here instantly appears in every schedule dropdown across all services!</p>
+          <div class="add-member-form">
+            <input type="text" id="newMemberName" placeholder="Enter Full Name (e.g. John Peter)" class="input-text">
+            <input type="text" id="newMemberRole" placeholder="Primary Skill (e.g. Camera, Audio, Live, Gimble)" class="input-text">
+            <input type="tel" id="newMemberPhone" placeholder="Mobile / WhatsApp (e.g. 7010368793)" class="input-text">
+            <button class="btn btn-primary" onclick="addNewMember()">
+              + Add to Team
+            </button>
+          </div>
+        </div>
+
+        <div class="member-grid" id="memberGrid">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- SUB-TAB 3: CUSTOMIZE CHECKLISTS -->
+      <div id="adminChecklistsTab" class="admin-tab-content">
+        <!-- Set Checklist Week Card in Admin -->
+        <div class="card card-accent-blue" style="margin-bottom: 20px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
+            <div class="header-tag tag-blue">📅 Set Checklist Service Week</div>
+            <span class="call-time-badge" id="adminActiveWeekBadge">Active: Week 1</span>
+          </div>
+          <p class="section-desc" style="margin-bottom: 14px;">
+            Choose which Sunday week to set for the service checklist. The volunteer checklist page will immediately update to this selected week.
+          </p>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+            <label style="font-size: 0.88rem; font-weight: 600; color: #e2e8f0;">Choose Checklist Week:</label>
+            <select id="adminActiveWeekSelect" class="role-select" style="min-width: 240px; font-weight: 600;" onchange="setAdminActiveWeek(this.value)">
+              <!-- populated dynamically -->
+            </select>
+            <button class="btn btn-save-schedule" onclick="setAdminActiveWeek(document.getElementById('adminActiveWeekSelect').value)" title="Set selected week for checklist">
+              💾 Set Checklist Week
+            </button>
+            <button class="btn btn-secondary" onclick="resetChecklists()" title="Reset checks for active week">
+              🔄 Reset Checks
+            </button>
+          </div>
+        </div>
+
+        <div id="newCategoryCard" class="card" style="border-color: rgba(59, 130, 246, 0.4); background: #0f182b;">
+          <h3 class="card-inner-title">+ Create New Checklist Category</h3>
+          <p class="section-desc" style="margin-bottom: 12px;">Add custom checklist categories for your church operations.</p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <input type="text" id="newCatTitle" placeholder="Category Title (e.g. 7. Stage Lighting)" class="input-text" style="flex: 2; min-width: 220px;">
+            <input type="text" id="newCatIncharge" placeholder="Incharge Role / Person" class="input-text" style="flex: 1; min-width: 180px;">
+            <button class="btn btn-primary" onclick="createChecklistCategory()">Save Category</button>
+          </div>
+        </div>
+
+        <div class="checklists-container" id="adminChecklistsContainer">
+          <!-- Rendered with edit/delete controls -->
+        </div>
+      </div>
+
+      <!-- SUB-TAB 4: BACKUP & RESTORE -->
+      <div id="adminBackupTab" class="admin-tab-content">
+        <div class="card">
+          <h3 class="card-inner-title">Data Backup & Restore</h3>
+          <p class="section-desc" style="margin-bottom: 16px;">Download a complete backup of your schedules, team members, and checklists to move between computers or save as safe backup.</p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn btn-primary" onclick="exportDataJSON()">
+              💾 Download Full Backup (.JSON)
+            </button>
+            <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()">
+              📂 Restore Backup from File
+            </button>
+            <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importDataJSON(event)">
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= ADMIN PIN LOGIN MODAL ================= -->
+  <div id="adminPinModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3>🔒 Admin Console Access</h3>
+        <button class="modal-close" onclick="closeAdminPinModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+        Enter your Admin PIN to unlock the management console.
+      </p>
+
+      <div style="margin-bottom: 20px;">
+        <input type="password" id="adminPinInput" placeholder="Enter PIN" class="input-text" style="width: 100%; text-align: center; font-size: 1.3rem; letter-spacing: 4px;" maxlength="8" onkeydown="if(event.key==='Enter') unlockAdminWithPin()">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-secondary" onclick="closeAdminPinModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="unlockAdminWithPin()">Unlock Console</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CHANGE PIN MODAL ================= -->
+  <div id="changePinModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3>🔑 Change Admin PIN</h3>
+        <button class="modal-close" onclick="closeChangePinModal()">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted);">Current PIN:</label>
+          <input type="password" id="oldPinInput" placeholder="Current PIN" class="input-text" style="width: 100%;">
+        </div>
+        <div>
+          <label style="font-size: 0.8rem; color: var(--text-muted);">New PIN:</label>
+          <input type="password" id="newPinInput" placeholder="New PIN (e.g. 4 digits)" class="input-text" style="width: 100%;">
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-secondary" onclick="closeChangePinModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewAdminPin()">Save New PIN</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DYNAMIC PAIR MODAL ================= -->
+  <div id="pairModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>👥 Assign Two Persons to This Slot</h3>
+        <button class="modal-close" onclick="closePairModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+        Pick the two team members who will share this duty together:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Person 1:</label>
+          <select id="modalPairSelect1" class="role-select" style="width: 100%;"></select>
+        </div>
+
+        <div style="text-align: center; font-weight: 800; color: #38bdf8; font-size: 1.2rem;">&</div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Person 2:</label>
+          <select id="modalPairSelect2" class="role-select" style="width: 100%;"></select>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-secondary" onclick="closePairModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmModalPair()">Assign to Slot</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EDIT TEAM MEMBER MODAL ================= -->
+  <div id="editMemberModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.2rem;">✏️</span>
+          <h3>Edit Team Member</h3>
+        </div>
+        <button class="modal-close" onclick="closeEditMemberModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+        Update member's full name or primary skill. Renaming automatically updates all existing schedules!
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Full Name:</label>
+          <input type="text" id="editMemberName" class="input-text" style="width: 100%; font-weight: 700; color: #38bdf8;" placeholder="e.g. John Peter">
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Primary Skill / Role:</label>
+          <input type="text" id="editMemberRole" class="input-text" style="width: 100%;" placeholder="e.g. Camera 1 & 2, Gimble, Live System">
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp / Mobile Number (Optional):</label>
+          <input type="tel" id="editMemberPhone" class="input-text" style="width: 100%;" placeholder="e.g. 7010368793 (10 digits)">
+        </div>
+
+        <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.28); border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: #93c5fd; display: flex; align-items: center; gap: 8px;">
+          <span>🔄</span>
+          <span><strong>Auto-Sync:</strong> Existing roster assignments for this member will automatically update to the new name!</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-secondary" onclick="closeEditMemberModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveMemberEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= VOLUNTEER SWAP REQUEST MODAL ================= -->
+  <div id="swapRequestModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">🔁</span>
+          <h3>Request Schedule Swap</h3>
+        </div>
+        <button class="modal-close" onclick="closeSwapRequestModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+        Can't make it to your scheduled slot? Generate a quick swap request message to send to the Media Team WhatsApp group:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Your Scheduled Shift:</label>
+          <select id="swapDutySelect" class="role-select" style="width: 100%;" onchange="updateSwapPreview()"></select>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Reason / Note (Optional):</label>
+          <input type="text" id="swapReasonInput" class="input-text" style="width: 100%;" placeholder="e.g. Out of station / urgent personal work" oninput="updateSwapPreview()">
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp Message Preview:</label>
+          <pre id="swapMessagePreview" class="whatsapp-bubble-mini" style="max-height: 160px;"></pre>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="closeSwapRequestModal()">Cancel</button>
+        <button class="btn btn-whatsapp" onclick="copySwapMessage()">📋 Copy Message</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSwapToWhatsApp()">💬 Open in WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= INDIVIDUAL WHATSAPP DIRECT REMINDER MODAL ================= -->
+  <div id="directReminderModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">📲</span>
+          <h3>Send Direct WhatsApp Reminder</h3>
+        </div>
+        <button class="modal-close" onclick="closeDirectReminderModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+        Send a personal reminder directly to <strong id="reminderVolunteerName" style="color: #38bdf8;">Volunteer</strong> for their upcoming duty:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Scheduled Duty to Remind:</label>
+          <select id="reminderDutySelect" class="role-select" style="width: 100%;" onchange="updateDirectReminderPreview()"></select>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Volunteer WhatsApp Number (Optional):</label>
+          <input type="tel" id="reminderPhoneInput" class="input-text" style="width: 100%;" placeholder="e.g. 919876543210 (with country code)" oninput="updateDirectReminderPreview()">
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Direct Message Preview:</label>
+          <pre id="directReminderPreview" class="whatsapp-bubble-mini" style="max-height: 160px;"></pre>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="closeDirectReminderModal()">Cancel</button>
+        <button class="btn btn-whatsapp" onclick="copyDirectReminderMessage()">📋 Copy Message</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendDirectReminderWhatsApp()">💬 Send via WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TOAST NOTIFICATION ================= -->
+  <div id="toast" class="toast-box">
+    <span id="toastIcon">✔️</span>
+    <span id="toastMsg">Schedule copied!</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
