@@ -2945,6 +2945,125 @@ function toggleWhatsAppPreview() {
   }
 }
 
+// ================= SATURDAY EVENING DUTY REMINDER GENERATOR =================
+function getNextUpcomingSundayDate() {
+  const sundays = (appState.firstService || []).map(r => r.date);
+  if (sundays.length === 0) return "";
+
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+
+  for (let dateStr of sundays) {
+    const parsed = new Date(dateStr);
+    if (!isNaN(parsed.getTime())) {
+      parsed.setHours(23, 59, 59, 999);
+      if (parsed >= now) {
+        return dateStr;
+      }
+    }
+  }
+  return sundays[0];
+}
+
+function generateSaturdayAlertText(targetDate) {
+  const sDate = targetDate || getNextUpcomingSundayDate();
+  const s1 = (appState.firstService || []).find(r => r.date === sDate) || (appState.firstService && appState.firstService[0]) || {};
+  const s2 = (appState.secondService || []).find(r => r.date === sDate) || (appState.secondService && appState.secondService[0]) || {};
+  const s3 = (appState.thirdService || []).find(r => r.date === sDate) || (appState.thirdService && appState.thirdService[0]) || {};
+
+  const activeDateStr = s1.date || sDate || 'This Sunday';
+
+  return `*🕊️ FULL LIFE CENTRE AG CHURCH - INDOOR MEDIA TEAM*
+━━━━━━━━━━━━━━━━━━━━━
+Shalom Media Team! 👋
+*REMINDER: TOMORROW'S SUNDAY MEDIA SERVING CREW*
+
+📅 *Service Date:* ${activeDateStr}
+⏰ *1st Service Call Time:* 05:30 AM Sharp
+🙏 *Pre-Service Team Prayer:* 05:45 AM
+📍 *Location:* Indoor Media Control Desk
+
+*🎬 1ST SERVICE SERVING CREW (05:30 AM Call):*
+• 🎥 1st Camera: *${s1.cam1 || '-'}*
+• 📹 2nd Camera: *${s1.cam2 || '-'}*
+• 🎯 Gimble: *${s1.gimble || '-'}*
+• 💻 Live in System: *${s1.live || '-'}*
+• ✂️ Spot Editing: *${s1.spot || '-'}*
+• 🔋 Camera & Battery Charging: *${s1.charging || 'Yashwanth & Sam Davit'}*
+
+*🎬 2ND SERVICE (08:00 AM Call):*
+• 🎥 Cam & Live Operator: *${s2.operator || '-'}*
+
+*🎬 3RD SERVICE (10:30 AM Call):*
+• 🎥 Cam & Live Operator: *${s3.operator || '-'}*
+
+━━━━━━━━━━━━━━━━━━━━━
+⚠️ *Important Team Instructions for Tomorrow:*
+1. Please be on time by *05:30 AM* for team prayer & equipment calibration.
+2. Battery incharges: Ensure all camera batteries & mic packs are tested before 06:15 AM.
+3. If any sudden emergency prevents you from serving, please notify Leader Lokesh (*7010368793*) immediately or use the Swap button on the portal.
+
+_"Whatever you do, work at it with all your heart as for the Lord." - Colossians 3:23_ 🙏✨
+God bless your faithful ministry!`;
+}
+
+function openSaturdayAlertModal() {
+  const modal = document.getElementById("saturdayAlertModal");
+  const dateSelect = document.getElementById("saturdayAlertDateSelect");
+  if (!modal) return;
+
+  if (dateSelect) {
+    const nextSunday = getNextUpcomingSundayDate();
+    dateSelect.innerHTML = (appState.firstService || []).map(r => `
+      <option value="${r.date}" ${r.date === nextSunday ? 'selected' : ''}>
+        📅 Sunday, ${r.date} ${r.date === nextSunday ? '★ (Next Service)' : ''}
+      </option>
+    `).join('');
+  }
+
+  updateSaturdayAlertModalPreview();
+  modal.style.display = "flex";
+}
+
+function closeSaturdayAlertModal() {
+  const modal = document.getElementById("saturdayAlertModal");
+  if (modal) modal.style.display = "none";
+}
+
+function updateSaturdayAlertModalPreview() {
+  const dateSelect = document.getElementById("saturdayAlertDateSelect");
+  const selectedDate = dateSelect ? dateSelect.value : "";
+  const preview = document.getElementById("saturdayAlertPreview");
+  if (preview) {
+    preview.textContent = generateSaturdayAlertText(selectedDate);
+  }
+}
+
+function copySaturdayAlertText() {
+  const preview = document.getElementById("saturdayAlertPreview");
+  if (!preview) return;
+  navigator.clipboard.writeText(preview.textContent).then(() => {
+    showToast("📋 Saturday reminder broadcast copied to clipboard!");
+  }).catch(() => {
+    copyFallback(preview.textContent);
+    showToast("📋 Saturday reminder broadcast copied!");
+  });
+}
+
+function sendSaturdayAlertWhatsApp() {
+  const preview = document.getElementById("saturdayAlertPreview");
+  if (!preview) return;
+  const encoded = encodeURIComponent(preview.textContent);
+  window.open(`https://wa.me/?text=${encoded}`, '_blank');
+}
+
+function sendSaturdayAlertToLeader() {
+  const preview = document.getElementById("saturdayAlertPreview");
+  if (!preview) return;
+  const encoded = encodeURIComponent(preview.textContent);
+  window.open(`https://wa.me/917010368793?text=${encoded}`, '_blank');
+}
+
 // ================= EXPORT & IMPORT BACKUP =================
 function exportDataJSON() {
   const jsonStr = JSON.stringify(appState, null, 2);

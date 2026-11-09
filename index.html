@@ -22,7 +22,7 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=3.7">
+  <link rel="stylesheet" href="styles.css?v=3.8">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -341,6 +341,9 @@
             </button>
             <button id="waTogglePreviewBtn" class="btn btn-secondary wa-mini-btn" onclick="toggleWhatsAppPreview()" title="Show/hide live message preview">
               👁️ Preview
+            </button>
+            <button class="btn btn-whatsapp wa-mini-btn" style="background: linear-gradient(135deg, #d97706, #b45309); font-weight: 700; gap: 4px; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.35);" onclick="openSaturdayAlertModal()" title="1-Click WhatsApp duty reminder for tomorrow's serving crew">
+              ⏰ Saturday Alert
             </button>
           </div>
         </div>
@@ -1482,6 +1485,41 @@
     </div>
   </div>
 
+  <!-- ================= SATURDAY EVENING DUTY ALERT MODAL ================= -->
+  <div id="saturdayAlertModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.35rem;">⏰</span>
+          <h3>Tomorrow's Sunday Duty Reminder</h3>
+        </div>
+        <button class="modal-close" onclick="closeSaturdayAlertModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
+        Generate an official pre-service alert with 05:30 AM call times, prayer reminders, and serving assignments for tomorrow's crew:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Service Date to Remind:</label>
+          <select id="saturdayAlertDateSelect" class="role-select" style="width: 100%; font-weight: 700;" onchange="updateSaturdayAlertModalPreview()"></select>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp Broadcast Message Preview:</label>
+          <pre id="saturdayAlertPreview" class="whatsapp-bubble-mini" style="max-height: 250px; font-size: 0.78rem;"></pre>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="closeSaturdayAlertModal()">Close</button>
+        <button class="btn btn-whatsapp" onclick="copySaturdayAlertText()">📋 Copy</button>
+        <button class="btn btn-whatsapp" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="sendSaturdayAlertToLeader()" title="Send preview to Leader Lokesh on WhatsApp">👤 To Leader</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSaturdayAlertWhatsApp()" title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= TOAST NOTIFICATION ================= -->
   <div id="toast" class="toast-box">
     <span id="toastIcon">✔️</span>
@@ -1492,6 +1530,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=3.7"></script>
+  <script src="app.js?v=3.8"></script>
 </body>
 </html>
