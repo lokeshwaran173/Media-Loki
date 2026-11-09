@@ -11,7 +11,18 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FLAG Media">
   <link rel="apple-touch-icon" href="logo.png">
-  <link rel="stylesheet" href="styles.css?v=2.1">
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem("FLAG_MEDIA_THEME") || "dark";
+        document.documentElement.setAttribute("data-theme", t);
+        if (t === "light") {
+          document.documentElement.classList.add("light-theme");
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="styles.css?v=3.4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -27,7 +38,7 @@
           <div class="brand-title-row">
             <h1>Full Life Centre AG Church</h1>
           </div>
-          <p>Indoor Media Operations &amp; Roster</p>
+          <p>Indoor Media Operations &amp; Schedule Portal</p>
         </div>
       </div>
 
@@ -40,7 +51,14 @@
         <button class="nav-btn" onclick="switchView('checklistsView', this)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
           <span class="nav-label-long">Service Checklists</span>
-          <span class="nav-label-short">Checklists</span> (<span id="checklistProgressBadge">0/34</span>)
+          <span class="nav-label-short">Checklists</span>
+          <span class="nav-badge-pill" id="checklistProgressBadge">0/34</span>
+        </button>
+        <button class="nav-btn" onclick="switchView('teamView', this)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span class="nav-label-long">Media Team</span>
+          <span class="nav-label-short">Team</span>
+          <span class="nav-badge-pill" id="publicMemberCountBadge">10</span>
         </button>
         <button id="adminNavBtn" class="nav-btn btn-admin-nav" onclick="handleAdminNavClick(this)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -49,16 +67,17 @@
       </nav>
 
       <div class="nav-actions">
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Switch Light / Dark Theme">
+          <span id="themeToggleIcon">☀️</span>
+          <span id="themeToggleText">Light</span>
+        </button>
         <span id="navCloudSyncBadge" class="cloud-sync-badge-pill" onclick="quickOpenCloudSync()" title="Multi-Device Cloud Sync Status &bull; Click to configure sync across all phones">
           <span class="sync-dot"></span>
           <span id="navCloudSyncText">☁️ Synced</span>
         </span>
-        <button class="btn btn-secondary" onclick="exportScheduleImagePNG()" title="Export Schedule as High-Res PNG Image for WhatsApp Status / Instagram">
-          📸 Export Image
-        </button>
-        <button class="btn btn-secondary" onclick="window.print()" title="Print clean schedule">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-          Print Schedule
+        <button class="btn btn-secondary nav-print-btn" onclick="window.print()" title="Print clean schedule">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <span>Print</span>
         </button>
       </div>
     </div>
@@ -72,7 +91,7 @@
       <img src="logo.png" alt="Full Life Centre AG Church Logo" class="print-logo">
       <div class="print-header-text">
         <h1 class="print-church-title">Full Life Centre Assembly of God Church</h1>
-        <h2 class="print-roster-title">Indoor Media Team &bull; Broadcast Schedule Roster &mdash; <span id="printActiveMonthYear">October 2026</span></h2>
+        <h2 class="print-roster-title">Indoor Media Team &bull; Broadcast Schedule &mdash; <span id="printActiveMonthYear">October 2026</span></h2>
         <p class="print-meta-info">⏰ Call Times &mdash; 1st Service: 05:30 AM (Prayer: 05:45 AM) &bull; 2nd Service: 08:00 AM &bull; 3rd Service: 10:30 AM &bull; Friday Fasting: 09:30 AM</p>
       </div>
     </div>
@@ -196,8 +215,8 @@
           <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
             <div class="badge-icon-chip">🗓️</div>
             <div>
-              <h2 class="section-title">Schedule Template &amp; Roster</h2>
-              <p class="section-desc">Broadcast volunteer roster for all Sunday and Friday services.</p>
+              <h2 class="section-title">Schedule Template &amp; Planner</h2>
+              <p class="section-desc">Broadcast volunteer schedule for all Sunday and Friday services.</p>
             </div>
           </div>
           <div class="active-month-display-wrap">
@@ -222,12 +241,12 @@
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div class="badge-icon-chip" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">👤</div>
             <div>
-              <h3 class="section-title" style="font-size: 1.15rem; color: #fff;">My Serving Schedule (Personal Filter)</h3>
+              <h3 class="section-title" style="font-size: 1.15rem;">My Serving Schedule (Personal Filter)</h3>
               <p class="section-desc">Select your name to see your personal duties, call times, export to calendar, or request a swap.</p>
             </div>
           </div>
           <div class="volunteer-filter-controls">
-            <select id="volunteerFilterSelect" class="role-select" style="min-width: 175px; font-weight: 700; border-color: rgba(245, 158, 11, 0.5); background-color: #10192e;" onchange="onVolunteerFilterChange(this.value)">
+            <select id="volunteerFilterSelect" class="role-select" style="min-width: 175px; font-weight: 700; border-color: rgba(245, 158, 11, 0.5);" onchange="onVolunteerFilterChange(this.value)">
               <option value="">👤 Select Your Name...</option>
               <!-- Dynamically populated with team members -->
             </select>
@@ -277,7 +296,7 @@
           <div class="whatsapp-mini-brand">
             <span class="whatsapp-dot-pulse"></span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#22c55e"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.059-2.072-.511-1.636-.68-2.684-2.339-2.766-2.449-.081-.11-.659-.877-.659-1.674 0-.797.417-1.19.565-1.353.148-.162.324-.203.432-.203.109 0 .217.001.312.006.101.005.234-.038.366.279.135.324.461 1.123.502 1.205.041.082.069.177.014.286-.055.109-.083.177-.164.273-.082.095-.172.213-.246.286-.082.081-.168.17-.072.335.096.164.428.706.918 1.142.631.562 1.163.736 1.328.818.164.082.261.071.358-.041.097-.112.417-.487.528-.654.111-.167.222-.139.373-.083.151.056.955.451 1.12.533.165.082.275.123.316.192.041.069.041.401-.103.806z"/></svg>
-            <strong style="color: #fff; font-size: 0.88rem;">WhatsApp Announcement</strong>
+            <strong class="whatsapp-card-title" style="font-size: 0.88rem;">WhatsApp Announcement</strong>
           </div>
 
           <div class="whatsapp-compact-controls">
@@ -428,6 +447,22 @@
 
     <!-- ================= VIEW 2: CHECKLISTS (PUBLIC & VOLUNTEERS) ================= -->
     <section id="checklistsView" class="view-panel">
+      <!-- Live Crew Sync Status Notice -->
+      <div class="card checklist-sync-banner card-accent-emerald">
+        <div class="sync-banner-content">
+          <span class="sync-dot connected"></span>
+          <div>
+            <strong class="sync-banner-title">Live Multi-Crew Real-Time Synchronization</strong>
+            <p class="sync-banner-sub">
+              When any volunteer checks a task during service, it updates immediately on everyone's phones in real time so the whole crew knows what is completed and what is pending!
+            </p>
+          </div>
+        </div>
+        <span class="header-tag tag-emerald sync-banner-tag">
+          👥 Live Shared Checklist
+        </span>
+      </div>
+
       <!-- Weekly Service Checklist Command Bar -->
       <div class="card week-checklist-banner card-accent-emerald">
         <div class="week-banner-top">
@@ -482,10 +517,58 @@
       </div>
     </section>
 
-    <!-- ================= VIEW 3: ADMIN CONSOLE (LEADER ONLY) ================= -->
+    <!-- ================= VIEW 3: MEDIA TEAM DIRECTORY (PUBLIC TO ALL CREW) ================= -->
+    <section id="teamView" class="view-panel">
+      <!-- Media Team Hero / Header Card -->
+      <div class="card header-card card-accent-blue" style="margin-bottom: 20px;">
+        <div class="card-row">
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <div class="badge-icon-chip" style="background: rgba(59, 130, 246, 0.18); border-color: rgba(59, 130, 246, 0.4); font-size: 1.5rem;">👥</div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="header-tag tag-blue" style="font-weight: 800;">FULL LIFE CENTRE AG CHURCH</span>
+                <span class="call-time-badge">Leader: Lokesh</span>
+              </div>
+              <h2 class="section-title" style="margin-top: 6px;">Indoor Media Crew Directory</h2>
+              <p class="section-desc">Meet all dedicated volunteers serving across cameras, live broadcast switching, gimbals, spot editing, and equipment maintenance.</p>
+            </div>
+          </div>
+          <div class="gear-incharge-badge">
+            <span style="font-size: 0.78rem; display: block;" class="crew-badge-label">Active Crew Strength:</span>
+            <strong style="color: #38bdf8; font-size: 1.05rem;" id="teamDirectoryCount">10 Crew Members</strong>
+            <span style="font-size: 0.75rem;" class="crew-badge-sub">Colossians 3:23</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Search & Skill Filter Bar -->
+      <div class="card" style="margin-bottom: 20px; padding: 14px 18px;">
+        <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 240px; position: relative;">
+            <input type="text" id="teamSearchInput" class="input-text" style="width: 100%; padding-left: 36px;" placeholder="🔍 Search member by name or skill..." oninput="filterTeamDirectory()">
+            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; opacity: 0.6; pointer-events: none;">👤</span>
+          </div>
+          <div class="gear-filter-pills" id="teamSkillFilters">
+            <button class="gear-filter-btn active" onclick="setTeamSkillFilter('all', this)">All Crew</button>
+            <button class="gear-filter-btn" onclick="setTeamSkillFilter('camera', this)">Camera</button>
+            <button class="gear-filter-btn" onclick="setTeamSkillFilter('live', this)">Live System</button>
+            <button class="gear-filter-btn" onclick="setTeamSkillFilter('gimble', this)">Gimble</button>
+            <button class="gear-filter-btn" onclick="setTeamSkillFilter('charging', this)">Battery / Charging</button>
+            <button class="gear-filter-btn" onclick="setTeamSkillFilter('spot', this)">Editing</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Public Team Directory Grid -->
+      <div class="team-directory-grid" id="publicTeamGrid">
+        <!-- Rendered dynamically via app.js -->
+      </div>
+    </section>
+
+    <!-- ================= VIEW 4: ADMIN CONSOLE (LEADER ONLY) ================= -->
     <section id="adminView" class="view-panel">
       <!-- Admin Header Bar -->
-      <div class="card header-card" style="border-left: 5px solid #f59e0b; background: linear-gradient(180deg, #1e2638 0%, #121a29 100%);">
+      <div class="card header-card admin-header-card" style="border-left: 5px solid #f59e0b;">
         <div class="card-row">
           <div>
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -713,14 +796,14 @@
         <!-- Early Morning Prayer (Admin Dropdowns) -->
         <div class="card">
           <!-- Seasonal Visibility Toggle Banner -->
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding: 12px 16px; background: rgba(15, 23, 42, 0.75); border-radius: 8px; border: 1px solid var(--border);">
+          <div class="seasonal-toggle-banner">
             <div style="flex: 1; min-width: 250px;">
               <div style="display: flex; align-items: center; gap: 8px;">
-                <strong style="color: #fff; font-size: 0.95rem;">Early Morning Prayer Schedule</strong>
-                <span id="morningPrayerStatusBadge" class="header-tag tag-amber" style="font-size: 0.75rem;">🔴 Inactive (Hidden on Public Roster)</span>
+                <strong style="font-size: 0.95rem;">Early Morning Prayer Schedule</strong>
+                <span id="morningPrayerStatusBadge" class="header-tag tag-amber" style="font-size: 0.75rem;">🔴 Inactive (Hidden on Public Schedule)</span>
               </div>
               <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
-                Seasonal schedule (Monday – Saturday). When turned OFF, it is completely hidden from the public roster. Turn it ON only when prayer campaign is active.
+                Seasonal schedule (Monday – Saturday). When turned OFF, it is completely hidden from the public schedule. Turn it ON only when prayer campaign is active.
               </p>
             </div>
             <button id="toggleMorningPrayerBtn" class="btn btn-primary" onclick="toggleMorningPrayerVisibility()">
@@ -806,14 +889,14 @@
             </div>
             <div class="analytics-metric-box">
               <span class="amb-val" id="ambRosterHealth" style="color: #a855f7;">Balanced</span>
-              <span class="amb-lbl">Roster Fairness</span>
+              <span class="amb-lbl">Schedule Balance</span>
             </div>
           </div>
 
           <!-- Member Workload Balancer Progress Bars -->
           <div style="margin-top: 18px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
-              <h4 style="font-size: 0.95rem; font-weight: 700; color: #f1f5f9;">Volunteer Duty Load This Month:</h4>
+              <h4 style="font-size: 0.95rem; font-weight: 700;">Volunteer Duty Load This Month:</h4>
               <div style="display: flex; gap: 10px; font-size: 0.75rem; color: var(--text-muted); flex-wrap: wrap;">
                 <span><span style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 2px;"></span> Optimal (2-3)</span>
                 <span><span style="display: inline-block; width: 10px; height: 10px; background: #f59e0b; border-radius: 2px;"></span> Heavy (4+)</span>
@@ -950,7 +1033,7 @@
             Choose which Sunday week to set for the service checklist. The volunteer checklist page will immediately update to this selected week.
           </p>
           <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-            <label style="font-size: 0.88rem; font-weight: 600; color: #e2e8f0;">Choose Checklist Week:</label>
+            <label style="font-size: 0.88rem; font-weight: 600;">Choose Checklist Week:</label>
             <select id="adminActiveWeekSelect" class="role-select" style="min-width: 240px; font-weight: 600;" onchange="setAdminActiveWeek(this.value)">
               <!-- populated dynamically -->
             </select>
@@ -963,7 +1046,7 @@
           </div>
         </div>
 
-        <div id="newCategoryCard" class="card" style="border-color: rgba(59, 130, 246, 0.4); background: #0f182b;">
+        <div id="newCategoryCard" class="card card-accent-blue">
           <h3 class="card-inner-title">+ Create New Checklist Category</h3>
           <p class="section-desc" style="margin-bottom: 12px;">Add custom checklist categories for your church operations.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
@@ -997,7 +1080,7 @@
           </div>
 
           <div style="margin: 16px 0;">
-            <label style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9; display: block; margin-bottom: 6px;">
+            <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 6px;">
               Firebase Realtime Database URL:
             </label>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -1005,7 +1088,7 @@
               <button class="btn btn-primary" onclick="saveAndConnectFirebase()" title="Connect to Firebase Realtime Database">
                 🔗 Connect &amp; Enable Cloud Sync
               </button>
-              <button class="btn btn-save-schedule" onclick="syncLocalToCloudNow()" id="btnSyncCloudNow" style="display: none;" title="Push current roster to Cloud immediately">
+              <button class="btn btn-save-schedule" onclick="syncLocalToCloudNow()" id="btnSyncCloudNow" style="display: none;" title="Push current schedule to Cloud immediately">
                 🔄 Sync Now
               </button>
               <button class="btn btn-secondary" onclick="disconnectFirebase()" id="btnDisconnectCloud" style="display: none;" title="Disconnect from Firebase">
@@ -1019,11 +1102,11 @@
 
           <!-- Free Firebase Quick Setup Guide Accordion -->
           <div class="cloud-setup-accordion">
-            <details style="background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;">
+            <details class="guide-details">
               <summary style="font-weight: 700; color: #38bdf8; cursor: pointer; font-size: 0.9rem;">
                 👉 How to get your FREE Firebase Database URL in 2 minutes (Step-by-Step Guide)
               </summary>
-              <div style="margin-top: 12px; font-size: 0.83rem; color: #cbd5e1; line-height: 1.6;">
+              <div class="guide-steps">
                 <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
                   <li>
                     Open <strong><a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: underline;">Firebase Console</a></strong> (sign in with any free Google account).
@@ -1057,97 +1140,7 @@
             </div>
           </div>
           <p class="section-desc" style="margin-bottom: 12px;">
-            Want to sync your current roster immediately without setting up Firebase? Generate a 1-click sync link! When volunteers tap the link in WhatsApp, their phones will automatically update to your latest schedule.
-          </p>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn btn-whatsapp" onclick="shareRosterSyncWhatsApp()">
-              💬 Share Sync Link on WhatsApp
-            </button>
-            <button class="btn btn-secondary" onclick="copyRosterSyncLink()">
-              📋 Copy Sync Link
-            </button>
-          </div>
-        </div>
-
-        <!-- Full File JSON Backup & Restore -->
-        <!-- ☁️ Multi-Device Live Cloud Sync (Firebase Realtime Database) -->
-        <div class="card card-accent-blue" style="margin-bottom: 24px;">
-          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="badge-icon-chip" style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">☁️</div>
-              <div>
-                <h3 class="section-title" style="font-size: 1.15rem;">Live Multi-Device Cloud Sync (Netlify &amp; Mobile)</h3>
-                <p class="section-desc">Connect free Google Firebase Realtime Database so changes saved by Admin instantly sync to all team members' phones across Netlify.</p>
-              </div>
-            </div>
-            <div id="cloudStatusBadge" class="header-tag tag-amber" style="font-size: 0.82rem; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
-              <span class="sync-dot"></span>
-              <span id="cloudStatusText">🟡 Local Mode (Ready to Connect)</span>
-            </div>
-          </div>
-
-          <div style="margin: 16px 0;">
-            <label style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9; display: block; margin-bottom: 6px;">
-              Firebase Realtime Database URL:
-            </label>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <input type="url" id="firebaseDbUrlInput" class="input-text" style="flex: 1; min-width: 260px;" value="https://flag-church-media-default-rtdb.firebaseio.com" placeholder="https://your-church-app-default-rtdb.firebaseio.com">
-              <button class="btn btn-primary" onclick="saveAndConnectFirebase()" title="Connect to Firebase Realtime Database">
-                🔗 Connect &amp; Enable Cloud Sync
-              </button>
-              <button class="btn btn-save-schedule" onclick="syncLocalToCloudNow()" id="btnSyncCloudNow" style="display: none;" title="Push current roster to Cloud immediately">
-                🔄 Sync Now
-              </button>
-              <button class="btn btn-secondary" onclick="disconnectFirebase()" id="btnDisconnectCloud" style="display: none;" title="Disconnect from Firebase">
-                🔌 Disconnect
-              </button>
-            </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
-              💡 Once connected, clicking <strong>💾 Save Schedule</strong> will automatically push updates to the cloud and refresh every volunteer's phone in real time!
-            </p>
-          </div>
-
-          <!-- Free Firebase Quick Setup Guide Accordion -->
-          <div class="cloud-setup-accordion">
-            <details style="background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px;">
-              <summary style="font-weight: 700; color: #38bdf8; cursor: pointer; font-size: 0.9rem;">
-                👉 How to get your FREE Firebase Database URL in 2 minutes (Step-by-Step Guide)
-              </summary>
-              <div style="margin-top: 12px; font-size: 0.83rem; color: #cbd5e1; line-height: 1.6;">
-                <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
-                  <li>
-                    Open <strong><a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: underline;">Firebase Console</a></strong> (sign in with any free Google account).
-                  </li>
-                  <li>
-                    Click <strong>+ Add project</strong>, enter a name (e.g. <code>flag-church-media</code>), and click Continue until the project is created.
-                  </li>
-                  <li>
-                    In the left navigation menu, click <strong>Build</strong> ➔ <strong>Realtime Database</strong> ➔ click <strong>Create Database</strong>.
-                  </li>
-                  <li>
-                    Select your nearest region (e.g. <em>Singapore</em> or <em>United States</em>), click <strong>Next</strong>, then choose <strong>"Start in test mode"</strong> (allows read &amp; write) and click <strong>Enable</strong>.
-                  </li>
-                  <li>
-                    Copy the Database URL displayed at the top of your database page (it looks like: <code>https://flag-church-media-default-rtdb.asia-southeast1.firebasedatabase.app</code> or <code>https://flag-church-media-default-rtdb.firebaseio.com</code>).
-                  </li>
-                  <li>
-                    Paste that URL into the box above and click <strong>🔗 Connect &amp; Enable Cloud Sync</strong>. That's it!
-                  </li>
-                </ol>
-              </div>
-            </details>
-          </div>
-        </div>
-
-        <!-- 🔗 Instant WhatsApp Team Sync Link (Works Right Now with 0 Setup!) -->
-        <div class="card card-accent-emerald" style="margin-bottom: 24px;">
-          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="header-tag tag-emerald">🔗 1-Click WhatsApp Team Sync Link (Instant Fallback)</span>
-            </div>
-          </div>
-          <p class="section-desc" style="margin-bottom: 12px;">
-            Want to sync your current roster immediately without setting up Firebase? Generate a 1-click sync link! When volunteers tap the link in WhatsApp, their phones will automatically update to your latest schedule.
+            Want to sync your current schedule immediately without setting up Firebase? Generate a 1-click sync link! When volunteers tap the link in WhatsApp, their phones will automatically update to your latest schedule.
           </p>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn btn-whatsapp" onclick="shareRosterSyncWhatsApp()">
@@ -1290,7 +1283,7 @@
 
         <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.28); border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: #93c5fd; display: flex; align-items: center; gap: 8px;">
           <span>🔄</span>
-          <span><strong>Auto-Sync:</strong> Existing roster assignments for this member will automatically update to the new name!</span>
+          <span><strong>Auto-Sync:</strong> Existing schedule assignments for this member will automatically update to the new name!</span>
         </div>
       </div>
 
@@ -1389,6 +1382,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=2.1"></script>
+  <script src="app.js?v=3.4"></script>
 </body>
 </html>

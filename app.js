@@ -270,8 +270,106 @@ function calculateDatesInMonth(year, monthIndex, targetDay) {
   return dates;
 }
 
+// ================= LIGHT / DARK THEME =================
+function getPreferredTheme() {
+  try {
+    return localStorage.getItem("FLAG_MEDIA_THEME") || "dark";
+  } catch (e) {
+    return "dark";
+  }
+}
+
+function setTheme(theme) {
+  const current = theme === "light" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", current);
+  document.documentElement.classList.toggle("light-theme", current === "light");
+  document.documentElement.classList.toggle("dark-theme", current === "dark");
+  
+  if (document.body) {
+    document.body.setAttribute("data-theme", current);
+    document.body.classList.toggle("light-theme", current === "light");
+    document.body.classList.toggle("dark-theme", current === "dark");
+  }
+
+  try {
+    localStorage.setItem("FLAG_MEDIA_THEME", current);
+  } catch (e) {}
+
+  const iconEl = document.getElementById("themeToggleIcon");
+  const textEl = document.getElementById("themeToggleText");
+  const toggleBtn = document.getElementById("themeToggleBtn");
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+
+  if (current === "light") {
+    if (iconEl) iconEl.textContent = "🌙";
+    if (textEl) textEl.textContent = "Dark";
+    if (toggleBtn) toggleBtn.setAttribute("title", "Currently in Light Mode &bull; Click for Dark Theme");
+    if (metaTheme) metaTheme.setAttribute("content", "#f8fafc");
+  } else {
+    if (iconEl) iconEl.textContent = "☀️";
+    if (textEl) textEl.textContent = "Light";
+    if (toggleBtn) toggleBtn.setAttribute("title", "Currently in Dark Mode &bull; Click for Light Theme");
+    if (metaTheme) metaTheme.setAttribute("content", "#0f172a");
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  const next = current === "light" ? "dark" : "light";
+  setTheme(next);
+  showToast(next === "light" ? "☀️ Light mode activated" : "🌙 Dark mode activated");
+}
+
+function initTheme() {
+  const preferred = getPreferredTheme();
+  setTheme(preferred);
+}
+
+// Auto-run theme immediately upon script load to sync icon/text
+initTheme();
+
+function ensureStateIntegrity(state) {
+  if (!state || typeof state !== "object") return state;
+
+  if (!state.members || !Array.isArray(state.members) || state.members.length === 0) {
+    state.members = JSON.parse(JSON.stringify(defaultState.members));
+  } else {
+    state.members = state.members.filter(m => m && m.name && String(m.name).trim().length > 0);
+    if (state.members.length === 0) {
+      state.members = JSON.parse(JSON.stringify(defaultState.members));
+    }
+  }
+
+  if (!state.firstService || !Array.isArray(state.firstService)) {
+    state.firstService = JSON.parse(JSON.stringify(defaultState.firstService));
+  }
+  if (!state.secondService || !Array.isArray(state.secondService)) {
+    state.secondService = JSON.parse(JSON.stringify(defaultState.secondService));
+  }
+  if (!state.thirdService || !Array.isArray(state.thirdService)) {
+    state.thirdService = JSON.parse(JSON.stringify(defaultState.thirdService));
+  }
+  if (!state.fridayPrayer || !Array.isArray(state.fridayPrayer)) {
+    state.fridayPrayer = JSON.parse(JSON.stringify(defaultState.fridayPrayer));
+  }
+  if (!state.gearIssues || !Array.isArray(state.gearIssues)) {
+    state.gearIssues = [];
+  }
+  if (!state.specialMeetings || !Array.isArray(state.specialMeetings)) {
+    state.specialMeetings = [];
+  }
+  if (!state.morningPrayer) {
+    state.morningPrayer = { enabled: false, title: "21 Days Early Morning Prayer", days: [] };
+  }
+  if (!state.checklists || !Array.isArray(state.checklists)) {
+    state.checklists = JSON.parse(JSON.stringify(defaultState.checklists || []));
+  }
+  return state;
+}
+
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
   checkUrlForRosterSync();
   loadState();
   initCalendarSelectors();
@@ -291,6 +389,8 @@ function loadState() {
   } else {
     appState = JSON.parse(JSON.stringify(defaultState));
   }
+
+  ensureStateIntegrity(appState);
 
   // Ensure gearIssues array exists
   if (!appState.gearIssues || !Array.isArray(appState.gearIssues)) {
@@ -777,6 +877,7 @@ function renderAll() {
   renderSpecialMeetings();
   renderMorningPrayer();
   renderMembers();
+  renderPublicTeamDirectory();
   renderWorkloadAnalytics();
   renderGearIssues();
   renderChecklists();
@@ -1097,10 +1198,10 @@ function renderMorningPrayer() {
   if (statusBadge) {
     if (isEnabled) {
       statusBadge.className = "header-tag tag-emerald";
-      statusBadge.textContent = "🟢 Active & Visible on Public Roster";
+      statusBadge.textContent = "🟢 Active & Visible on Public Schedule";
     } else {
       statusBadge.className = "header-tag tag-amber";
-      statusBadge.textContent = "🔴 Inactive (Hidden on Public Roster)";
+      statusBadge.textContent = "🔴 Inactive (Hidden on Public Schedule)";
     }
   }
 
@@ -1181,9 +1282,9 @@ function toggleMorningPrayerVisibility() {
   renderAll();
 
   if (appState.morningPrayer.enabled) {
-    showToast("🟢 Early Morning Prayer is now VISIBLE on the public roster!");
+    showToast("🟢 Early Morning Prayer is now VISIBLE on the public schedule!");
   } else {
-    showToast("🔴 Early Morning Prayer is now HIDDEN from the public roster.");
+    showToast("🔴 Early Morning Prayer is now HIDDEN from the public schedule.");
   }
 }
 
@@ -1212,7 +1313,7 @@ function setMorningPrayerCampaign(name) {
 }
 
 function resetMorningPrayerToWeekdays() {
-  if (confirm("Reset roster to standard Monday through Saturday (6 days)?")) {
+  if (confirm("Reset schedule to standard Monday through Saturday (6 days)?")) {
     const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     appState.morningPrayer.days = weekDays.map((d, i) => ({
       id: Date.now() + i,
@@ -1374,40 +1475,40 @@ function removeRow(serviceType, index) {
 // ================= MEMBERS MANAGER =================
 function calculateMemberShifts(name) {
   let count = 0;
-  if (!name) return 0;
+  if (!name || !appState) return 0;
 
   // 1st Service
-  (appState.firstService || []).forEach(r => {
+  ((appState && appState.firstService) || []).forEach(r => {
     ['cam1', 'cam2', 'gimble', 'live', 'spot', 'charging'].forEach(field => {
       if (r[field] && r[field].includes(name)) count++;
     });
   });
 
   // 2nd Service
-  (appState.secondService || []).forEach(r => {
+  ((appState && appState.secondService) || []).forEach(r => {
     if (r.operator && r.operator.includes(name)) count++;
   });
 
   // 3rd Service
-  (appState.thirdService || []).forEach(r => {
+  ((appState && appState.thirdService) || []).forEach(r => {
     if (r.operator && r.operator.includes(name)) count++;
   });
 
   // Friday Fasting
-  (appState.fridayPrayer || []).forEach(r => {
+  ((appState && appState.fridayPrayer) || []).forEach(r => {
     if (r.cam1 && r.cam1.includes(name)) count++;
     if (r.live && r.live.includes(name)) count++;
   });
 
   // Special Meetings
-  (appState.specialMeetings || []).forEach(r => {
+  ((appState && appState.specialMeetings) || []).forEach(r => {
     ['cam1', 'cam2', 'gimble', 'live', 'spot'].forEach(field => {
       if (r[field] && r[field].includes(name)) count++;
     });
   });
 
   // Early Morning Prayer (only count if seasonal schedule is active)
-  if (appState.morningPrayer && appState.morningPrayer.enabled && appState.morningPrayer.days) {
+  if (appState && appState.morningPrayer && appState.morningPrayer.enabled && appState.morningPrayer.days) {
     appState.morningPrayer.days.forEach(r => {
       ['cam1', 'cam2', 'gimbal', 'liveEditor', 'socialMedia'].forEach(field => {
         if (r[field] && r[field].includes(name)) count++;
@@ -1482,6 +1583,170 @@ function renderMembers() {
   if (memberBadge) {
     memberBadge.textContent = appState.members.length;
   }
+}
+
+// ================= PUBLIC MEDIA TEAM DIRECTORY =================
+let currentTeamSkillFilter = "all";
+
+function setTeamSkillFilter(filter, btn) {
+  currentTeamSkillFilter = filter;
+  const buttons = document.querySelectorAll("#teamSkillFilters .gear-filter-btn");
+  buttons.forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderPublicTeamDirectory();
+}
+
+function filterTeamDirectory() {
+  renderPublicTeamDirectory();
+}
+
+function renderPublicTeamDirectory() {
+  const container = document.getElementById("publicTeamGrid");
+  const countEl = document.getElementById("teamDirectoryCount");
+  const badgeEl = document.getElementById("publicMemberCountBadge");
+
+  const membersList = (appState && Array.isArray(appState.members) && appState.members.length > 0)
+    ? appState.members
+    : defaultState.members;
+
+  const totalMembers = membersList.length;
+  if (countEl) countEl.textContent = `${totalMembers} Crew Members`;
+  if (badgeEl) badgeEl.textContent = totalMembers;
+
+  if (!container) return;
+
+  const searchInput = document.getElementById("teamSearchInput");
+  const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+  const avatarGradients = [
+    "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+    "linear-gradient(135deg, #8b5cf6, #6d28d9)",
+    "linear-gradient(135deg, #10b981, #047857)",
+    "linear-gradient(135deg, #f59e0b, #b45309)",
+    "linear-gradient(135deg, #ec4899, #be185d)",
+    "linear-gradient(135deg, #06b6d4, #0e7490)"
+  ];
+
+  let filtered = membersList;
+
+  // Filter by skill chip
+  if (typeof currentTeamSkillFilter !== "undefined" && currentTeamSkillFilter !== "all") {
+    filtered = filtered.filter(m => {
+      const roleStr = (m.role || "").toLowerCase();
+      if (currentTeamSkillFilter === "camera") return roleStr.includes("cam") || roleStr.includes("camera");
+      if (currentTeamSkillFilter === "live") return roleStr.includes("live") || roleStr.includes("system");
+      if (currentTeamSkillFilter === "gimble") return roleStr.includes("gimble") || roleStr.includes("gimbal");
+      if (currentTeamSkillFilter === "charging") return roleStr.includes("charg") || roleStr.includes("battery");
+      if (currentTeamSkillFilter === "spot") return roleStr.includes("spot") || roleStr.includes("edit");
+      return true;
+    });
+  }
+
+  // Filter by search text
+  if (searchTerm) {
+    filtered = filtered.filter(m => {
+      const nameMatch = (m.name || "").toLowerCase().includes(searchTerm);
+      const roleMatch = (m.role || "").toLowerCase().includes(searchTerm);
+      return nameMatch || roleMatch;
+    });
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 40px 16px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; color: var(--text-muted);">
+        <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🔍</span>
+        <strong style="font-size: 1rem;">No team members found</strong>
+        <p style="font-size: 0.82rem; margin-top: 4px;">Try searching for another name or clearing the skill filter.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const mName = getMonthName(appState && appState.selectedMonth !== undefined ? appState.selectedMonth : 9);
+
+  container.innerHTML = filtered.map(m => {
+    const rawName = (m.name || "Member").trim();
+    const initials = rawName.split(/\s+/).map(n => n[0] || "").join("").toUpperCase() || "M";
+    const shiftCount = typeof calculateMemberShifts === "function" ? calculateMemberShifts(rawName) : 0;
+    const gradIndex = Math.abs(rawName.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)) % avatarGradients.length;
+    const avatarBg = avatarGradients[gradIndex];
+
+    let shiftTagColor = "#10b981";
+    let shiftTagText = `${shiftCount} ${shiftCount === 1 ? 'shift' : 'shifts'} in ${mName}`;
+    if (shiftCount === 0) {
+      shiftTagColor = "#94a3b8";
+      shiftTagText = `Resting in ${mName}`;
+    } else if (shiftCount >= 4) {
+      shiftTagColor = "#f59e0b";
+    }
+
+    const hasPhone = m.phone && m.phone.trim();
+    const cleanPhone = hasPhone ? m.phone.replace(/[^0-9]/g, "") : "";
+    const waUrl = cleanPhone ? (cleanPhone.startsWith("91") ? `https://wa.me/${cleanPhone}` : `https://wa.me/91${cleanPhone}`) : "";
+
+    return `
+      <div class="team-member-card-public">
+        <div class="team-card-top">
+          <div class="team-avatar-lg" style="background: ${avatarBg};">
+            ${initials}
+          </div>
+          <div class="team-meta-info">
+            <h3>${escapeQuotes(rawName)}</h3>
+            <span class="team-role-pill" title="${escapeQuotes(m.role || 'Media Volunteer')}">
+              ${escapeQuotes(m.role || 'Media Volunteer')}
+            </span>
+          </div>
+        </div>
+
+        <div class="team-card-details">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.76rem; color: #94a3b8;">Serving Shifts:</span>
+            <span style="font-size: 0.76rem; font-weight: 700; color: ${shiftTagColor};">
+              ${shiftTagText}
+            </span>
+          </div>
+          ${hasPhone ? `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
+              <span style="font-size: 0.76rem; color: #94a3b8;">Contact:</span>
+              <span style="font-size: 0.76rem; color: #4ade80; font-family: var(--font-mono); font-weight: 700;">
+                📱 ${m.phone}
+              </span>
+            </div>
+          ` : ''}
+        </div>
+
+        <div class="team-card-actions">
+          <button class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;" onclick="selectVolunteerForSchedule('${escapeQuotes(rawName)}')">
+            👤 View Duties
+          </button>
+          ${hasPhone ? `
+            <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm" style="text-decoration: none;" title="Open WhatsApp Chat with ${escapeQuotes(rawName)}">
+              💬 WhatsApp
+            </a>
+          ` : `
+            <button class="btn btn-secondary btn-sm" onclick="openDirectReminderModal('${escapeQuotes(rawName)}')" title="Send Duty Reminder">
+              📲 Remind
+            </button>
+          `}
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function selectVolunteerForSchedule(name) {
+  // 1. Switch view to schedule
+  const scheduleNavBtn = document.querySelectorAll(".nav-btn")[0];
+  switchView("scheduleView", scheduleNavBtn);
+
+  // 2. Select in volunteer personal filter
+  setTimeout(() => {
+    onVolunteerFilterChange(name, true);
+    const filterCard = document.getElementById("personalFilterCard");
+    if (filterCard) {
+      filterCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, 100);
 }
 
 // Edit Member Modal State & Handlers
@@ -2000,6 +2265,9 @@ function toggleCheckItem(clId, itemId) {
   saveState();
   renderChecklists();
   updateBadges();
+
+  const isDone = appState.weeklyChecks[viewDate][itemId];
+  showToast(isDone ? "✅ Task marked complete & synced live to all crew!" : "⏳ Task marked pending & synced live!");
 }
 
 function resetChecklists() {
@@ -2091,8 +2359,20 @@ function switchView(viewId, btn) {
   document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
 
-  document.getElementById(viewId).classList.add("active");
-  btn.classList.add("active");
+  const panel = document.getElementById(viewId);
+  if (panel) panel.classList.add("active");
+  if (btn) {
+    btn.classList.add("active");
+  } else {
+    const matchingBtn = document.querySelector(`.nav-btn[onclick*="${viewId}"]`);
+    if (matchingBtn) matchingBtn.classList.add("active");
+  }
+
+  if (viewId === "teamView") {
+    renderPublicTeamDirectory();
+  } else if (viewId === "scheduleView") {
+    renderAll();
+  }
 }
 
 // ================= WHATSAPP EXPORT & LIVE PREVIEW =================
@@ -2253,7 +2533,7 @@ function generateWhatsAppText() {
     const s3 = (appState.thirdService || []).find(r => r.date === selectedDate) || {};
 
     let text = `🕊️ FULL LIFE CENTRE AG CHURCH (FLAG)\n`;
-    text += `🎥 INDOOR MEDIA TEAM - SUNDAY ROSTER\n\n`;
+    text += `🎥 INDOOR MEDIA TEAM - SUNDAY SERVICE\n\n`;
     text += `📅 Date: ${selectedDate}\n\n`;
 
     text += `══════════════════════════════\n`;
@@ -2283,7 +2563,7 @@ function generateWhatsAppText() {
     text += `📅 Date: ${selectedDate}\n\n`;
 
     text += `══════════════════════════════\n`;
-    text += `🎥 MEDIA DUTY ROSTER\n`;
+    text += `🎥 MEDIA DUTY SCHEDULE\n`;
     text += `══════════════════════════════\n`;
     text += `• 1st Cam: ${fRow.cam1 || '-'}\n`;
     text += `• Live in System: ${fRow.live || '-'}\n\n`;
@@ -2295,7 +2575,7 @@ function generateWhatsAppText() {
     const spec = (appState.specialMeetings || []).find(r => (r.title + " - " + r.date) === selectedDate || r.title === selectedDate || r.date === selectedDate) || {};
 
     let text = `🕊️ FULL LIFE CENTRE AG CHURCH (FLAG)\n`;
-    text += `🌟 SPECIAL MEETING MEDIA ROSTER\n\n`;
+    text += `🌟 SPECIAL MEETING MEDIA SCHEDULE\n\n`;
     text += `📅 Meeting: ${spec.title || 'Special Meeting'}\n`;
     text += `📆 Date: ${spec.date || '-'}\n\n`;
 
@@ -2319,7 +2599,7 @@ function generateWhatsAppText() {
     const dayRow = (appState.morningPrayer && appState.morningPrayer.days ? appState.morningPrayer.days.find(r => r.day === selectedDate) : {}) || {};
 
     let text = `🕊️ FULL LIFE CENTRE AG CHURCH (FLAG)\n`;
-    text += `🌅 EARLY MORNING PRAYER MEDIA ROSTER\n\n`;
+    text += `🌅 EARLY MORNING PRAYER MEDIA SCHEDULE\n\n`;
     text += `🔥 Campaign: ${campaignTitle}\n`;
     text += `📅 Scheduled: ${selectedDate}\n\n`;
 
@@ -2391,7 +2671,8 @@ function importDataJSON(event) {
   reader.onload = function(e) {
     try {
       const imported = JSON.parse(e.target.result);
-      if (imported.firstService && imported.members) {
+      if (imported.firstService) {
+        ensureStateIntegrity(imported);
         appState = imported;
         saveState();
         renderAll();
@@ -2703,7 +2984,7 @@ function renderVolunteerPersonalBox(name, duties) {
             <div class="duty-date">📅 ${escapeHtml(d.date)}</div>
             <div class="duty-service">${escapeHtml(d.service)}</div>
             <div class="duty-role">${escapeHtml(d.role)}</div>
-            ${d.assignedText && d.assignedText.includes('&') ? `<div style="font-size: 0.76rem; color: #cbd5e1; margin-top: 2px;">👥 Paired with: <strong>${escapeHtml(d.assignedText)}</strong></div>` : ''}
+            ${d.assignedText && d.assignedText.includes('&') ? `<div style="font-size: 0.76rem; opacity: 0.85; margin-top: 2px;">👥 Paired with: <strong>${escapeHtml(d.assignedText)}</strong></div>` : ''}
           </div>
         `).join('')}
       </div>
@@ -3124,7 +3405,10 @@ function dismissPWABanner() {
 
 // ================= FEATURE 5: 📸 1-CLICK HIGH-RES SCHEDULE IMAGE EXPORT (PNG) =================
 function exportScheduleImagePNG() {
-  showToast("📸 Generating high-resolution schedule image...");
+  const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+  const isLight = currentTheme === "light";
+
+  showToast(isLight ? "📸 Generating high-resolution Light Theme schedule image..." : "📸 Generating high-resolution schedule image...");
 
   const mName = getMonthName(appState.selectedMonth) || (appState.month ? appState.month.split(' ')[0] : 'Current');
   const year = appState.selectedYear || (appState.month ? appState.month.split(' ')[1] : '2026');
@@ -3155,24 +3439,38 @@ function exportScheduleImagePNG() {
   canvas.width = width;
   canvas.height = height;
 
-  // Background gradient
+  // Background gradient (Theme-Aware)
   const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-  bgGrad.addColorStop(0, "#080d1a");
-  bgGrad.addColorStop(0.5, "#0d1527");
-  bgGrad.addColorStop(1, "#050914");
+  if (isLight) {
+    bgGrad.addColorStop(0, "#ffffff");
+    bgGrad.addColorStop(0.5, "#f8fafc");
+    bgGrad.addColorStop(1, "#f1f5f9");
+  } else {
+    bgGrad.addColorStop(0, "#080d1a");
+    bgGrad.addColorStop(0.5, "#0d1527");
+    bgGrad.addColorStop(1, "#050914");
+  }
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, width, height);
 
   // Subtle ambient glow orbs
   ctx.save();
   const radGlow1 = ctx.createRadialGradient(200, 150, 10, 200, 150, 350);
-  radGlow1.addColorStop(0, "rgba(56, 189, 248, 0.12)");
+  if (isLight) {
+    radGlow1.addColorStop(0, "rgba(56, 189, 248, 0.08)");
+  } else {
+    radGlow1.addColorStop(0, "rgba(56, 189, 248, 0.12)");
+  }
   radGlow1.addColorStop(1, "transparent");
   ctx.fillStyle = radGlow1;
   ctx.fillRect(0, 0, 500, 400);
 
   const radGlow2 = ctx.createRadialGradient(width - 200, height - 200, 10, width - 200, height - 200, 400);
-  radGlow2.addColorStop(0, "rgba(245, 158, 11, 0.08)");
+  if (isLight) {
+    radGlow2.addColorStop(0, "rgba(245, 158, 11, 0.05)");
+  } else {
+    radGlow2.addColorStop(0, "rgba(245, 158, 11, 0.08)");
+  }
   radGlow2.addColorStop(1, "transparent");
   ctx.fillStyle = radGlow2;
   ctx.fillRect(width - 500, height - 500, 500, 500);
@@ -3188,7 +3486,7 @@ function exportScheduleImagePNG() {
     ctx.closePath();
     if (fill) ctx.fill();
     if (stroke) {
-      ctx.strokeStyle = strokeColor || "rgba(255,255,255,0.15)";
+      ctx.strokeStyle = strokeColor || (isLight ? "#cbd5e1" : "rgba(255,255,255,0.15)");
       ctx.stroke();
     }
   }
@@ -3215,23 +3513,30 @@ function exportScheduleImagePNG() {
     }
 
     const textLeft = padding + 85;
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
     ctx.font = "800 24px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
     ctx.fillText("FULL LIFE CENTRE ASSEMBLY OF GOD CHURCH 🕊️", textLeft, curY + 28);
 
-    ctx.fillStyle = "#38bdf8";
+    ctx.fillStyle = isLight ? "#0284c7" : "#38bdf8";
     ctx.font = "700 14px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
     ctx.fillText("INDOOR MEDIA TEAM • OFFICIAL BROADCAST SERVING SCHEDULE", textLeft, curY + 52);
 
     // Month Badge
     const badgeW = 210;
     const badgeX = width - padding - badgeW;
-    ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
-    ctx.strokeStyle = "#f59e0b";
-    ctx.lineWidth = 1.5;
-    roundRect(ctx, badgeX, curY + 8, badgeW, 46, 8, true, true, "#f59e0b");
-
-    ctx.fillStyle = "#fef08a";
+    if (isLight) {
+      ctx.fillStyle = "#fffbeb";
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, badgeX, curY + 8, badgeW, 46, 8, true, true, "#f59e0b");
+      ctx.fillStyle = "#92400e";
+    } else {
+      ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, badgeX, curY + 8, badgeW, 46, 8, true, true, "#f59e0b");
+      ctx.fillStyle = "#fef08a";
+    }
     ctx.font = "800 16px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(`📅 ${monthTitle.toUpperCase()}`, badgeX + (badgeW / 2), curY + 36);
@@ -3241,7 +3546,7 @@ function exportScheduleImagePNG() {
     curY += 95;
 
     // Divider
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.strokeStyle = isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.1)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(padding, curY);
@@ -3252,17 +3557,18 @@ function exportScheduleImagePNG() {
 
     // Section 1: 1st Service Card
     ctx.save();
-    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-    roundRect(ctx, padding, curY, innerWidth, firstServiceH, 12, true, true, "rgba(59, 130, 246, 0.4)");
+    ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
+    const stroke1 = isLight ? "#bae6fd" : "rgba(59, 130, 246, 0.4)";
+    roundRect(ctx, padding, curY, innerWidth, firstServiceH, 12, true, true, stroke1);
 
-    ctx.fillStyle = "#3b82f6";
+    ctx.fillStyle = isLight ? "#0284c7" : "#3b82f6";
     ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
 
-    ctx.fillStyle = "#60a5fa";
+    ctx.fillStyle = isLight ? "#0369a1" : "#60a5fa";
     ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("1ST SERVICE (ENGLISH/TAMIL)", padding + 18, curY + 32);
 
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
     ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("⏰ Call Time: 05:30 AM  |  Prayer: 05:45 AM  |  Broadcast: 06:30 AM – 08:00 AM", padding + 265, curY + 32);
 
@@ -3277,11 +3583,11 @@ function exportScheduleImagePNG() {
     ];
 
     const tHeaderY = curY + 60;
-    ctx.fillStyle = "rgba(30, 41, 59, 0.7)";
+    ctx.fillStyle = isLight ? "#f1f5f9" : "rgba(30, 41, 59, 0.7)";
     ctx.fillRect(padding + 12, tHeaderY - 18, innerWidth - 24, 26);
 
-    ctx.fillStyle = "#cbd5e1";
-    ctx.font = "700 11px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle = isLight ? "#0f172a" : "#cbd5e1";
+    ctx.font = "800 11px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", colX[0], tHeaderY);
     ctx.fillText("🎥 1ST CAM", colX[1], tHeaderY);
     ctx.fillText("📹 2ND CAM", colX[2], tHeaderY);
@@ -3293,21 +3599,27 @@ function exportScheduleImagePNG() {
     let rowY = tHeaderY + 28;
     (appState.firstService || []).forEach((r, idx) => {
       if (idx % 2 === 1) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.02)";
+        ctx.fillStyle = isLight ? "#f8fafc" : "rgba(255, 255, 255, 0.02)";
         ctx.fillRect(padding + 12, rowY - 18, innerWidth - 24, 38);
       }
 
-      ctx.fillStyle = "rgba(59, 130, 246, 0.2)";
-      ctx.strokeStyle = "rgba(59, 130, 246, 0.4)";
+      ctx.fillStyle = isLight ? "#eff6ff" : "rgba(59, 130, 246, 0.2)";
+      ctx.strokeStyle = isLight ? "#93c5fd" : "rgba(59, 130, 246, 0.4)";
       roundRect(ctx, colX[0] - 4, rowY - 16, 95, 24, 5, true, true);
-      ctx.fillStyle = "#93c5fd";
+      ctx.fillStyle = isLight ? "#1d4ed8" : "#93c5fd";
       ctx.font = "800 11px 'JetBrains Mono', monospace";
       ctx.fillText(r.date, colX[0] + 4, rowY);
 
       ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
       const names = [r.cam1, r.cam2, r.gimble, r.live, r.spot, r.charging];
       names.forEach((name, nIdx) => {
-        ctx.fillStyle = (name && name.includes("&")) ? "#fef08a" : "#ffffff";
+        if (!name || name === "—") {
+          ctx.fillStyle = isLight ? "#94a3b8" : "#64748b";
+        } else if (name.includes("&")) {
+          ctx.fillStyle = isLight ? "#92400e" : "#fef08a";
+        } else {
+          ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
+        }
         ctx.fillText(name || "—", colX[nIdx + 1], rowY);
       });
 
@@ -3323,54 +3635,56 @@ function exportScheduleImagePNG() {
 
     // 2nd Service
     ctx.save();
-    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-    roundRect(ctx, padding, curY, colW, secondThirdH, 12, true, true, "rgba(245, 158, 11, 0.4)");
-    ctx.fillStyle = "#f59e0b";
+    ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
+    const stroke2 = isLight ? "#fde68a" : "rgba(245, 158, 11, 0.4)";
+    roundRect(ctx, padding, curY, colW, secondThirdH, 12, true, true, stroke2);
+    ctx.fillStyle = isLight ? "#d97706" : "#f59e0b";
     ctx.fillRect(padding + 12, curY, colW - 24, 3);
 
-    ctx.fillStyle = "#fbbf24";
+    ctx.fillStyle = isLight ? "#b45309" : "#fbbf24";
     ctx.font = "800 14px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("2ND SERVICE (TAMIL)", padding + 18, curY + 28);
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
     ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("⏰ Call: 08:00 AM | Service: 08:45 – 10:30 AM", padding + 18, curY + 46);
 
     let r2Y = curY + 76;
     (appState.secondService || []).forEach((r, idx) => {
-      ctx.fillStyle = "rgba(245, 158, 11, 0.18)";
-      roundRect(ctx, padding + 18, r2Y - 16, 95, 24, 5, true, true, "rgba(245, 158, 11, 0.35)");
-      ctx.fillStyle = "#fde68a";
+      ctx.fillStyle = isLight ? "#fffbeb" : "rgba(245, 158, 11, 0.18)";
+      roundRect(ctx, padding + 18, r2Y - 16, 95, 24, 5, true, true, isLight ? "#fcd34d" : "rgba(245, 158, 11, 0.35)");
+      ctx.fillStyle = isLight ? "#92400e" : "#fde68a";
       ctx.font = "800 11px 'JetBrains Mono', monospace";
       ctx.fillText(r.date, padding + 26, r2Y);
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
       ctx.font = "700 13px 'Plus Jakarta Sans', sans-serif";
       ctx.fillText(r.operator || "—", padding + 130, r2Y);
       r2Y += 42;
     });
 
     // 3rd Service
-    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-    roundRect(ctx, col2X, curY, colW, secondThirdH, 12, true, true, "rgba(168, 85, 247, 0.4)");
-    ctx.fillStyle = "#a855f7";
+    ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
+    const stroke3 = isLight ? "#e9d5ff" : "rgba(168, 85, 247, 0.4)";
+    roundRect(ctx, col2X, curY, colW, secondThirdH, 12, true, true, stroke3);
+    ctx.fillStyle = isLight ? "#9333ea" : "#a855f7";
     ctx.fillRect(col2X + 12, curY, colW - 24, 3);
 
-    ctx.fillStyle = "#c084fc";
+    ctx.fillStyle = isLight ? "#7e22ce" : "#c084fc";
     ctx.font = "800 14px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("3RD SERVICE (ENGLISH)", col2X + 18, curY + 28);
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
     ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("⏰ Call: 10:30 AM | Service: 11:15 AM – 01:00 PM", col2X + 18, curY + 46);
 
     let r3Y = curY + 76;
     (appState.thirdService || []).forEach((r, idx) => {
-      ctx.fillStyle = "rgba(168, 85, 247, 0.18)";
-      roundRect(ctx, col2X + 18, r3Y - 16, 95, 24, 5, true, true, "rgba(168, 85, 247, 0.35)");
-      ctx.fillStyle = "#e9d5ff";
+      ctx.fillStyle = isLight ? "#faf5ff" : "rgba(168, 85, 247, 0.18)";
+      roundRect(ctx, col2X + 18, r3Y - 16, 95, 24, 5, true, true, isLight ? "#d8b4fe" : "rgba(168, 85, 247, 0.35)");
+      ctx.fillStyle = isLight ? "#6b21a8" : "#e9d5ff";
       ctx.font = "800 11px 'JetBrains Mono', monospace";
       ctx.fillText(r.date, col2X + 26, r3Y);
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
       ctx.font = "700 13px 'Plus Jakarta Sans', sans-serif";
       ctx.fillText(r.operator || "—", col2X + 130, r3Y);
       r3Y += 42;
@@ -3381,34 +3695,37 @@ function exportScheduleImagePNG() {
 
     // Section 3: Friday Fasting
     ctx.save();
-    ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-    roundRect(ctx, padding, curY, innerWidth, fridayH, 12, true, true, "rgba(16, 185, 129, 0.4)");
-    ctx.fillStyle = "#10b981";
+    ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
+    const strokeF = isLight ? "#bbf7d0" : "rgba(16, 185, 129, 0.4)";
+    roundRect(ctx, padding, curY, innerWidth, fridayH, 12, true, true, strokeF);
+    ctx.fillStyle = isLight ? "#16a34a" : "#10b981";
     ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
 
-    ctx.fillStyle = "#34d399";
+    ctx.fillStyle = isLight ? "#15803d" : "#34d399";
     ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("FRIDAY FASTING PRAYER", padding + 18, curY + 30);
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
     ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("⏰ Call Time: 09:30 AM  |  Service: 10:00 AM – 01:00 PM", padding + 225, curY + 30);
 
     const fHeaderY = curY + 58;
-    ctx.fillStyle = "#cbd5e1";
-    ctx.font = "700 11px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle = isLight ? "#f1f5f9" : "#cbd5e1";
+    ctx.fillRect(padding + 12, fHeaderY - 18, innerWidth - 24, 26);
+    ctx.fillStyle = isLight ? "#0f172a" : "#cbd5e1";
+    ctx.font = "800 11px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", padding + 24, fHeaderY);
     ctx.fillText("🎥 CAMERA OPERATOR", padding + 240, fHeaderY);
     ctx.fillText("💻 LIVE IN SYSTEM", padding + 600, fHeaderY);
 
     let rfY = fHeaderY + 28;
     (appState.fridayPrayer || []).forEach((r, idx) => {
-      ctx.fillStyle = "rgba(16, 185, 129, 0.18)";
-      roundRect(ctx, padding + 24, rfY - 16, 95, 24, 5, true, true, "rgba(16, 185, 129, 0.35)");
-      ctx.fillStyle = "#a7f3d0";
+      ctx.fillStyle = isLight ? "#f0fdf4" : "rgba(16, 185, 129, 0.18)";
+      roundRect(ctx, padding + 24, rfY - 16, 95, 24, 5, true, true, isLight ? "#86efac" : "rgba(16, 185, 129, 0.35)");
+      ctx.fillStyle = isLight ? "#166534" : "#a7f3d0";
       ctx.font = "800 11px 'JetBrains Mono', monospace";
       ctx.fillText(r.date, padding + 32, rfY);
 
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
       ctx.font = "700 13px 'Plus Jakarta Sans', sans-serif";
       ctx.fillText(r.cam1 || "—", padding + 240, rfY);
       ctx.fillText(r.live || "—", padding + 600, rfY);
@@ -3421,22 +3738,23 @@ function exportScheduleImagePNG() {
     // Special Meetings
     if (specialCount > 0) {
       ctx.save();
-      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
-      roundRect(ctx, padding, curY, innerWidth, specialH, 12, true, true, "rgba(168, 85, 247, 0.4)");
-      ctx.fillStyle = "#a855f7";
+      ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
+      const strokeS = isLight ? "#e9d5ff" : "rgba(168, 85, 247, 0.4)";
+      roundRect(ctx, padding, curY, innerWidth, specialH, 12, true, true, strokeS);
+      ctx.fillStyle = isLight ? "#9333ea" : "#a855f7";
       ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
 
-      ctx.fillStyle = "#c084fc";
+      ctx.fillStyle = isLight ? "#7e22ce" : "#c084fc";
       ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
       ctx.fillText("🌟 SPECIAL MEETINGS & CONFERENCES", padding + 18, curY + 30);
 
       let spY = curY + 60;
       (appState.specialMeetings || []).forEach(r => {
-        ctx.fillStyle = "#fef08a";
+        ctx.fillStyle = isLight ? "#92400e" : "#fef08a";
         ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
         ctx.fillText(`🌟 ${r.title || 'Meeting'} (${r.date})`, padding + 24, spY);
 
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
         ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
         ctx.fillText(`🎥 Cam 1: ${r.cam1 || '—'}  |  📹 Cam 2: ${r.cam2 || '—'}  |  🎯 Gimble: ${r.gimble || '—'}  |  💻 Live: ${r.live || '—'}`, padding + 320, spY);
         spY += 40;
@@ -3445,22 +3763,51 @@ function exportScheduleImagePNG() {
       curY += specialH + 20;
     }
 
+    // Morning Prayer (if enabled)
+    if (morningCount > 0) {
+      ctx.save();
+      ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
+      const strokeM = isLight ? "#fed7aa" : "rgba(249, 115, 22, 0.4)";
+      roundRect(ctx, padding, curY, innerWidth, morningH, 12, true, true, strokeM);
+      ctx.fillStyle = isLight ? "#ea580c" : "#f97316";
+      ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
+
+      ctx.fillStyle = isLight ? "#c2410c" : "#fb923c";
+      ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
+      const mTitle = (appState.morningPrayer && appState.morningPrayer.title) ? appState.morningPrayer.title.toUpperCase() : "EARLY MORNING PRAYER";
+      ctx.fillText(`🌅 ${mTitle}`, padding + 18, curY + 30);
+
+      let mpY = curY + 60;
+      (appState.morningPrayer.days || []).forEach(r => {
+        ctx.fillStyle = isLight ? "#c2410c" : "#fed7aa";
+        ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
+        ctx.fillText(`🌅 ${r.day || 'Day'}`, padding + 24, mpY);
+
+        ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
+        ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
+        ctx.fillText(`🎥 Cam 1: ${r.cam1 || '—'}  |  📹 Cam 2: ${r.cam2 || '—'}  |  🎯 Gimble: ${r.gimbal || '—'}  |  💻 Live: ${r.liveEditor || '—'}  |  📱 Social: ${r.socialMedia || '—'}`, padding + 160, mpY);
+        mpY += 40;
+      });
+      ctx.restore();
+      curY += morningH + 20;
+    }
+
     // Footer
     curY += 10;
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.strokeStyle = isLight ? "#cbd5e1" : "rgba(255, 255, 255, 0.1)";
     ctx.beginPath();
     ctx.moveTo(padding, curY);
     ctx.lineTo(width - padding, curY);
     ctx.stroke();
 
     curY += 28;
-    ctx.fillStyle = "#cbd5e1";
+    ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
     ctx.font = "italic 600 13px 'Plus Jakarta Sans', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText('"Whatever you do, work at it with all your heart, as working for the Lord." — Colossians 3:23', width / 2, curY);
 
     curY += 22;
-    ctx.fillStyle = "#64748b";
+    ctx.fillStyle = isLight ? "#64748b" : "#64748b";
     ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("Full Life Centre AG Church • Indoor Media Portal • Media Desk Command Center", width / 2, curY);
 
@@ -3474,12 +3821,12 @@ function exportScheduleImagePNG() {
       const a = document.createElement("a");
       const safeMonth = monthTitle.replace(/[^a-zA-Z0-9]/g, "_");
       a.href = url;
-      a.download = `FLAG_Media_Schedule_${safeMonth}.png`;
+      a.download = `FLAG_Media_Schedule_${safeMonth}_${isLight ? 'Light' : 'Dark'}.png`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast("📸 High-Resolution Schedule PNG exported! Ready for WhatsApp Status.");
+      showToast(isLight ? "📸 High-Resolution Light Theme Schedule PNG exported! Ready for WhatsApp Status." : "📸 High-Resolution Dark Theme Schedule PNG exported! Ready for WhatsApp Status.");
     }, "image/png");
   };
 
@@ -3574,6 +3921,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
         console.log("☁️ Real-time cloud sync received:", cloudState);
         isSyncingFromCloud = true;
         // Merge received cloud state into appState
+        ensureStateIntegrity(cloudState);
         appState = cloudState;
         // Cache to local storage
         localStorage.setItem("FLAG_MEDIA_PORTAL_STATE", JSON.stringify(appState));
@@ -3584,6 +3932,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
         showToast("☁️ Real-time schedule updated from Cloud!");
       } else if (!cloudState) {
         // First time cloud initialization - push current local state to cloud!
+        ensureStateIntegrity(appState);
         ref.set(appState).catch(err => console.warn("Init cloud error:", err));
       }
     }, err => {
@@ -3623,7 +3972,7 @@ function syncLocalToCloudNow() {
     return;
   }
   saveToCloud(appState);
-  showToast("☁️ Pushed local roster to Cloud! All volunteers will see this immediately.");
+  showToast("☁️ Pushed local schedule to Cloud! All volunteers will see this immediately.");
 }
 
 function disconnectFirebase() {
@@ -3740,7 +4089,7 @@ function copyRosterSyncLink() {
 function shareRosterSyncWhatsApp() {
   const url = getRosterSyncUrl();
   const mName = getMonthName(appState.selectedMonth);
-  const msg = `🕊️ *Full Life Centre AG Church — Media Roster Update*\n\nAdmin Lokesh has updated the ${mName} ${appState.selectedYear} media schedule!\n\n📲 *Tap this link to sync the latest roster onto your phone:*\n${url}\n\n_(Opening the link will instantly save the latest duty assignments to your phone)_`;
+  const msg = `🕊️ *Full Life Centre AG Church — Media Schedule Update*\n\nAdmin Lokesh has updated the ${mName} ${appState.selectedYear} media schedule!\n\n📲 *Tap this link to sync the latest schedule onto your phone:*\n${url}\n\n_(Opening the link will instantly save the latest duty assignments to your phone)_`;
   const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(waUrl, "_blank");
 }
@@ -4121,7 +4470,7 @@ function renderGearIssues() {
     container.innerHTML = `
       <div style="text-align: center; padding: 32px 16px; color: var(--text-muted); background: rgba(15, 23, 42, 0.4); border-radius: 8px;">
         <span style="font-size: 2rem; display: block; margin-bottom: 8px;">🎉</span>
-        <strong style="color: #f1f5f9; font-size: 0.95rem;">No equipment issues logged in this view!</strong>
+        <strong style="font-size: 0.95rem;">No equipment issues logged in this view!</strong>
         <p style="font-size: 0.8rem; margin-top: 4px;">All media gear is in top shape or no matching issues found.</p>
       </div>
     `;
