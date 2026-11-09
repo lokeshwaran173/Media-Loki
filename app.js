@@ -206,10 +206,16 @@ function updateAdminNavUI() {
 
   if (isAdminLoggedIn) {
     btn.classList.add("active");
-    text.textContent = window.innerWidth <= 480 ? "Admin 🔓" : "Admin (Unlocked)";
+    text.innerHTML = `
+      <span class="nav-label-long">Admin 🔓 (Unlocked)</span>
+      <span class="nav-label-short">Admin 🔓</span>
+    `;
   } else {
     btn.classList.remove("active");
-    text.textContent = "Admin Console";
+    text.innerHTML = `
+      <span class="nav-label-long">Admin Console</span>
+      <span class="nav-label-short">Admin</span>
+    `;
   }
 }
 
@@ -2347,10 +2353,7 @@ function updateBadges() {
   const heroProg = document.getElementById("heroChecklistProgress");
   if (heroProg) {
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
-    const weeks = getServiceWeeks();
-    const wObj = weeks.find(w => w.date === activeDate);
-    const wTag = wObj ? `(${wObj.shortLabel})` : '';
-    heroProg.textContent = `${done}/${total} Tasks Done (${pct}%) ${wTag}`.trim();
+    heroProg.textContent = `${done}/${total} Done (${pct}%)`;
   }
 }
 
