@@ -22,7 +22,7 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=3.5">
+  <link rel="stylesheet" href="styles.css?v=3.6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -67,6 +67,10 @@
       </nav>
 
       <div class="nav-actions">
+        <button id="navInstallPwaBtn" class="theme-toggle-btn nav-install-btn" style="display: none; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); color: #34d399;" onclick="triggerPWAInstall()" title="Install Church App to Phone Home Screen">
+          <span style="font-size: 0.95rem;">📲</span>
+          <span>App</span>
+        </button>
         <button id="themeToggleBtn" class="theme-toggle-btn" onclick="toggleTheme()" title="Switch Light / Dark Theme">
           <span id="themeToggleIcon">☀️</span>
           <span id="themeToggleText">Light</span>
@@ -250,6 +254,9 @@
               <option value="">👤 Select Your Name...</option>
               <!-- Dynamically populated with team members -->
             </select>
+            <button class="btn btn-secondary" style="padding: 7px 12px; font-size: 0.82rem; gap: 5px; border-color: rgba(245, 158, 11, 0.4);" onclick="openSwapRequestModal()" title="Request schedule swap or report absence">
+              <span>🔄</span> Swap / Absence
+            </button>
             <button id="clearVolunteerFilterBtn" class="btn btn-secondary" style="display: none; padding: 7px 12px; font-size: 0.82rem;" onclick="clearVolunteerFilter()">
               ✕ Show All
             </button>
@@ -1296,39 +1303,97 @@
 
   <!-- ================= VOLUNTEER SWAP REQUEST MODAL ================= -->
   <div id="swapRequestModal" class="modal-overlay">
-    <div class="modal-card" style="max-width: 480px;">
+    <div class="modal-card" style="max-width: 500px;">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span style="font-size: 1.3rem;">🔁</span>
-          <h3>Request Schedule Swap</h3>
+          <h3>Request Swap / Report Absence</h3>
         </div>
         <button class="modal-close" onclick="closeSwapRequestModal()">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-        Can't make it to your scheduled slot? Generate a quick swap request message to send to the Media Team WhatsApp group:
+        Can't make it to your scheduled slot? Generate a quick church-official message to send to the Media WhatsApp group or Leader Lokesh:
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+        <div id="swapVolunteerSelectWrap">
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Your Name (Volunteer):</label>
+          <select id="swapVolunteerSelect" class="role-select" style="width: 100%;" onchange="onSwapVolunteerSelectChange(this.value)"></select>
+        </div>
+
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Your Scheduled Shift:</label>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Request Type:</label>
+          <select id="swapTypeSelect" class="role-select" style="width: 100%;" onchange="updateSwapPreview()">
+            <option value="swap">🔄 Request Shift Swap / Cover</option>
+            <option value="absence">🚫 Report Absence / Emergency</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Scheduled Shift:</label>
           <select id="swapDutySelect" class="role-select" style="width: 100%;" onchange="updateSwapPreview()"></select>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Reason / Note (Optional):</label>
-          <input type="text" id="swapReasonInput" class="input-text" style="width: 100%;" placeholder="e.g. Out of station / urgent personal work" oninput="updateSwapPreview()">
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Reason / Note:</label>
+          <input type="text" id="swapReasonInput" class="input-text" style="width: 100%;" placeholder="e.g. Out of station / urgent personal work / health" oninput="updateSwapPreview()">
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Suggested Substitute / Covered By (Optional):</label>
+          <input type="text" id="swapReplacementInput" class="input-text" style="width: 100%;" placeholder="e.g. Bro. Balaji agreed to cover / Looking for volunteer" oninput="updateSwapPreview()">
         </div>
 
         <div>
           <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp Message Preview:</label>
-          <pre id="swapMessagePreview" class="whatsapp-bubble-mini" style="max-height: 160px;"></pre>
+          <pre id="swapMessagePreview" class="whatsapp-bubble-mini" style="max-height: 150px;"></pre>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+      <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="closeSwapRequestModal()">Cancel</button>
-        <button class="btn btn-whatsapp" onclick="copySwapMessage()">📋 Copy Message</button>
-        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSwapToWhatsApp()">💬 Open in WhatsApp</button>
+        <button class="btn btn-whatsapp" onclick="copySwapMessage()">📋 Copy</button>
+        <button class="btn btn-whatsapp" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="sendSwapToLeaderWhatsApp()" title="Send directly to Leader Lokesh on WhatsApp">👤 Send to Leader</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSwapToWhatsApp()" title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PWA iOS INSTALLATION GUIDE MODAL ================= -->
+  <div id="iosInstallModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">📲</span>
+          <h3>Install FLAG Media on iPhone</h3>
+        </div>
+        <button class="modal-close" onclick="closeIosInstallModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
+        Install the official church portal to your iPhone Home Screen in 3 quick steps:
+      </p>
+      <div class="ios-install-steps">
+        <div class="ios-step-card">
+          <div class="ios-step-num">1</div>
+          <div class="ios-step-text">
+            Tap the <strong>Share</strong> button <span class="ios-icon-pill">⎋ / 📤</span> at the bottom of Safari.
+          </div>
+        </div>
+        <div class="ios-step-card">
+          <div class="ios-step-num">2</div>
+          <div class="ios-step-text">
+            Scroll down and tap <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">➕</span>.
+          </div>
+        </div>
+        <div class="ios-step-card">
+          <div class="ios-step-num">3</div>
+          <div class="ios-step-text">
+            Tap <strong style="color: #34d399;">"Add"</strong> in the top-right corner. You're ready!
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 18px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-primary" onclick="closeIosInstallModal()">Got it, Thanks!</button>
       </div>
     </div>
   </div>
@@ -1382,6 +1447,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=3.5"></script>
+  <script src="app.js?v=3.6"></script>
 </body>
 </html>

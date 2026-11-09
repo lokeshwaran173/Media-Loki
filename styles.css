@@ -5630,6 +5630,20 @@ html.light-theme .whatsapp-compact-card {
 }
 
 /* PWA Install Banner & App Title */
+[data-theme="light"] .pwa-install-card,
+html.light-theme .pwa-install-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%) !important;
+  border: 1.5px solid #86efac !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.12) !important;
+}
+
+[data-theme="light"] .nav-install-btn,
+html.light-theme .nav-install-btn {
+  background: #ecfdf5 !important;
+  border-color: #86efac !important;
+  color: #059669 !important;
+}
+
 [data-theme="light"] .pwa-app-title,
 html.light-theme .pwa-app-title {
   color: #0f172a !important;
@@ -5638,6 +5652,138 @@ html.light-theme .pwa-app-title {
 [data-theme="light"] .pwa-app-sub,
 html.light-theme .pwa-app-sub {
   color: #475569 !important;
+}
+
+/* ================= DUTY ACTION MICRO-STRIP ================= */
+.duty-actions-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-wrap: wrap;
+}
+
+.btn-duty-action {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  user-select: none;
+}
+
+.btn-duty-action:hover {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-duty-action.btn-duty-swap:hover {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+}
+
+[data-theme="light"] .duty-actions-strip,
+html.light-theme .duty-actions-strip {
+  border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+[data-theme="light"] .btn-duty-action,
+html.light-theme .btn-duty-action {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .btn-duty-action:hover,
+html.light-theme .btn-duty-action:hover {
+  background: #f0f9ff !important;
+  border-color: #0284c7 !important;
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .btn-duty-action.btn-duty-swap:hover,
+html.light-theme .btn-duty-action.btn-duty-swap:hover {
+  background: #fef3c7 !important;
+  border-color: #d97706 !important;
+  color: #b45309 !important;
+}
+
+/* ================= iOS PWA INSTALLATION GUIDE ================= */
+.ios-install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ios-step-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 10px 14px;
+}
+
+.ios-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ios-step-text {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+
+.ios-icon-pill {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+  margin: 0 2px;
+}
+
+[data-theme="light"] .ios-step-card,
+html.light-theme .ios-step-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .ios-step-text,
+html.light-theme .ios-step-text {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .ios-icon-pill,
+html.light-theme .ios-icon-pill {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
 }
 
 /* Universal text fallback guarantee for all containers in light theme */

@@ -381,6 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCalendarSelectors();
   initCloudSync();
   renderAll();
+  initPWABanner();
 });
 
 function loadState() {
@@ -2981,13 +2982,24 @@ function renderVolunteerPersonalBox(name, duties) {
   } else {
     dutiesHtml = `
       <div class="volunteer-duties-grid">
-        ${duties.map(d => `
+        ${duties.map((d, dIdx) => `
           <div class="volunteer-duty-item">
             <span class="duty-badge-time">⏰ Call: ${escapeHtml(d.callTime)}</span>
             <div class="duty-date">📅 ${escapeHtml(d.date)}</div>
             <div class="duty-service">${escapeHtml(d.service)}</div>
             <div class="duty-role">${escapeHtml(d.role)}</div>
             ${d.assignedText && d.assignedText.includes('&') ? `<div style="font-size: 0.76rem; opacity: 0.85; margin-top: 2px;">👥 Paired with: <strong>${escapeHtml(d.assignedText)}</strong></div>` : ''}
+            <div class="duty-actions-strip">
+              <button type="button" class="btn-duty-action" onclick="addSingleDutyToGoogleCalendar('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}')" title="Add this shift directly to Google Calendar">
+                📅 Google Cal
+              </button>
+              <button type="button" class="btn-duty-action" onclick="downloadSingleDutyIcs('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}')" title="Download .ics event with Saturday 12h, 60m & 15m alarms">
+                📱 iCal
+              </button>
+              <button type="button" class="btn-duty-action btn-duty-swap" onclick="openSwapForSpecificDuty('${escapeQuotes(memberObj.name)}', ${dIdx})" title="Request a swap or report absence for this specific shift">
+                🔄 Swap / Absent
+              </button>
+            </div>
           </div>
         `).join('')}
       </div>
@@ -3007,11 +3019,14 @@ function renderVolunteerPersonalBox(name, duties) {
         </div>
       </div>
       <div class="volunteer-actions-row">
-        <button class="btn btn-primary" style="padding: 8px 14px; font-size: 0.84rem; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="downloadVolunteerCalendar('${escapeQuotes(memberObj.name)}')">
-          📅 Add to Calendar (.ics)
+        <button class="btn btn-primary" style="padding: 8px 14px; font-size: 0.84rem; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="addVolunteerNextDutyToGoogleCalendar('${escapeQuotes(memberObj.name)}')">
+          📅 Add to Google Cal
+        </button>
+        <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.84rem;" onclick="downloadVolunteerCalendar('${escapeQuotes(memberObj.name)}')">
+          📱 Phone Calendar (.ics)
         </button>
         <button class="btn btn-warning" style="padding: 8px 14px; font-size: 0.84rem; background: linear-gradient(135deg, #d97706, #b45309);" onclick="openSwapRequestModal('${escapeQuotes(memberObj.name)}')">
-          🔁 Request Swap
+          🔄 Request Swap / Absence
         </button>
         <button class="btn btn-whatsapp" style="padding: 8px 14px; font-size: 0.84rem;" onclick="shareMyScheduleWhatsApp('${escapeQuotes(memberObj.name)}')">
           💬 Share My Schedule
@@ -3023,7 +3038,164 @@ function renderVolunteerPersonalBox(name, duties) {
   box.style.display = "block";
 }
 
-// Calendar Generator (.ics) with 60-min Pre-Call Alarms
+// ================= FEATURE 1: 📅 GOOGLE CALENDAR & PHONE (.ICS) EXPORTS =================
+
+// Robust UTC Parser for Indian Standard Time (IST, UTC+05:30)
+function parseDutyUtc(dateStr, timeStr) {
+  const months = {
+    jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+    jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11
+  };
+  let year = new Date().getFullYear();
+  let month = new Date().getMonth();
+  let day = 1;
+
+  const parts = (dateStr || '').trim().split(/[\s-]+/);
+  if (parts.length >= 3) {
+    if (parts[0].length === 4) {
+      // YYYY-MM-DD
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10) - 1;
+      day = parseInt(parts[2], 10);
+    } else {
+      // DD Mon YYYY
+      day = parseInt(parts[0], 10);
+      const mKey = parts[1].slice(0, 3).toLowerCase();
+      if (months[mKey] !== undefined) month = months[mKey];
+      year = parseInt(parts[2], 10);
+    }
+  }
+
+  let hours = 8;
+  let minutes = 0;
+  if (timeStr) {
+    const tm = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+    if (tm) {
+      hours = parseInt(tm[1], 10);
+      minutes = parseInt(tm[2], 10);
+      const meridiem = (tm[3] || '').toUpperCase();
+      if (meridiem === 'PM' && hours < 12) hours += 12;
+      if (meridiem === 'AM' && hours === 12) hours = 0;
+    }
+  }
+
+  // Offset: IST is UTC+05:30, so UTC time = IST time - 5 hours 30 mins
+  const istOffsetMs = 5.5 * 60 * 60 * 1000;
+  const utcMs = Date.UTC(year, month, day, hours, minutes, 0) - istOffsetMs;
+  const startUtc = new Date(utcMs);
+  const endUtc = new Date(utcMs + (2.5 * 60 * 60 * 1000)); // Default 2.5 hours shift
+
+  const pad = n => String(n).padStart(2, '0');
+  const formatUtc = (d) => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
+
+  return {
+    startUtc: formatUtc(startUtc),
+    endUtc: formatUtc(endUtc),
+    startDate: startUtc,
+    endDate: endUtc
+  };
+}
+
+// 1-Click Google Calendar Direct URL Generator
+function addSingleDutyToGoogleCalendar(date, service, role, callTime, prayerTime, volunteerName) {
+  const utc = parseDutyUtc(date, callTime);
+  const title = `FLAG Media: ${role} (${service})`;
+  const location = "Full Life Centre AG Church, Indoor Media Desk";
+  const details = `Full Life Centre AG Church - Indoor Media Ministry\n\n👤 Volunteer: ${volunteerName || 'Media Team'}\n⛪ Service: ${service}\n🎬 Scheduled Role: ${role}\n⏰ Call Time: ${callTime}\n🙏 Team Prayer: ${prayerTime || '15 mins before call'}\n📍 Location: Indoor Media Desk\n\n"Whatever you do, work at it with all your heart as for the Lord." - Colossians 3:23 🙏✨`;
+
+  const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${utc.startUtc}/${utc.endUtc}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+  
+  window.open(gCalUrl, '_blank');
+  showToast(`📅 Opening Google Calendar for ${service} on ${date}...`);
+}
+
+function addVolunteerNextDutyToGoogleCalendar(name) {
+  const volunteer = name || window.currentVolunteerFilter;
+  if (!volunteer) {
+    showToast("Please select your name first.");
+    return;
+  }
+  const duties = getVolunteerDuties(volunteer);
+  if (!duties || duties.length === 0) {
+    showToast(`No duties scheduled for ${volunteer}.`);
+    return;
+  }
+  const nextDuty = duties[0];
+  addSingleDutyToGoogleCalendar(
+    nextDuty.date,
+    nextDuty.service,
+    nextDuty.role,
+    nextDuty.callTime,
+    nextDuty.prayerTime,
+    volunteer
+  );
+  if (duties.length > 1) {
+    showToast(`📅 Adding duty 1 of ${duties.length} to Google Calendar. Use individual shift buttons below for other dates!`);
+  }
+}
+
+// Single-Duty .ics Generator with Saturday 12h, 60-min & 15-min Alarms
+function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunteerName) {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const nowStamp = `${pad(now.getUTCFullYear())}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+
+  const utc = parseDutyUtc(date, callTime);
+  const uid = `flag-media-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@fulllifecentre.church`;
+  const summary = `FLAG Media: ${role} (${service})`;
+  const description = `Full Life Centre AG Church - Indoor Media Duty\\nService: ${service}\\nRole: ${role}\\nCall Time: ${callTime}\\nTeam Prayer: ${prayerTime || '15 mins before call'}\\nAssigned: ${volunteerName}\\n\\nPlease arrive promptly. God bless your ministry!`;
+
+  const icsBody = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Full Life Centre AG Church//Indoor Media Portal//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:FLAG Media - ' + (volunteerName || 'Duty'),
+    'X-WR-TIMEZONE:Asia/Kolkata',
+    'BEGIN:VEVENT',
+    `UID:${uid}`,
+    `DTSTAMP:${nowStamp}`,
+    `DTSTART:${utc.startUtc}`,
+    `DTEND:${utc.endUtc}`,
+    `SUMMARY:${summary}`,
+    `DESCRIPTION:${description}`,
+    'LOCATION:Full Life Centre AG Church, Indoor Media Desk',
+    'STATUS:CONFIRMED',
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:FLAG Media Saturday 12hr Reminder: Duty Tomorrow Morning',
+    'TRIGGER:-PT12H',
+    'END:VALARM',
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:FLAG Media Call Time in 60 Mins',
+    'TRIGGER:-PT60M',
+    'END:VALARM',
+    'BEGIN:VALARM',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:FLAG Media Call Time in 15 Mins',
+    'TRIGGER:-PT15M',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const blob = new Blob([icsBody], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const safeDate = (date || 'Duty').replace(/[^a-zA-Z0-9]/g, '_');
+  a.href = url;
+  a.download = `FLAG_Media_${safeDate}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  showToast(`📅 Calendar event downloaded for ${date}!`);
+}
+
+// Calendar Generator (.ics) with Saturday 12-Hour, 60-min & 15-min Pre-Call Alarms
 function downloadVolunteerCalendar(name) {
   const volunteer = name || window.currentVolunteerFilter;
   if (!volunteer) {
@@ -3042,25 +3214,7 @@ function downloadVolunteerCalendar(name) {
 
   let icsEvents = [];
   duties.forEach((d, idx) => {
-    // Parse call time
-    let cleanTime = "08:00 AM";
-    if (d.callTime) {
-      const matchTime = d.callTime.match(/(\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?)/i);
-      if (matchTime) cleanTime = matchTime[1];
-    }
-    const startObj = new Date(`${d.date} ${cleanTime}`);
-    
-    let dtStart = "";
-    let dtEnd = "";
-    if (!isNaN(startObj.getTime())) {
-      const startLocal = `${pad(startObj.getFullYear())}${pad(startObj.getMonth() + 1)}${pad(startObj.getDate())}T${pad(startObj.getHours())}${pad(startObj.getMinutes())}00`;
-      const endObj = new Date(startObj.getTime() + 2.5 * 60 * 60 * 1000); // 2.5 hours default
-      const endLocal = `${pad(endObj.getFullYear())}${pad(endObj.getMonth() + 1)}${pad(endObj.getDate())}T${pad(endObj.getHours())}${pad(endObj.getMinutes())}00`;
-      dtStart = startLocal;
-      dtEnd = endLocal;
-    } else {
-      return; // Skip non-parseable entries
-    }
+    const utc = parseDutyUtc(d.date, d.callTime);
 
     const uid = `flag-media-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 8)}@fulllifecentre.church`;
     const summary = `FLAG Media: ${d.role} (${d.serviceShort})`;
@@ -3069,12 +3223,17 @@ function downloadVolunteerCalendar(name) {
     icsEvents.push(`BEGIN:VEVENT
 UID:${uid}
 DTSTAMP:${nowStamp}
-DTSTART:${dtStart}
-DTEND:${dtEnd}
+DTSTART:${utc.startUtc}
+DTEND:${utc.endUtc}
 SUMMARY:${summary}
 DESCRIPTION:${description}
 LOCATION:Full Life Centre AG Church, Indoor Media Desk
 STATUS:CONFIRMED
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:FLAG Media Saturday 12hr Reminder: Duty Tomorrow Morning
+TRIGGER:-PT12H
+END:VALARM
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:FLAG Media Call Time in 60 Mins
@@ -3153,37 +3312,64 @@ function shareMyScheduleWhatsApp(name) {
   window.open(`https://wa.me/?text=${encoded}`, '_blank');
 }
 
-// ================= FEATURE 2: 🔁 WHATSAPP VOLUNTEER SWAP REQUEST =================
+// ================= FEATURE 2: 🔁 VOLUNTEER SWAP REQUEST / REPORT ABSENCE =================
 let currentSwapVolunteer = "";
 
-function openSwapRequestModal(name) {
-  const volunteer = name || window.currentVolunteerFilter || (appState.members && appState.members[0] ? appState.members[0].name : "");
-  if (!volunteer) {
-    showToast("Please select a volunteer first.");
-    return;
-  }
-  currentSwapVolunteer = volunteer;
+function openSwapRequestModal(name, preselectDutyIndex) {
+  // Populate volunteer select dropdown
+  const volSelect = document.getElementById("swapVolunteerSelect");
+  const members = appState.members || [];
+  const selectedName = name || window.currentVolunteerFilter || (members[0] ? members[0].name : "");
 
-  const select = document.getElementById("swapDutySelect");
-  const duties = getVolunteerDuties(volunteer);
-  if (select) {
-    select.innerHTML = "";
-    if (duties.length === 0) {
-      select.innerHTML = `<option value="general">No specific duty scheduled (General Request)</option>`;
-    } else {
-      duties.forEach((d, idx) => {
-        select.innerHTML += `<option value="${idx}">${d.date} - ${d.serviceShort} (${d.role})</option>`;
-      });
-    }
+  if (volSelect) {
+    volSelect.innerHTML = members.map(m => `
+      <option value="${escapeHtml(m.name)}" ${m.name.toLowerCase() === (selectedName || '').toLowerCase() ? 'selected' : ''}>
+        👤 ${escapeHtml(m.name)} (${escapeHtml(m.role || 'Crew')})
+      </option>
+    `).join('');
   }
+
+  currentSwapVolunteer = selectedName || (members[0] ? members[0].name : "");
+  populateSwapDutiesDropdown(currentSwapVolunteer, preselectDutyIndex);
 
   const reasonInput = document.getElementById("swapReasonInput");
   if (reasonInput) reasonInput.value = "";
+
+  const repInput = document.getElementById("swapReplacementInput");
+  if (repInput) repInput.value = "";
+
+  const typeSelect = document.getElementById("swapTypeSelect");
+  if (typeSelect) typeSelect.value = "swap";
 
   updateSwapPreview();
 
   const modal = document.getElementById("swapRequestModal");
   if (modal) modal.style.display = "flex";
+}
+
+function openSwapForSpecificDuty(volunteerName, dutyIndex) {
+  openSwapRequestModal(volunteerName, dutyIndex);
+}
+
+function onSwapVolunteerSelectChange(volunteerName) {
+  currentSwapVolunteer = volunteerName;
+  populateSwapDutiesDropdown(volunteerName);
+  updateSwapPreview();
+}
+
+function populateSwapDutiesDropdown(volunteerName, preselectIdx) {
+  const select = document.getElementById("swapDutySelect");
+  if (!select) return;
+  const duties = getVolunteerDuties(volunteerName);
+  select.innerHTML = "";
+  if (duties.length === 0) {
+    select.innerHTML = `<option value="general">No specific duty scheduled (General Request)</option>`;
+  } else {
+    duties.forEach((d, idx) => {
+      const isSelected = (preselectIdx !== undefined && preselectIdx === idx) ? "selected" : "";
+      select.innerHTML += `<option value="${idx}" ${isSelected}>📅 ${d.date} - ${d.serviceShort} (${d.role})</option>`;
+    });
+  }
 }
 
 function closeSwapRequestModal() {
@@ -3197,8 +3383,17 @@ function updateSwapPreview() {
   const selectedIdx = select ? parseInt(select.value, 10) : 0;
   const duty = (!isNaN(selectedIdx) && duties[selectedIdx]) ? duties[selectedIdx] : null;
 
+  const typeSelect = document.getElementById("swapTypeSelect");
+  const reqType = typeSelect ? typeSelect.value : "swap";
+  const isAbsence = reqType === "absence";
+
   const reasonInput = document.getElementById("swapReasonInput");
-  const reason = (reasonInput && reasonInput.value.trim()) ? reasonInput.value.trim() : "Personal emergency / urgent commitment";
+  const reason = (reasonInput && reasonInput.value.trim()) 
+    ? reasonInput.value.trim() 
+    : (isAbsence ? "Emergency personal commitment / unwell" : "Personal schedule clash / need shift cover");
+
+  const repInput = document.getElementById("swapReplacementInput");
+  const replacement = repInput ? repInput.value.trim() : "";
 
   let dutyText = "";
   if (duty) {
@@ -3207,19 +3402,33 @@ function updateSwapPreview() {
     dutyText = `📅 *Month:* ${appState.month || 'Current Month'}\n⛪ *Service:* Media Team Duty`;
   }
 
-  const msg = `*🔄 FLAG MEDIA TEAM - VOLUNTEER SWAP REQUEST*
-━━━━━━━━━━━━━━━━━━━━━
-Shalom Media Team! 👋
+  let repLine = "";
+  if (replacement) {
+    repLine = `\n🤝 *Covered / Swapped With:* ${replacement}`;
+  } else if (!isAbsence) {
+    repLine = `\n🤝 *Covered By:* Looking for a volunteer to cover or trade shifts`;
+  }
 
-I need a volunteer to kindly swap or cover my scheduled media duty:
+  let titleLine = isAbsence 
+    ? `*🚫 FLAG MEDIA TEAM - REPORT ABSENCE NOTICE*` 
+    : `*🔄 FLAG MEDIA TEAM - VOLUNTEER SWAP REQUEST*`;
+
+  let openingLine = isAbsence
+    ? `Shalom Media Team! 👋\n\nI am reporting that I will unfortunately be unable to attend my scheduled media shift due to an emergency:`
+    : `Shalom Media Team! 👋\n\nI need a volunteer to kindly swap or cover my scheduled media duty:`;
+
+  const msg = `${titleLine}
+━━━━━━━━━━━━━━━━━━━━━
+${openingLine}
 
 👤 *Volunteer:* ${currentSwapVolunteer}
 ${dutyText}
-📝 *Reason:* ${reason}
+📝 *Reason:* ${reason}${repLine}
 
-Is anyone available to cover or trade shifts with me? Please let me know or reply directly. 
+${isAbsence ? 'Please pray for me and update the schedule roster accordingly.' : 'Is anyone available to cover or trade shifts with me? Please reply directly.'}
 
-Thank you and God bless! 🙏🕊️`;
+Thank you and God bless! 🙏🕊️
+_"Whatever you do, work at it with all your heart as for the Lord." - Col 3:23_`;
 
   const preview = document.getElementById("swapMessagePreview");
   if (preview) preview.textContent = msg;
@@ -3241,6 +3450,14 @@ function sendSwapToWhatsApp() {
   if (!preview) return;
   const encoded = encodeURIComponent(preview.textContent);
   window.open(`https://wa.me/?text=${encoded}`, '_blank');
+}
+
+function sendSwapToLeaderWhatsApp() {
+  const preview = document.getElementById("swapMessagePreview");
+  if (!preview) return;
+  const encoded = encodeURIComponent(preview.textContent);
+  // Leader Lokesh WhatsApp: 917010368793
+  window.open(`https://wa.me/917010368793?text=${encoded}`, '_blank');
 }
 
 // ================= FEATURE 3: 📲 INDIVIDUAL WHATSAPP DIRECT REMINDER =================
@@ -3367,19 +3584,56 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+function isPwaInstalled() {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+         window.navigator.standalone === true ||
+         document.referrer.includes('android-app://');
+}
+
+function isIosDevice() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent || '') ||
+         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+function initPWABanner() {
+  if (isPwaInstalled()) {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (banner) banner.style.display = 'none';
+    const navBtn = document.getElementById('navInstallPwaBtn');
+    if (navBtn) navBtn.style.display = 'none';
+    return;
+  }
+
+  // Show persistent nav install button for 1-tap access anytime
+  const navBtn = document.getElementById('navInstallPwaBtn');
+  if (navBtn) navBtn.style.display = 'inline-flex';
+
+  const dismissed = sessionStorage.getItem('flag_pwa_dismissed') === 'true';
+  const banner = document.getElementById('pwaInstallBanner');
+  if (banner && !dismissed) {
+    banner.style.display = 'flex';
+  }
+}
+
 let deferredPwaPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPwaPrompt = e;
-  const banner = document.getElementById('pwaInstallBanner');
-  if (banner && !sessionStorage.getItem('flag_pwa_dismissed')) {
-    banner.style.display = 'flex';
+  if (!isPwaInstalled()) {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (banner && !sessionStorage.getItem('flag_pwa_dismissed')) {
+      banner.style.display = 'flex';
+    }
+    const navBtn = document.getElementById('navInstallPwaBtn');
+    if (navBtn) navBtn.style.display = 'inline-flex';
   }
 });
 
 window.addEventListener('appinstalled', () => {
   const banner = document.getElementById('pwaInstallBanner');
   if (banner) banner.style.display = 'none';
+  const navBtn = document.getElementById('navInstallPwaBtn');
+  if (navBtn) navBtn.style.display = 'none';
   deferredPwaPrompt = null;
   showToast('🎉 FLAG Media App installed to your device!');
 });
@@ -3394,10 +3648,24 @@ function triggerPWAInstall() {
       deferredPwaPrompt = null;
       const banner = document.getElementById('pwaInstallBanner');
       if (banner) banner.style.display = 'none';
+      const navBtn = document.getElementById('navInstallPwaBtn');
+      if (navBtn) navBtn.style.display = 'none';
     });
+  } else if (isIosDevice()) {
+    openIosInstallModal();
   } else {
-    showToast('📱 To install on iOS/Android: Tap Share or Menu (⋮) and select "Add to Home Screen"');
+    showToast('📱 To install: Tap browser menu (⋮) and select "Install app" or "Add to Home Screen"');
   }
+}
+
+function openIosInstallModal() {
+  const modal = document.getElementById("iosInstallModal");
+  if (modal) modal.style.display = "flex";
+}
+
+function closeIosInstallModal() {
+  const modal = document.getElementById("iosInstallModal");
+  if (modal) modal.style.display = "none";
 }
 
 function dismissPWABanner() {
