@@ -22,7 +22,7 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=3.6">
+  <link rel="stylesheet" href="styles.css?v=3.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -229,6 +229,14 @@
               <span class="active-month-label">ACTIVE SCHEDULE:</span>
               <strong id="publicActiveMonthBadge" class="active-month-name">October 2026</strong>
             </div>
+            <div class="schedule-view-switcher">
+              <button id="schedViewTableBtn" class="sched-view-btn active" onclick="setScheduleLayoutMode('table')" title="View Full Grid Table">
+                📋 Table View
+              </button>
+              <button id="schedViewCardBtn" class="sched-view-btn" onclick="setScheduleLayoutMode('card')" title="View Clean Mobile Service Cards">
+                📱 Card View
+              </button>
+            </div>
             <button class="btn btn-primary" onclick="exportScheduleImagePNG()" style="padding: 6px 14px; font-size: 0.82rem; background: linear-gradient(135deg, #0284c7, #0f766e); font-weight: 700; gap: 6px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);" title="Download High-Res PNG Schedule Image">
               📸 Download Image (PNG)
             </button>
@@ -295,6 +303,8 @@
             </tbody>
           </table>
         </div>
+        <!-- Mobile Card View Container -->
+        <div class="schedule-cards-grid" id="publicCards1stService" style="display: none;"></div>
       </div>
 
       <!-- Compact WhatsApp Announcement Bar -->
@@ -360,6 +370,7 @@
               <tbody id="publicTbody2ndService"></tbody>
             </table>
           </div>
+          <div class="schedule-cards-grid" id="publicCards2ndService" style="display: none;"></div>
         </div>
 
         <!-- 3rd Service -->
@@ -379,6 +390,7 @@
               <tbody id="publicTbody3rdService"></tbody>
             </table>
           </div>
+          <div class="schedule-cards-grid" id="publicCards3rdService" style="display: none;"></div>
         </div>
       </div>
 
@@ -400,6 +412,7 @@
             <tbody id="publicTbodyFridayService"></tbody>
           </table>
         </div>
+        <div class="schedule-cards-grid" id="publicCardsFridayService" style="display: none;"></div>
       </div>
 
       <!-- Special Meetings / Conferences Schedule -->
@@ -515,6 +528,38 @@
               ✅ Mark All Done
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- ================= 1-TAP CATEGORY READINESS COMMAND BOX ================= -->
+      <div class="card category-readiness-card card-accent-emerald" style="margin-bottom: 22px;">
+        <div class="category-readiness-header">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div class="badge-icon-chip" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); font-size: 1.3rem;">⚡</div>
+            <div>
+              <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: #fff;" class="cat-readiness-title">1-Tap Category Readiness Status</h3>
+              <p style="font-size: 0.82rem; color: var(--text-muted); margin: 3px 0 0 0;" class="cat-readiness-sub">
+                Quick 1-tap completion for all 6 service areas. Mark sections complete or filter pending tasks.
+              </p>
+            </div>
+          </div>
+          <!-- Task Status Filter Tabs -->
+          <div class="checklist-status-filters" id="checklistStatusFilters">
+            <button class="status-filter-pill active" onclick="setChecklistStatusFilter('all', this)" id="filterAllTasksBtn">
+              📋 All Tasks (<span id="countAllTasks">34</span>)
+            </button>
+            <button class="status-filter-pill pill-pending" onclick="setChecklistStatusFilter('pending', this)" id="filterPendingTasksBtn">
+              ⏳ Pending Only (<span id="countPendingTasks">34</span>)
+            </button>
+            <button class="status-filter-pill pill-done" onclick="setChecklistStatusFilter('done', this)" id="filterDoneTasksBtn">
+              ✅ Done (<span id="countDoneTasks">0</span>)
+            </button>
+          </div>
+        </div>
+
+        <!-- 6 Quick Category Readiness Cards Grid -->
+        <div class="category-readiness-grid" id="categoryReadinessGrid">
+          <!-- Dynamically populated via app.js -->
         </div>
       </div>
 
@@ -1447,6 +1492,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=3.6"></script>
+  <script src="app.js?v=3.7"></script>
 </body>
 </html>

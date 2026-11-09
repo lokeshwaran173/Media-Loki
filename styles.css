@@ -5786,6 +5786,559 @@ html.light-theme .ios-icon-pill {
   color: #0f172a !important;
 }
 
+/* ================= SCHEDULE VIEW SWITCHER (TABLE VS CARDS) ================= */
+.schedule-view-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.sched-view-btn {
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.sched-view-btn:hover {
+  color: #fff;
+}
+
+.sched-view-btn.active {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+}
+
+/* ================= MOBILE SCHEDULE CARDS ================= */
+.schedule-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.schedule-service-card {
+  background: linear-gradient(180deg, rgba(22, 33, 56, 0.85) 0%, rgba(14, 21, 36, 0.96) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.schedule-service-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.sched-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+}
+
+.sched-card-date {
+  font-weight: 800;
+  font-size: 0.98rem;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.sched-card-roles {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.sched-role-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  padding: 2px 0;
+}
+
+.sched-role-label {
+  color: #94a3b8;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.sched-role-val {
+  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+/* ================= 1-TAP CATEGORY READINESS COMMAND BOX ================= */
+.category-readiness-card {
+  border-radius: 16px;
+  padding: 18px 20px;
+  background: linear-gradient(180deg, rgba(22, 33, 56, 0.9) 0%, rgba(14, 21, 36, 0.98) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.category-readiness-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.checklist-status-filters {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-filter-pill {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.status-filter-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.status-filter-pill.active {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.35);
+}
+
+.status-filter-pill.pill-pending.active {
+  background: #d97706;
+  border-color: #fbbf24;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(217, 119, 6, 0.35);
+}
+
+.status-filter-pill.pill-done.active {
+  background: #059669;
+  border-color: #34d399;
+  color: #ffffff;
+  box-shadow: 0 2px 10px rgba(5, 150, 105, 0.35);
+}
+
+.category-readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 12px;
+}
+
+.cat-readiness-card {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.cat-readiness-card:hover {
+  border-color: #10b981;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cat-readiness-card.cat-done {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.cat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cat-icon-chip {
+  font-size: 1.25rem;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.cat-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cat-card-incharge {
+  font-size: 0.74rem;
+  color: #38bdf8;
+  display: block;
+  margin-top: 1px;
+}
+
+.cat-status-badge {
+  font-size: 0.76rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  padding: 2px 7px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.cat-status-badge.badge-complete {
+  background: rgba(16, 185, 129, 0.25);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.cat-status-badge.badge-pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.cat-progress-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  margin: 4px 0 2px 0;
+  overflow: hidden;
+}
+
+.cat-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+}
+
+.cat-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cat-pct-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #94a3b8;
+}
+
+.btn-cat-action {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: all 0.15s ease;
+}
+
+.btn-mark-done {
+  background: linear-gradient(135deg, #059669, #047857);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.35);
+}
+
+.btn-mark-done:hover {
+  background: linear-gradient(135deg, #10b981, #059669);
+  transform: translateY(-1px);
+}
+
+.btn-reopen {
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-reopen:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+/* 1-Tap Category Button in Checklist Box Header */
+.btn-cat-complete {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.btn-cat-complete:hover {
+  background: rgba(16, 185, 129, 0.3);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.btn-cat-complete.is-complete {
+  background: rgba(16, 185, 129, 0.28);
+  color: #a7f3d0;
+  border-color: #10b981;
+}
+
+.checklist-box.box-all-done {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+/* Device Remember Pill */
+.device-remember-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.74rem;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.btn-remember-switch {
+  background: transparent;
+  border: none;
+  color: #38bdf8;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.74rem;
+  padding: 0;
+  font-family: inherit;
+}
+
+.btn-remember-switch:hover {
+  color: #7dd3fc;
+}
+
+/* Highlight pulse on jump */
+.highlight-section-pulse {
+  animation: sectionPulse 1.8s ease;
+}
+
+@keyframes sectionPulse {
+  0%, 100% {
+    box-shadow: var(--shadow-sm);
+  }
+  30%, 70% {
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.8), 0 0 8px #34d399;
+    border-color: #10b981;
+  }
+}
+
+/* ================= LIGHT THEME OVERRIDES FOR NEW COMPONENTS ================= */
+[data-theme="light"] .schedule-view-switcher,
+html.light-theme .schedule-view-switcher {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .sched-view-btn,
+html.light-theme .sched-view-btn {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .sched-view-btn:hover,
+html.light-theme .sched-view-btn:hover {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .sched-view-btn.active,
+html.light-theme .sched-view-btn.active {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .schedule-service-card,
+html.light-theme .schedule-service-card {
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .sched-card-date,
+html.light-theme .sched-card-date {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .sched-card-top,
+html.light-theme .sched-card-top {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .sched-role-label,
+html.light-theme .sched-role-label {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .category-readiness-card,
+html.light-theme .category-readiness-card {
+  background: #ffffff !important;
+  border-color: #86efac !important;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08) !important;
+}
+
+[data-theme="light"] .cat-readiness-title,
+html.light-theme .cat-readiness-title {
+  color: #065f46 !important;
+}
+
+[data-theme="light"] .cat-readiness-sub,
+html.light-theme .cat-readiness-sub {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .status-filter-pill,
+html.light-theme .status-filter-pill {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+[data-theme="light"] .status-filter-pill:hover,
+html.light-theme .status-filter-pill:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .status-filter-pill.active,
+html.light-theme .status-filter-pill.active {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .status-filter-pill.pill-pending.active,
+html.light-theme .status-filter-pill.pill-pending.active {
+  background: #d97706 !important;
+  border-color: #d97706 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .status-filter-pill.pill-done.active,
+html.light-theme .status-filter-pill.pill-done.active {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .cat-readiness-card,
+html.light-theme .cat-readiness-card {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .cat-readiness-card.cat-done,
+html.light-theme .cat-readiness-card.cat-done {
+  background: #ecfdf5 !important;
+  border-color: #86efac !important;
+}
+
+[data-theme="light"] .cat-card-title,
+html.light-theme .cat-card-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .cat-card-incharge,
+html.light-theme .cat-card-incharge {
+  color: #0284c7 !important;
+}
+
+[data-theme="light"] .cat-icon-chip,
+html.light-theme .cat-icon-chip {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .cat-progress-track,
+html.light-theme .cat-progress-track {
+  background: #e2e8f0 !important;
+}
+
+[data-theme="light"] .cat-pct-label,
+html.light-theme .cat-pct-label {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .btn-reopen,
+html.light-theme .btn-reopen {
+  background: #e2e8f0 !important;
+  color: #1e293b !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .btn-cat-complete,
+html.light-theme .btn-cat-complete {
+  background: #ecfdf5 !important;
+  border-color: #86efac !important;
+  color: #047857 !important;
+}
+
+[data-theme="light"] .device-remember-pill,
+html.light-theme .device-remember-pill {
+  background: #fef3c7 !important;
+  border-color: #fde68a !important;
+  color: #92400e !important;
+}
+
+[data-theme="light"] .btn-remember-switch,
+html.light-theme .btn-remember-switch {
+  color: #0284c7 !important;
+}
+
 /* Universal text fallback guarantee for all containers in light theme */
 [data-theme="light"] div,
 [data-theme="light"] span,

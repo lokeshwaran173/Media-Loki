@@ -382,6 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initCloudSync();
   renderAll();
   initPWABanner();
+  initSavedVolunteer();
 });
 
 function loadState() {
@@ -751,8 +752,34 @@ function badgeForName(name) {
 }
 
 // ================= RENDER PUBLIC READ-ONLY SCHEDULE (VOLUNTEER VIEW) =================
+let currentScheduleLayoutMode = localStorage.getItem("FLAG_SCHEDULE_LAYOUT_MODE") || "table";
+
+function setScheduleLayoutMode(mode) {
+  currentScheduleLayoutMode = mode || "table";
+  try { localStorage.setItem("FLAG_SCHEDULE_LAYOUT_MODE", currentScheduleLayoutMode); } catch (e) {}
+
+  updateScheduleLayoutVisibility();
+  showToast(currentScheduleLayoutMode === "card" ? "📱 Switched to Mobile Card View" : "📋 Switched to Table View");
+}
+
+function updateScheduleLayoutVisibility() {
+  const isCard = currentScheduleLayoutMode === "card";
+  const tableWraps = document.querySelectorAll("#scheduleView .table-wrap");
+  const cardGrids = document.querySelectorAll("#scheduleView .schedule-cards-grid");
+  const tableHints = document.querySelectorAll("#scheduleView .mobile-table-hint");
+
+  tableWraps.forEach(el => el.style.display = isCard ? "none" : "block");
+  cardGrids.forEach(el => el.style.display = isCard ? "grid" : "none");
+  tableHints.forEach(el => el.style.display = isCard ? "none" : "block");
+
+  const tableBtn = document.getElementById("schedViewTableBtn");
+  const cardBtn = document.getElementById("schedViewCardBtn");
+  if (tableBtn) tableBtn.classList.toggle("active", !isCard);
+  if (cardBtn) cardBtn.classList.toggle("active", isCard);
+}
+
 function renderPublicSchedule() {
-  // 1st Service Public
+  // 1. 1st Service Public (Table View)
   const t1 = document.getElementById("publicTbody1stService");
   if (t1) {
     t1.innerHTML = "";
@@ -771,7 +798,50 @@ function renderPublicSchedule() {
     });
   }
 
-  // 2nd Service Public
+  // 1st Service Public (Mobile Card View)
+  const c1 = document.getElementById("publicCards1stService");
+  if (c1) {
+    c1.innerHTML = "";
+    (appState.firstService || []).forEach(r => {
+      const card = document.createElement("div");
+      card.className = "schedule-service-card card-accent-blue";
+      card.innerHTML = `
+        <div class="sched-card-top">
+          <div class="sched-card-date">📅 ${r.date}</div>
+          <span class="duty-badge-time">⏰ Call: 05:30 AM | Prayer: 05:45 AM</span>
+        </div>
+        <div class="sched-card-roles">
+          <div class="sched-role-row">
+            <span class="sched-role-label">🎥 1st Cam:</span>
+            <div class="sched-role-val">${badgeForName(r.cam1)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">📹 2nd Cam:</span>
+            <div class="sched-role-val">${badgeForName(r.cam2)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">🎯 Gimble:</span>
+            <div class="sched-role-val">${badgeForName(r.gimble)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">💻 Live System:</span>
+            <div class="sched-role-val">${badgeForName(r.live)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">✂️ Spot Editing:</span>
+            <div class="sched-role-val">${badgeForName(r.spot)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">🔋 Battery & Charging:</span>
+            <div class="sched-role-val">${badgeForName(r.charging)}</div>
+          </div>
+        </div>
+      `;
+      c1.appendChild(card);
+    });
+  }
+
+  // 2. 2nd Service Public (Table View)
   const t2 = document.getElementById("publicTbody2ndService");
   if (t2) {
     t2.innerHTML = "";
@@ -785,7 +855,30 @@ function renderPublicSchedule() {
     });
   }
 
-  // 3rd Service Public
+  // 2nd Service Public (Mobile Card View)
+  const c2 = document.getElementById("publicCards2ndService");
+  if (c2) {
+    c2.innerHTML = "";
+    (appState.secondService || []).forEach(r => {
+      const card = document.createElement("div");
+      card.className = "schedule-service-card card-accent-amber";
+      card.innerHTML = `
+        <div class="sched-card-top">
+          <div class="sched-card-date">📅 ${r.date}</div>
+          <span class="duty-badge-time">⏰ Call: 08:00 AM</span>
+        </div>
+        <div class="sched-card-roles">
+          <div class="sched-role-row">
+            <span class="sched-role-label">🎥 Cam & Live Operator:</span>
+            <div class="sched-role-val">${badgeForName(r.operator)}</div>
+          </div>
+        </div>
+      `;
+      c2.appendChild(card);
+    });
+  }
+
+  // 3. 3rd Service Public (Table View)
   const t3 = document.getElementById("publicTbody3rdService");
   if (t3) {
     t3.innerHTML = "";
@@ -799,7 +892,30 @@ function renderPublicSchedule() {
     });
   }
 
-  // Friday Fasting Public
+  // 3rd Service Public (Mobile Card View)
+  const c3 = document.getElementById("publicCards3rdService");
+  if (c3) {
+    c3.innerHTML = "";
+    (appState.thirdService || []).forEach(r => {
+      const card = document.createElement("div");
+      card.className = "schedule-service-card card-accent-purple";
+      card.innerHTML = `
+        <div class="sched-card-top">
+          <div class="sched-card-date">📅 ${r.date}</div>
+          <span class="duty-badge-time">⏰ Call: 10:30 AM</span>
+        </div>
+        <div class="sched-card-roles">
+          <div class="sched-role-row">
+            <span class="sched-role-label">🎥 Cam & Live Operator:</span>
+            <div class="sched-role-val">${badgeForName(r.operator)}</div>
+          </div>
+        </div>
+      `;
+      c3.appendChild(card);
+    });
+  }
+
+  // 4. Friday Fasting Public (Table View)
   const tf = document.getElementById("publicTbodyFridayService");
   if (tf) {
     tf.innerHTML = "";
@@ -811,6 +927,33 @@ function renderPublicSchedule() {
         <td>${badgeForName(r.live)}</td>
       `;
       tf.appendChild(tr);
+    });
+  }
+
+  // Friday Fasting Public (Mobile Card View)
+  const cf = document.getElementById("publicCardsFridayService");
+  if (cf) {
+    cf.innerHTML = "";
+    (appState.fridayPrayer || []).forEach(r => {
+      const card = document.createElement("div");
+      card.className = "schedule-service-card card-accent-emerald";
+      card.innerHTML = `
+        <div class="sched-card-top">
+          <div class="sched-card-date">📅 ${r.date}</div>
+          <span class="duty-badge-time">⏰ Call: 09:30 AM</span>
+        </div>
+        <div class="sched-card-roles">
+          <div class="sched-role-row">
+            <span class="sched-role-label">🎥 1st Cam:</span>
+            <div class="sched-role-val">${badgeForName(r.cam1)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">💻 Live System:</span>
+            <div class="sched-role-val">${badgeForName(r.live)}</div>
+          </div>
+        </div>
+      `;
+      cf.appendChild(card);
     });
   }
 
@@ -862,6 +1005,9 @@ function renderPublicSchedule() {
       });
     }
   }
+
+  // Update layout visibility according to current mode
+  updateScheduleLayoutVisibility();
 }
 
 // Master Render
@@ -1689,7 +1835,21 @@ function renderPublicTeamDirectory() {
 
     const hasPhone = m.phone && m.phone.trim();
     const cleanPhone = hasPhone ? m.phone.replace(/[^0-9]/g, "") : "";
-    const waUrl = cleanPhone ? (cleanPhone.startsWith("91") ? `https://wa.me/${cleanPhone}` : `https://wa.me/91${cleanPhone}`) : "";
+
+    // Build intelligent church-official WhatsApp message draft
+    const duties = typeof getVolunteerDuties === "function" ? getVolunteerDuties(rawName) : [];
+    let draft = "";
+    if (duties.length > 0) {
+      const nextDuty = duties[0];
+      draft = `*🕊️ FULL LIFE CENTRE AG CHURCH - INDOOR MEDIA TEAM*\n━━━━━━━━━━━━━━━━━━━━━\nShalom ${rawName}! 👋\n\nReaching out regarding your scheduled Media Team duty:\n📅 *Date:* ${nextDuty.date}\n⛪ *Service:* ${nextDuty.serviceShort}\n🎬 *Role:* ${nextDuty.role}\n⏰ *Call Time:* ${nextDuty.callTime}\n\nLooking forward to serving together for the Lord! 🙏✨\n_"Whatever you do, work at it with all your heart as for the Lord." - Col 3:23_\n- Full Life Centre AG Church`;
+    } else {
+      draft = `*🕊️ FULL LIFE CENTRE AG CHURCH - INDOOR MEDIA TEAM*\n━━━━━━━━━━━━━━━━━━━━━\nShalom ${rawName}! 👋\n\nReaching out from the FLAG Church Indoor Media Team regarding our media schedule and upcoming church services.\n\nGod bless you and your ministry! 🙏✨\n_"Colossians 3:23"_\n- Full Life Centre AG Church`;
+    }
+    const encodedDraft = encodeURIComponent(draft);
+
+    const waUrl = cleanPhone 
+      ? (cleanPhone.startsWith("91") ? `https://wa.me/${cleanPhone}?text=${encodedDraft}` : `https://wa.me/91${cleanPhone}?text=${encodedDraft}`) 
+      : `https://wa.me/?text=${encodedDraft}`;
 
     return `
       <div class="team-member-card-public">
@@ -1726,15 +1886,9 @@ function renderPublicTeamDirectory() {
           <button class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;" onclick="selectVolunteerForSchedule('${escapeQuotes(rawName)}')">
             👤 View Duties
           </button>
-          ${hasPhone ? `
-            <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm" style="text-decoration: none;" title="Open WhatsApp Chat with ${escapeQuotes(rawName)}">
-              💬 WhatsApp
-            </a>
-          ` : `
-            <button class="btn btn-secondary btn-sm" onclick="openDirectReminderModal('${escapeQuotes(rawName)}')" title="Send Duty Reminder">
-              📲 Remind
-            </button>
-          `}
+          <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm" style="text-decoration: none; gap: 5px;" title="Open WhatsApp Chat with pre-filled message for ${escapeQuotes(rawName)}">
+            💬 WhatsApp
+          </a>
         </div>
       </div>
     `;
@@ -2091,6 +2245,62 @@ function setActiveWeekDate(date) {
   showToast(`Checklist set to ${wName}!`);
 }
 
+let currentChecklistStatusFilter = "all";
+
+function setChecklistStatusFilter(filter, btnEl) {
+  currentChecklistStatusFilter = filter || "all";
+  document.querySelectorAll(".status-filter-pill").forEach(btn => btn.classList.remove("active"));
+  if (btnEl) {
+    btnEl.classList.add("active");
+  } else {
+    const defaultBtn = document.getElementById(
+      filter === "pending" ? "filterPendingTasksBtn" : (filter === "done" ? "filterDoneTasksBtn" : "filterAllTasksBtn")
+    );
+    if (defaultBtn) defaultBtn.classList.add("active");
+  }
+  renderChecklists();
+}
+
+function toggleCategoryChecklistDone(clId) {
+  const viewDate = currentViewingWeekDate();
+  if (!appState.weeklyChecks) appState.weeklyChecks = {};
+  if (!appState.weeklyChecks[viewDate]) appState.weeklyChecks[viewDate] = {};
+  const checks = appState.weeklyChecks[viewDate];
+
+  const cl = (appState.checklists || []).find(c => c.id === clId);
+  if (!cl || !cl.items || cl.items.length === 0) return;
+
+  const allCurrentlyDone = cl.items.every(i => !!checks[i.id]);
+  const newStatus = !allCurrentlyDone;
+
+  cl.items.forEach(i => {
+    checks[i.id] = newStatus;
+    if (viewDate === getActiveWeekDate()) {
+      i.done = newStatus;
+    }
+  });
+
+  saveState();
+  renderChecklists();
+  updateBadges();
+
+  const cleanTitle = cl.title.replace(/^\d+\.\s*/, '');
+  if (newStatus) {
+    showToast(`✅ "${cleanTitle}" marked complete (${cl.items.length}/${cl.items.length} tasks) & synced live!`);
+  } else {
+    showToast(`⏳ "${cleanTitle}" reopened & synced live!`);
+  }
+}
+
+function scrollToChecklistCategory(clId) {
+  const el = document.getElementById(`cat-box-${clId}`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.add('highlight-section-pulse');
+    setTimeout(() => el.classList.remove('highlight-section-pulse'), 1800);
+  }
+}
+
 function renderChecklists() {
   const container = document.getElementById("checklistsContainer");
   const adminContainer = document.getElementById("adminChecklistsContainer");
@@ -2114,6 +2324,15 @@ function renderChecklists() {
     });
   }
   const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+  const pendingTasks = totalTasks - doneTasks;
+
+  // Update Status Filter Counters
+  const countAll = document.getElementById("countAllTasks");
+  const countPending = document.getElementById("countPendingTasks");
+  const countDone = document.getElementById("countDoneTasks");
+  if (countAll) countAll.textContent = totalTasks;
+  if (countPending) countPending.textContent = pendingTasks;
+  if (countDone) countDone.textContent = doneTasks;
 
   // 2. Update Public Weekly Banner DOM elements
   const bannerTitle = document.getElementById("activeWeekBannerTitle");
@@ -2151,7 +2370,59 @@ function renderChecklists() {
     `;
   }
 
-  // 4. Update Admin Controls
+  // 4. Render 1-Tap Category Readiness Command Box
+  const catGrid = document.getElementById("categoryReadinessGrid");
+  if (catGrid && appState.checklists) {
+    const catIcons = {
+      "cam-clean": "📷",
+      "sys-clean": "💻",
+      "eq-charge": "🔋",
+      "mic-battery": "🎙️",
+      "outside-tv": "📺",
+      "live-procedure": "🎬"
+    };
+
+    catGrid.innerHTML = appState.checklists.map(cl => {
+      const icon = catIcons[cl.id] || "📋";
+      const total = cl.items ? cl.items.length : 0;
+      let completed = 0;
+      if (cl.items) {
+        cl.items.forEach(i => {
+          if (checks[i.id]) completed++;
+        });
+      }
+      const allDone = total > 0 && completed === total;
+      const catPct = total === 0 ? 0 : Math.round((completed / total) * 100);
+
+      return `
+        <div class="cat-readiness-card ${allDone ? 'cat-done' : ''}" onclick="scrollToChecklistCategory('${cl.id}')" title="Click to view & scroll to ${escapeQuotes(cl.title)}">
+          <div class="cat-card-header">
+            <div class="cat-icon-chip">${icon}</div>
+            <div style="flex: 1; min-width: 0;">
+              <h4 class="cat-card-title">${escapeHtml(cl.title)}</h4>
+              <span class="cat-card-incharge">👤 ${escapeHtml(cl.assignedTo || 'Media Crew')}</span>
+            </div>
+            <span class="cat-status-badge ${allDone ? 'badge-complete' : 'badge-pending'}">
+              ${completed}/${total}
+            </span>
+          </div>
+
+          <div class="cat-progress-track">
+            <div class="cat-progress-fill" style="width: ${catPct}%;"></div>
+          </div>
+
+          <div class="cat-card-footer">
+            <span class="cat-pct-label">${catPct}% Done</span>
+            <button type="button" class="btn-cat-action ${allDone ? 'btn-reopen' : 'btn-mark-done'}" onclick="event.stopPropagation(); toggleCategoryChecklistDone('${cl.id}')" title="${allDone ? 'Click to reopen this section' : '1-Tap to mark all ' + total + ' tasks complete'}">
+              ${allDone ? '↩️ Reopen' : '✅ Mark Done'}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // 5. Update Admin Controls
   const adminSelect = document.getElementById("adminActiveWeekSelect");
   if (adminSelect) {
     adminSelect.innerHTML = "";
@@ -2178,12 +2449,21 @@ function renderChecklists() {
         if (checks[i.id]) completed++;
       });
     }
+    const allDone = total > 0 && completed === total;
     const catPct = total === 0 ? 0 : Math.round((completed / total) * 100);
 
     let taskHtml = "";
     if (cl.items) {
+      const filterMode = currentChecklistStatusFilter || "all";
+      let visibleItemCount = 0;
+
       cl.items.forEach(item => {
         const isDone = !!checks[item.id];
+        // Apply live filter: pending only or done only
+        if (filterMode === "pending" && isDone) return;
+        if (filterMode === "done" && !isDone) return;
+        visibleItemCount++;
+
         taskHtml += `
           <div class="task-row ${isDone ? 'checked' : ''}">
             <div class="task-main" onclick="toggleCheckItem('${cl.id}', '${item.id}')">
@@ -2194,16 +2474,27 @@ function renderChecklists() {
           </div>
         `;
       });
+
+      if (visibleItemCount === 0) {
+        if (filterMode === "pending") {
+          taskHtml = `<p style="font-size: 0.82rem; color: #10b981; padding: 8px 4px; font-weight: 700;">🎉 All tasks completed in this section!</p>`;
+        } else if (filterMode === "done") {
+          taskHtml = `<p style="font-size: 0.82rem; color: #94a3b8; padding: 8px 4px;">No tasks completed yet in this section.</p>`;
+        }
+      }
     }
 
     return `
-      <div class="checklist-box">
+      <div class="checklist-box ${allDone ? 'box-all-done' : ''}" id="cat-box-${cl.id}">
         <div class="checklist-header">
           <div>
             <h3 class="checklist-title">${cl.title}</h3>
             <p class="checklist-assigned">👤 Incharge: ${cl.assignedTo}</p>
           </div>
-          <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <button type="button" class="btn-cat-complete ${allDone ? 'is-complete' : ''}" onclick="toggleCategoryChecklistDone('${cl.id}')" title="${allDone ? 'Click to reopen section' : '1-Tap to mark all ' + total + ' tasks complete'}">
+              ${allDone ? '✅ Complete (Undo)' : '⚡ Mark Section Complete'}
+            </button>
             <span class="call-time-badge">${completed}/${total}</span>
             ${isAdmin ? `
               <button class="cat-del-btn" onclick="deleteChecklistCategory('${cl.id}')" title="Delete this entire checklist category">
@@ -2231,7 +2522,7 @@ function renderChecklists() {
     `;
   }
 
-  // 5. Render Public / Volunteer Checklists
+  // 6. Render Public / Volunteer Checklists
   if (container) {
     container.innerHTML = "";
     if (appState.checklists) {
@@ -2241,7 +2532,7 @@ function renderChecklists() {
     }
   }
 
-  // 6. Render Admin Editable Checklists
+  // 7. Render Admin Editable Checklists
   if (adminContainer) {
     adminContainer.innerHTML = "";
     if (appState.checklists) {
@@ -2929,7 +3220,15 @@ function initVolunteerFilter() {
 }
 
 function onVolunteerFilterChange(name, shouldScroll = true) {
-  window.currentVolunteerFilter = name || "";
+  window.currentVolunteerFilter = (name || "").trim();
+  try {
+    if (window.currentVolunteerFilter) {
+      localStorage.setItem("FLAG_SAVED_VOLUNTEER_NAME", window.currentVolunteerFilter);
+    } else {
+      localStorage.removeItem("FLAG_SAVED_VOLUNTEER_NAME");
+    }
+  } catch (e) {}
+
   const clearBtn = document.getElementById("clearVolunteerFilterBtn");
   const select = document.getElementById("volunteerFilterSelect");
   if (select && select.value !== window.currentVolunteerFilter) {
@@ -2963,6 +3262,19 @@ function clearVolunteerFilter() {
   if (select) select.value = "";
   onVolunteerFilterChange("", false);
   showToast("Showing full church media schedule");
+}
+
+function initSavedVolunteer() {
+  try {
+    const savedVol = localStorage.getItem("FLAG_SAVED_VOLUNTEER_NAME");
+    if (savedVol) {
+      const select = document.getElementById("volunteerFilterSelect");
+      if (select) {
+        select.value = savedVol;
+        onVolunteerFilterChange(savedVol, false);
+      }
+    }
+  } catch (e) {}
 }
 
 function renderVolunteerPersonalBox(name, duties) {
@@ -3016,6 +3328,10 @@ function renderVolunteerPersonalBox(name, duties) {
             <span class="header-tag tag-purple" style="font-size: 0.74rem; padding: 2px 7px;">${escapeHtml(memberObj.role || 'Media Crew')}</span>
             • 🎯 <strong>${dutyCount}</strong> ${dutyCount === 1 ? 'duty' : 'duties'} scheduled this month
           </p>
+          <div class="device-remember-pill" title="Saved on your device for instant access">
+            <span>📌 Saved on this device</span>
+            <button type="button" class="btn-remember-switch" onclick="clearVolunteerFilter()">Switch</button>
+          </div>
         </div>
       </div>
       <div class="volunteer-actions-row">
