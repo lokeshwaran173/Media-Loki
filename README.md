@@ -49,7 +49,7 @@ A clean, responsive web application built specifically for your weekly church me
 ### 3. 💬 Selective WhatsApp Group Announcement Generator
 * **Specific Date vs. Full Month:** Choose whether to generate an announcement for a single upcoming service or the whole month.
 * **Sunday vs. Friday Filter:**
-  * **Sunday Service:** Formats 1st (05:30 AM Call), 2nd (08:00 AM Call), and 3rd (10:30 AM Call) services cleanly without bulky reminders or brackets.
+  * **Sunday Service:** Formats 1st (05:30 AM Call, Starts 06:00 AM), 2nd (08:00 AM Call, Starts 08:30 AM), and 3rd (10:30 AM Call, Starts 11:00 AM) services cleanly without bulky reminders or brackets.
   * **Friday Fasting:** Formats 1st Cam, Live System, and 09:30 AM call time.
 * **Compact Toolbar:** Designed as a sleek ~50px toolbar with instant 1-click **`📋 Copy`**, **`💬 Open in WhatsApp`**, and a collapsible preview drawer.
 

@@ -22,7 +22,7 @@
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=3.8">
+  <link rel="stylesheet" href="styles.css?v=3.9">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -96,7 +96,7 @@
       <div class="print-header-text">
         <h1 class="print-church-title">Full Life Centre Assembly of God Church</h1>
         <h2 class="print-roster-title">Indoor Media Team &bull; Broadcast Schedule &mdash; <span id="printActiveMonthYear">October 2026</span></h2>
-        <p class="print-meta-info">⏰ Call Times &mdash; 1st Service: 05:30 AM (Prayer: 05:45 AM) &bull; 2nd Service: 08:00 AM &bull; 3rd Service: 10:30 AM &bull; Friday Fasting: 09:30 AM</p>
+        <p class="print-meta-info">⏰ Call Times &mdash; 1st Service: 05:30 AM (Starts 06:00 AM) &bull; 2nd Service: 08:00 AM (Starts 08:30 AM) &bull; 3rd Service: 10:30 AM (Starts 11:00 AM) &bull; Friday Fasting: 09:30 AM</p>
       </div>
     </div>
 
@@ -152,7 +152,7 @@
             <div class="stat-content">
               <div class="stat-icon-wrapper blue-glow">🎥</div>
               <div class="stat-info">
-                <span class="stat-label">1st Service</span>
+                <span class="stat-label">1st Service (Starts 06:00 AM)</span>
                 <strong class="stat-value">05:30 AM Call</strong>
                 <span class="stat-sub">1st &amp; 2nd Cam, Gimble, Live, Spot</span>
               </div>
@@ -280,7 +280,7 @@
       <!-- 1st Service Table (Public / Team View) -->
       <div class="card card-accent-blue">
         <div class="card-header">
-          <div class="header-tag tag-blue">1st Service</div>
+          <div class="header-tag tag-blue">1st Service (06:00 AM &ndash; 08:00 AM)</div>
           <span class="call-time-badge">⏰ Call Time: 05:30 AM | Prayer: 05:45 AM</span>
         </div>
 
@@ -359,7 +359,7 @@
         <!-- 2nd Service -->
         <div class="card card-accent-amber">
           <div class="card-header">
-            <div class="header-tag tag-amber">2nd Service</div>
+            <div class="header-tag tag-amber">2nd Service (08:30 AM &ndash; 10:30 AM)</div>
             <span class="call-time-badge">⏰ Call Time: 08:00 AM</span>
           </div>
           <div class="table-wrap">
@@ -379,7 +379,7 @@
         <!-- 3rd Service -->
         <div class="card card-accent-purple">
           <div class="card-header">
-            <div class="header-tag tag-purple">3rd Service</div>
+            <div class="header-tag tag-purple">3rd Service (11:00 AM &ndash; 01:00 PM)</div>
             <span class="call-time-badge">⏰ Call Time: 10:30 AM</span>
           </div>
           <div class="table-wrap">
@@ -730,7 +730,7 @@
         <!-- 1st Service Table (Admin Dropdowns) -->
         <div class="card">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-            <div class="header-tag tag-blue">1st Service Assignment Editor (Dropdowns)</div>
+            <div class="header-tag tag-blue">1st Service Assignment Editor (06:00 AM &ndash; 08:00 AM)</div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;" onclick="manualSaveSchedule()">💾 Save</button>
               <button class="btn btn-primary" onclick="addNewSundayRow()">+ Add Sunday Date</button>
@@ -760,7 +760,7 @@
         <div class="grid-2col">
           <div class="card">
             <div class="card-header">
-              <div class="header-tag tag-amber">2nd Service (Select Operator)</div>
+              <div class="header-tag tag-amber">2nd Service (08:30 AM &ndash; 10:30 AM)</div>
             </div>
             <div class="table-wrap">
               <table class="schedule-table">
@@ -778,7 +778,7 @@
 
           <div class="card">
             <div class="card-header">
-              <div class="header-tag tag-purple">3rd Service (Select Operator)</div>
+              <div class="header-tag tag-purple">3rd Service (11:00 AM &ndash; 01:00 PM)</div>
             </div>
             <div class="table-wrap">
               <table class="schedule-table">
@@ -1530,6 +1530,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=3.8"></script>
+  <script src="app.js?v=3.9"></script>
 </body>
 </html>

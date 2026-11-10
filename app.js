@@ -123,13 +123,13 @@ const defaultState = {
       assignedTo: "Team Leader & All Crew",
       items: [
         { id: "p1", text: "05:30 AM: Team arrival & 5-minute pre-service prayer", done: false },
-        { id: "p2", text: "07:15 AM: Power on switchers, PCs, cameras, and Outside TV", done: false },
-        { id: "p3", text: "07:30 AM: Match camera white balance (4500K-5600K) & lock focus", done: false },
-        { id: "p4", text: "07:45 AM: Soundcheck broadcast audio levels (-18 to -12 dBFS)", done: false },
-        { id: "p5", text: "08:00 AM: Load sermon notes & test lyric lower-third overlays", done: false },
-        { id: "p6", text: "08:15 AM: Start YouTube countdown stream with music loop", done: false },
-        { id: "p7", text: "Post-Service: Stop stream ➔ Stop local recording ➔ Verify SSD file", done: false },
-        { id: "p8", text: "Post-Service: Transfer raw file to Joshua & pack down equipment", done: false }
+        { id: "p2", text: "05:35 AM: Power on switchers, streaming PCs, cameras, and Outside TV", done: false },
+        { id: "p3", text: "05:45 AM: Match camera white balance (4500K-5600K) & lock tripod focus", done: false },
+        { id: "p4", text: "05:50 AM: Soundcheck broadcast audio levels (-18 to -12 dBFS)", done: false },
+        { id: "p5", text: "05:55 AM: Start YouTube countdown stream & lyric overlays (1st Service: 06:00 AM)", done: false },
+        { id: "p6", text: "08:00 AM: 2nd Service Crew Handover & Live System Setup (2nd Service: 08:30 AM)", done: false },
+        { id: "p7", text: "10:30 AM: 3rd Service Crew Handover & Live System Setup (3rd Service: 11:00 AM)", done: false },
+        { id: "p8", text: "Post-Service: Stop stream ➔ Stop local recording ➔ Verify SSD file & pack down", done: false }
       ]
     }
   ],
@@ -443,13 +443,23 @@ function loadState() {
     appState.morningPrayer.enabled = false;
   }
 
-  // Auto-sync checklist p1 arrival time if still on old 07:00 AM
+  // Auto-sync checklist items for Sunday Service Live Procedure with accurate 06:00 AM, 08:30 AM, 11:00 AM timings
   if (appState.checklists) {
+    const procedureUpdates = {
+      p1: "05:30 AM: Team arrival & 5-minute pre-service prayer",
+      p2: "05:35 AM: Power on switchers, streaming PCs, cameras, and Outside TV",
+      p3: "05:45 AM: Match camera white balance (4500K-5600K) & lock tripod focus",
+      p4: "05:50 AM: Soundcheck broadcast audio levels (-18 to -12 dBFS)",
+      p5: "05:55 AM: Start YouTube countdown stream & lyric overlays (1st Service: 06:00 AM)",
+      p6: "08:00 AM: 2nd Service Crew Handover & Live System Setup (2nd Service: 08:30 AM)",
+      p7: "10:30 AM: 3rd Service Crew Handover & Live System Setup (3rd Service: 11:00 AM)",
+      p8: "Post-Service: Stop stream ➔ Stop local recording ➔ Verify SSD file & pack down"
+    };
     appState.checklists.forEach(cl => {
       if (cl.id === "live-procedure" && cl.items) {
         cl.items.forEach(i => {
-          if (i.id === "p1" && i.text && i.text.includes("07:00 AM")) {
-            i.text = "05:30 AM: Team arrival & 5-minute pre-service prayer";
+          if (procedureUpdates[i.id]) {
+            i.text = procedureUpdates[i.id];
           }
         });
       }
@@ -808,7 +818,7 @@ function renderPublicSchedule() {
       card.innerHTML = `
         <div class="sched-card-top">
           <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">⏰ Call: 05:30 AM | Prayer: 05:45 AM</span>
+          <span class="duty-badge-time">⏰ Call: 05:30 AM | Service: 06:00 AM &ndash; 08:00 AM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
@@ -865,7 +875,7 @@ function renderPublicSchedule() {
       card.innerHTML = `
         <div class="sched-card-top">
           <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">⏰ Call: 08:00 AM</span>
+          <span class="duty-badge-time">⏰ Call: 08:00 AM | Service: 08:30 AM &ndash; 10:30 AM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
@@ -902,7 +912,7 @@ function renderPublicSchedule() {
       card.innerHTML = `
         <div class="sched-card-top">
           <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">⏰ Call: 10:30 AM</span>
+          <span class="duty-badge-time">⏰ Call: 10:30 AM | Service: 11:00 AM &ndash; 01:00 PM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
@@ -1333,13 +1343,23 @@ function renderMorningPrayer() {
     appState.morningPrayer.enabled = false;
   }
 
-  // Auto-sync checklist p1 arrival time if still on old 07:00 AM
+  // Auto-sync checklist items for Sunday Service Live Procedure with accurate 06:00 AM, 08:30 AM, 11:00 AM timings
   if (appState.checklists) {
+    const procedureUpdates = {
+      p1: "05:30 AM: Team arrival & 5-minute pre-service prayer",
+      p2: "05:35 AM: Power on switchers, streaming PCs, cameras, and Outside TV",
+      p3: "05:45 AM: Match camera white balance (4500K-5600K) & lock tripod focus",
+      p4: "05:50 AM: Soundcheck broadcast audio levels (-18 to -12 dBFS)",
+      p5: "05:55 AM: Start YouTube countdown stream & lyric overlays (1st Service: 06:00 AM)",
+      p6: "08:00 AM: 2nd Service Crew Handover & Live System Setup (2nd Service: 08:30 AM)",
+      p7: "10:30 AM: 3rd Service Crew Handover & Live System Setup (3rd Service: 11:00 AM)",
+      p8: "Post-Service: Stop stream ➔ Stop local recording ➔ Verify SSD file & pack down"
+    };
     appState.checklists.forEach(cl => {
       if (cl.id === "live-procedure" && cl.items) {
         cl.items.forEach(i => {
-          if (i.id === "p1" && i.text && i.text.includes("07:00 AM")) {
-            i.text = "05:30 AM: Team arrival & 5-minute pre-service prayer";
+          if (procedureUpdates[i.id]) {
+            i.text = procedureUpdates[i.id];
           }
         });
       }
@@ -1841,7 +1861,8 @@ function renderPublicTeamDirectory() {
     let draft = "";
     if (duties.length > 0) {
       const nextDuty = duties[0];
-      draft = `*🕊️ FULL LIFE CENTRE AG CHURCH - INDOOR MEDIA TEAM*\n━━━━━━━━━━━━━━━━━━━━━\nShalom ${rawName}! 👋\n\nReaching out regarding your scheduled Media Team duty:\n📅 *Date:* ${nextDuty.date}\n⛪ *Service:* ${nextDuty.serviceShort}\n🎬 *Role:* ${nextDuty.role}\n⏰ *Call Time:* ${nextDuty.callTime}\n\nLooking forward to serving together for the Lord! 🙏✨\n_"Whatever you do, work at it with all your heart as for the Lord." - Col 3:23_\n- Full Life Centre AG Church`;
+      const startInfo = nextDuty.serviceStart ? ` (Starts ${nextDuty.serviceStart})` : '';
+      draft = `*🕊️ FULL LIFE CENTRE AG CHURCH - INDOOR MEDIA TEAM*\n━━━━━━━━━━━━━━━━━━━━━\nShalom ${rawName}! 👋\n\nReaching out regarding your scheduled Media Team duty:\n📅 *Date:* ${nextDuty.date}\n⛪ *Service:* ${nextDuty.serviceShort}${startInfo}\n🎬 *Role:* ${nextDuty.role}\n⏰ *Call Time:* ${nextDuty.callTime} Sharp\n\nLooking forward to serving together for the Lord! 🙏✨\n_"Whatever you do, work at it with all your heart as for the Lord." - Col 3:23_\n- Full Life Centre AG Church`;
     } else {
       draft = `*🕊️ FULL LIFE CENTRE AG CHURCH - INDOOR MEDIA TEAM*\n━━━━━━━━━━━━━━━━━━━━━\nShalom ${rawName}! 👋\n\nReaching out from the FLAG Church Indoor Media Team regarding our media schedule and upcoming church services.\n\nGod bless you and your ministry! 🙏✨\n_"Colossians 3:23"_\n- Full Life Centre AG Church`;
     }
@@ -2770,7 +2791,7 @@ function generateWhatsAppText() {
     text += `🎥 INDOOR MEDIA TEAM - ${m.toUpperCase()} SCHEDULE\n\n`;
 
     text += `══════════════════════════════\n`;
-    text += `📅 1ST SERVICE SCHEDULE\n`;
+    text += `📅 1ST SERVICE SCHEDULE (06:00 AM – 08:00 AM | Call: 05:30 AM)\n`;
     text += `══════════════════════════════\n`;
 
     appState.firstService.forEach(r => {
@@ -2784,7 +2805,7 @@ function generateWhatsAppText() {
     });
 
     text += `══════════════════════════════\n`;
-    text += `📅 2ND & 3RD SERVICE\n`;
+    text += `📅 2ND SERVICE (08:30 AM) & 3RD SERVICE (11:00 AM)\n`;
     text += `══════════════════════════════\n`;
     appState.secondService.forEach((r, idx) => {
       const r3 = appState.thirdService[idx] || {};
@@ -2832,7 +2853,7 @@ function generateWhatsAppText() {
     text += `📅 Date: ${selectedDate}\n\n`;
 
     text += `══════════════════════════════\n`;
-    text += `🌅 1ST SERVICE\n`;
+    text += `🌅 1ST SERVICE (06:00 AM – 08:00 AM | Call: 05:30 AM)\n`;
     text += `══════════════════════════════\n`;
     text += `• 1st Cam: ${s1.cam1 || '-'}\n`;
     text += `• 2nd Cam: ${s1.cam2 || '-'}\n`;
@@ -2844,8 +2865,8 @@ function generateWhatsAppText() {
     text += `══════════════════════════════\n`;
     text += `☀️ 2ND & 3RD SERVICE\n`;
     text += `══════════════════════════════\n`;
-    text += `• 2nd Service: ${s2.operator || '-'}\n`;
-    text += `• 3rd Service: ${s3.operator || '-'}\n\n`;
+    text += `• 2nd Service (08:30 AM – 10:30 AM | Call: 08:00 AM): ${s2.operator || '-'}\n`;
+    text += `• 3rd Service (11:00 AM – 01:00 PM | Call: 10:30 AM): ${s3.operator || '-'}\n\n`;
 
     text += `Let's serve with excellence and honor the Lord! 🙌`;
     return text;
@@ -2979,11 +3000,12 @@ Shalom Media Team! 👋
 *REMINDER: TOMORROW'S SUNDAY MEDIA SERVING CREW*
 
 📅 *Service Date:* ${activeDateStr}
-⏰ *1st Service Call Time:* 05:30 AM Sharp
-🙏 *Pre-Service Team Prayer:* 05:45 AM
+⏰ *1st Service:* Starts 06:00 AM (Call: 05:30 AM Sharp | Prayer: 05:45 AM)
+⏰ *2nd Service:* Starts 08:30 AM (Call: 08:00 AM)
+⏰ *3rd Service:* Starts 11:00 AM (Call: 10:30 AM)
 📍 *Location:* Indoor Media Control Desk
 
-*🎬 1ST SERVICE SERVING CREW (05:30 AM Call):*
+*🎬 1ST SERVICE SERVING CREW (05:30 AM Call | Starts 06:00 AM):*
 • 🎥 1st Camera: *${s1.cam1 || '-'}*
 • 📹 2nd Camera: *${s1.cam2 || '-'}*
 • 🎯 Gimble: *${s1.gimble || '-'}*
@@ -2991,17 +3013,15 @@ Shalom Media Team! 👋
 • ✂️ Spot Editing: *${s1.spot || '-'}*
 • 🔋 Camera & Battery Charging: *${s1.charging || 'Yashwanth & Sam Davit'}*
 
-*🎬 2ND SERVICE (08:00 AM Call):*
+*🎬 2ND SERVICE (08:00 AM Call | Starts 08:30 AM):*
 • 🎥 Cam & Live Operator: *${s2.operator || '-'}*
 
-*🎬 3RD SERVICE (10:30 AM Call):*
+*🎬 3RD SERVICE (10:30 AM Call | Starts 11:00 AM):*
 • 🎥 Cam & Live Operator: *${s3.operator || '-'}*
 
 ━━━━━━━━━━━━━━━━━━━━━
 ⚠️ *Important Team Instructions for Tomorrow:*
-1. Please be on time by *05:30 AM* for team prayer & equipment calibration.
-2. Battery incharges: Ensure all camera batteries & mic packs are tested before 06:15 AM.
-3. If any sudden emergency prevents you from serving, please notify Leader Lokesh (*7010368793*) immediately or use the Swap button on the portal.
+• Please be on time before 30 minutes of service and make the arrangement and setup properly.
 
 _"Whatever you do, work at it with all your heart as for the Lord." - Colossians 3:23_ 🙏✨
 God bless your faithful ministry!`;
@@ -3171,14 +3191,14 @@ function getVolunteerDuties(name) {
       if (matches(r[rm.key])) {
         duties.push({
           date: r.date,
-          service: '1st Service (English/Tamil)',
+          service: '1st Service (06:00 AM – 08:00 AM)',
           serviceShort: '1st Service',
           role: rm.label,
           rawRole: rm.key,
           assignedText: r[rm.key],
           callTime: '05:30 AM',
           prayerTime: '05:45 AM',
-          serviceStart: '06:30 AM',
+          serviceStart: '06:00 AM',
           serviceEnd: '08:00 AM',
           colorTag: 'tag-blue'
         });
@@ -3191,14 +3211,14 @@ function getVolunteerDuties(name) {
     if (matches(r.operator)) {
       duties.push({
         date: r.date,
-        service: '2nd Service (Tamil)',
+        service: '2nd Service (08:30 AM – 10:30 AM)',
         serviceShort: '2nd Service',
         role: '🎥 Camera & Live System',
         rawRole: 'operator',
         assignedText: r.operator,
         callTime: '08:00 AM',
         prayerTime: '08:15 AM',
-        serviceStart: '08:45 AM',
+        serviceStart: '08:30 AM',
         serviceEnd: '10:30 AM',
         colorTag: 'tag-amber'
       });
@@ -3210,14 +3230,14 @@ function getVolunteerDuties(name) {
     if (matches(r.operator)) {
       duties.push({
         date: r.date,
-        service: '3rd Service (English)',
+        service: '3rd Service (11:00 AM – 01:00 PM)',
         serviceShort: '3rd Service',
         role: '🎥 Camera & Live System',
         rawRole: 'operator',
         assignedText: r.operator,
         callTime: '10:30 AM',
         prayerTime: '10:45 AM',
-        serviceStart: '11:15 AM',
+        serviceStart: '11:00 AM',
         serviceEnd: '01:00 PM',
         colorTag: 'tag-purple'
       });
@@ -3415,7 +3435,7 @@ function renderVolunteerPersonalBox(name, duties) {
       <div class="volunteer-duties-grid">
         ${duties.map((d, dIdx) => `
           <div class="volunteer-duty-item">
-            <span class="duty-badge-time">⏰ Call: ${escapeHtml(d.callTime)}</span>
+            <span class="duty-badge-time">⏰ Call: ${escapeHtml(d.callTime)} | Starts: ${escapeHtml(d.serviceStart)}</span>
             <div class="duty-date">📅 ${escapeHtml(d.date)}</div>
             <div class="duty-service">${escapeHtml(d.service)}</div>
             <div class="duty-role">${escapeHtml(d.role)}</div>
@@ -4276,7 +4296,7 @@ function exportScheduleImagePNG() {
 
     ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
     ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("⏰ Call Time: 05:30 AM  |  Prayer: 05:45 AM  |  Broadcast: 06:30 AM – 08:00 AM", padding + 265, curY + 32);
+    ctx.fillText("⏰ Call Time: 05:30 AM  |  Prayer: 05:45 AM  |  Service: 06:00 AM – 08:00 AM", padding + 265, curY + 32);
 
     const colX = [
       padding + 16,
@@ -4352,7 +4372,7 @@ function exportScheduleImagePNG() {
     ctx.fillText("2ND SERVICE (TAMIL)", padding + 18, curY + 28);
     ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
     ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("⏰ Call: 08:00 AM | Service: 08:45 – 10:30 AM", padding + 18, curY + 46);
+    ctx.fillText("⏰ Call: 08:00 AM | Service: 08:30 – 10:30 AM", padding + 18, curY + 46);
 
     let r2Y = curY + 76;
     (appState.secondService || []).forEach((r, idx) => {
@@ -4380,7 +4400,7 @@ function exportScheduleImagePNG() {
     ctx.fillText("3RD SERVICE (ENGLISH)", col2X + 18, curY + 28);
     ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
     ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("⏰ Call: 10:30 AM | Service: 11:15 AM – 01:00 PM", col2X + 18, curY + 46);
+    ctx.fillText("⏰ Call: 10:30 AM | Service: 11:00 AM – 01:00 PM", col2X + 18, curY + 46);
 
     let r3Y = curY + 76;
     (appState.thirdService || []).forEach((r, idx) => {
