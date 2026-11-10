@@ -1,20 +1,75 @@
 // FLAG Church - Indoor Media Application Logic
 
+// Official Full Life Centre AG Church Indoor Media Crew Directory & Contacts
+const OFFICIAL_CREW_DIRECTORY = [
+  { name: "Lokesh", role: "Leader & Gimble", phone: "+91 70103 68793" },
+  { name: "Balaji", role: "Camera 1 & 2", phone: "+91 80560 44254" },
+  { name: "Shyam David", role: "Gimble & Live System", phone: "+91 86818 54526" },
+  { name: "Sam Joshua", role: "Charging Incharge & Camera", phone: "+91 81110 63598" },
+  { name: "Praveen doss", role: "2nd Service Cam & Live", phone: "+91 78100 33166" },
+  { name: "Sanjay", role: "Gimble & Camera", phone: "+91 70928 15470" },
+  { name: "Mathew", role: "Camera & Live System", phone: "+91 96001 34194" },
+  { name: "Jose", role: "Camera & Media Operations", phone: "+91 85319 72562" },
+  { name: "Joshua", role: "Spot Editing & Media", phone: "+91 78718 97417" },
+  { name: "Karthik", role: "Live System & Media Tech", phone: "+91 74181 48641" },
+  { name: "Kailash", role: "Camera & Spot Editing", phone: "+91 79045 07246" },
+  { name: "Aandross", role: "2nd Service Cam & Live", phone: "+91 86675 67203" },
+  { name: "Anand", role: "Live in System", phone: "+91 63791 69115" },
+  { name: "Aaron", role: "Camera & Live System", phone: "+91 88078 04614" },
+  { name: "Yashwanth", role: "Live in System & Battery Incharge", phone: "+91 70103 68793" },
+  { name: "Andrew", role: "Camera 1 & 3rd Service", phone: "" },
+  { name: "Franklin", role: "Camera 1 & 3rd Service", phone: "" }
+];
+
+function isAliasMatch(strA, strB) {
+  if (!strA || !strB) return false;
+  const a = strA.toLowerCase().trim();
+  const b = strB.toLowerCase().trim();
+  if (a === b || a.includes(b) || b.includes(a)) return true;
+
+  const clusters = [
+    ["shyam", "shyam david", "shyam davit"],
+    ["sam", "sam joshua", "sam davit"],
+    ["praveen", "praveen doss"],
+    ["andross", "aandross"],
+    ["yashwanth", "yashwant"]
+  ];
+
+  for (const group of clusters) {
+    const aInGroup = group.some(x => a === x || a.includes(x));
+    const bInGroup = group.some(x => b === x || b.includes(x));
+    if (aInGroup && bInGroup) return true;
+  }
+  return false;
+}
+
+function syncOfficialCrewPhoneNumbers(state) {
+  if (!state || !Array.isArray(state.members)) return;
+
+  OFFICIAL_CREW_DIRECTORY.forEach(official => {
+    let existing = state.members.find(m => isAliasMatch(m.name, official.name));
+    if (existing) {
+      if (official.phone) existing.phone = official.phone;
+      if (official.name !== existing.name && ["Shyam Davit", "Sam Davit", "Praveen", "Andross"].includes(existing.name)) {
+        existing.name = official.name;
+      }
+      if (official.role && (!existing.role || existing.role === "Media Volunteer")) {
+        existing.role = official.role;
+      }
+    } else {
+      state.members.push({
+        name: official.name,
+        role: official.role,
+        phone: official.phone || ""
+      });
+    }
+  });
+}
+
 // Initial Default State
 const defaultState = {
   month: "October 2026",
-  members: [
-    { name: "Lokesh", role: "Leader & Gimble" },
-    { name: "Balaji", role: "Camera 1 & 2" },
-    { name: "Shyam Davit", role: "Gimble & Live System" },
-    { name: "Sam Davit", role: "Charging Incharge" },
-    { name: "Anand", role: "Live in System" },
-    { name: "Yashwanth", role: "Live in System & Charging", phone: "7010368793" },
-    { name: "Andrew", role: "Camera 1 & 3rd Service" },
-    { name: "Franklin", role: "Camera 1 & 3rd Service" },
-    { name: "Joshua", role: "Spot Editing" },
-    { name: "Praveen", role: "2nd Service Cam & Live" }
-  ],
+  members: JSON.parse(JSON.stringify(OFFICIAL_CREW_DIRECTORY)),
   firstService: [
     { id: 1, date: "04 Oct 2026", cam1: "Balaji", cam2: "Lokesh", gimble: "Shyam Davit", live: "Anand", spot: "Joshua", charging: "Yashwanth & Sam Davit" },
     { id: 2, date: "11 Oct 2026", cam1: "Andrew & Franklin", cam2: "Shyam Davit", gimble: "Lokesh", live: "Yashwanth", spot: "Joshua", charging: "Yashwanth & Sam Davit" },
@@ -345,6 +400,7 @@ function ensureStateIntegrity(state) {
       state.members = JSON.parse(JSON.stringify(defaultState.members));
     }
   }
+  syncOfficialCrewPhoneNumbers(state);
 
   if (!state.firstService || !Array.isArray(state.firstService)) {
     state.firstService = JSON.parse(JSON.stringify(defaultState.firstService));
@@ -530,17 +586,15 @@ function loadState() {
     appState.weeklyChecks[appState.activeWeekDate] = existingChecks;
   }
 
-  // Auto-sync Yashwanth's phone number & unified spelling in appState.members
+  // Auto-sync official crew phone numbers, roles, and unified spelling in appState.members
   if (appState && appState.members) {
     appState.members.forEach(m => {
       if (m.name === "Yashwant") {
         renameMemberAcrossSchedules("Yashwant", "Yashwanth");
         m.name = "Yashwanth";
       }
-      if (m.name.toLowerCase() === "yashwanth" || m.name.toLowerCase() === "yashwant") {
-        m.phone = "7010368793";
-      }
     });
+    syncOfficialCrewPhoneNumbers(appState);
   }
 
   saveState();
@@ -752,7 +806,7 @@ function badgeForName(name) {
     return `<span class="roster-empty">&mdash;</span>`;
   }
   const isPersonal = window.currentVolunteerFilter && 
-    name.toLowerCase().includes(window.currentVolunteerFilter.toLowerCase());
+    isAliasMatch(name, window.currentVolunteerFilter);
   const highlightClass = isPersonal ? " roster-highlight-personal" : "";
 
   if (name.includes("&")) {
@@ -1649,34 +1703,35 @@ function removeRow(serviceType, index) {
 function calculateMemberShifts(name) {
   let count = 0;
   if (!name || !appState) return 0;
+  const check = (val) => isAliasMatch(name, val);
 
   // 1st Service
   ((appState && appState.firstService) || []).forEach(r => {
     ['cam1', 'cam2', 'gimble', 'live', 'spot', 'charging'].forEach(field => {
-      if (r[field] && r[field].includes(name)) count++;
+      if (check(r[field])) count++;
     });
   });
 
   // 2nd Service
   ((appState && appState.secondService) || []).forEach(r => {
-    if (r.operator && r.operator.includes(name)) count++;
+    if (check(r.operator)) count++;
   });
 
   // 3rd Service
   ((appState && appState.thirdService) || []).forEach(r => {
-    if (r.operator && r.operator.includes(name)) count++;
+    if (check(r.operator)) count++;
   });
 
   // Friday Fasting
   ((appState && appState.fridayPrayer) || []).forEach(r => {
-    if (r.cam1 && r.cam1.includes(name)) count++;
-    if (r.live && r.live.includes(name)) count++;
+    if (check(r.cam1)) count++;
+    if (check(r.live)) count++;
   });
 
   // Special Meetings
   ((appState && appState.specialMeetings) || []).forEach(r => {
     ['cam1', 'cam2', 'gimble', 'live', 'spot'].forEach(field => {
-      if (r[field] && r[field].includes(name)) count++;
+      if (check(r[field])) count++;
     });
   });
 
@@ -1684,7 +1739,7 @@ function calculateMemberShifts(name) {
   if (appState && appState.morningPrayer && appState.morningPrayer.enabled && appState.morningPrayer.days) {
     appState.morningPrayer.days.forEach(r => {
       ['cam1', 'cam2', 'gimbal', 'liveEditor', 'socialMedia'].forEach(field => {
-        if (r[field] && r[field].includes(name)) count++;
+        if (check(r[field])) count++;
       });
     });
   }
@@ -1854,7 +1909,10 @@ function renderPublicTeamDirectory() {
     }
 
     const hasPhone = m.phone && m.phone.trim();
-    const cleanPhone = hasPhone ? m.phone.replace(/[^0-9]/g, "") : "";
+    const cleanDigits = hasPhone ? m.phone.replace(/[^0-9]/g, "") : "";
+    const intlDigits = cleanDigits 
+      ? (cleanDigits.startsWith("91") && cleanDigits.length === 12 ? cleanDigits : `91${cleanDigits.slice(-10)}`)
+      : "";
 
     // Build intelligent church-official WhatsApp message draft
     const duties = typeof getVolunteerDuties === "function" ? getVolunteerDuties(rawName) : [];
@@ -1868,8 +1926,8 @@ function renderPublicTeamDirectory() {
     }
     const encodedDraft = encodeURIComponent(draft);
 
-    const waUrl = cleanPhone 
-      ? (cleanPhone.startsWith("91") ? `https://wa.me/${cleanPhone}?text=${encodedDraft}` : `https://wa.me/91${cleanPhone}?text=${encodedDraft}`) 
+    const waUrl = intlDigits 
+      ? `https://wa.me/${intlDigits}?text=${encodedDraft}` 
       : `https://wa.me/?text=${encodedDraft}`;
 
     return `
@@ -1907,6 +1965,11 @@ function renderPublicTeamDirectory() {
           <button class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;" onclick="selectVolunteerForSchedule('${escapeQuotes(rawName)}')">
             👤 View Duties
           </button>
+          ${intlDigits ? `
+            <a href="tel:+${intlDigits}" class="btn btn-secondary btn-sm" style="padding: 6px 10px; gap: 4px;" title="Call ${escapeQuotes(rawName)} directly">
+              📞 Call
+            </a>
+          ` : ''}
           <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm" style="text-decoration: none; gap: 5px;" title="Open WhatsApp Chat with pre-filled message for ${escapeQuotes(rawName)}">
             💬 WhatsApp
           </a>
@@ -3174,7 +3237,7 @@ function getVolunteerDuties(name) {
 
   const matches = (assigned) => {
     if (!assigned) return false;
-    return assigned.toLowerCase().includes(target);
+    return isAliasMatch(target, assigned);
   };
 
   // 1st Service
