@@ -90,7 +90,6 @@ const initialData = {
     {
       id: "cam-maint",
       title: "1. Camera Maintenance",
-      incharge: "Camera Operators",
       timing: "Every Saturday Preparation",
       items: [
         { id: "cm1", text: "Clean all cameras (Camera 1 and Camera 2).", done: false },
@@ -100,7 +99,6 @@ const initialData = {
     {
       id: "sys-equip",
       title: "2. System & Equipment Cleaning",
-      incharge: "Live System & Equipment Team",
       timing: "Every Saturday Preparation",
       items: [
         { id: "se1", text: "Clean the streaming system / PC.", done: false },
@@ -111,7 +109,6 @@ const initialData = {
     {
       id: "charge-batt",
       title: "3. Charging & Battery Preparation",
-      incharge: "Yashwanth & Charging Incharge",
       timing: "Every Saturday Preparation",
       items: [
         { id: "cb1", text: "Charge the Gimbal.", done: false },
@@ -122,7 +119,6 @@ const initialData = {
     {
       id: "live-proc",
       title: "4. Sunday Service Live Procedure",
-      incharge: "Team Leader & Live System Operators",
       timing: "Every Saturday Preparation",
       items: [
         { id: "lp1", text: "Prepare and update the Sunday Service Live Procedure.", done: false },
@@ -133,7 +129,6 @@ const initialData = {
     {
       id: "outside-tv",
       title: "5. Outside TV & Live Stream Testing",
-      incharge: "Assigned Floater / Support Tech",
       timing: "Every Saturday Preparation",
       items: [
         { id: "ot1", text: "Set up the outside TV.", done: false },

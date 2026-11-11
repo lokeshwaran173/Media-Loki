@@ -110,12 +110,11 @@ const defaultState = {
       { id: 6, day: "Saturday", cam1: "Yashwanth", cam2: "Andrew", gimbal: "Shyam Davit", liveEditor: "Praveen", socialMedia: "Joshua" }
     ]
   },
-  checklistTemplateVersion: 2,
+  checklistTemplateVersion: 3,
   checklists: [
     {
       id: "cam-maint",
       title: "1. Camera Maintenance",
-      assignedTo: "Camera Operators",
       items: [
         { id: "cm1", text: "Clean all cameras (Camera 1 and Camera 2).", done: false },
         { id: "cm2", text: "Ensure cameras are functioning properly.", done: false }
@@ -124,7 +123,6 @@ const defaultState = {
     {
       id: "sys-equip",
       title: "2. System & Equipment Cleaning",
-      assignedTo: "Live System & Equipment Team",
       items: [
         { id: "se1", text: "Clean the streaming system / PC.", done: false },
         { id: "se2", text: "Clean all tripods.", done: false },
@@ -134,7 +132,6 @@ const defaultState = {
     {
       id: "charge-batt",
       title: "3. Charging & Battery Preparation",
-      assignedTo: "Yashwanth & Charging Incharge",
       items: [
         { id: "cb1", text: "Charge the Gimbal.", done: false },
         { id: "cb2", text: "Charge all camera batteries.", done: false },
@@ -144,7 +141,6 @@ const defaultState = {
     {
       id: "live-proc",
       title: "4. Sunday Service Live Procedure",
-      assignedTo: "Team Leader & Live System Operators",
       items: [
         { id: "lp1", text: "Prepare and update the Sunday Service Live Procedure.", done: false },
         { id: "lp2", text: "Verify the streaming workflow.", done: false },
@@ -154,7 +150,6 @@ const defaultState = {
     {
       id: "outside-tv",
       title: "5. Outside TV & Live Stream Testing",
-      assignedTo: "Assigned Floater / Support Tech",
       items: [
         { id: "ot1", text: "Set up the outside TV.", done: false },
         { id: "ot2", text: "Connect and test the TV display.", done: false },
@@ -400,9 +395,9 @@ function ensureStateIntegrity(state) {
   }
   const legacyChecklistIds = new Set(["cam-clean", "sys-clean", "eq-charge", "mic-battery", "live-procedure", "cam-cleaning", "sys-cleaning", "eq-charging", "mic-batteries"]);
   const hasLegacyChecklists = Array.isArray(state.checklists) && state.checklists.some(c => legacyChecklistIds.has(c.id));
-  if (!state.checklists || !Array.isArray(state.checklists) || state.checklistTemplateVersion !== 2 || hasLegacyChecklists) {
+  if (!state.checklists || !Array.isArray(state.checklists) || !state.checklistTemplateVersion || state.checklistTemplateVersion < 2 || hasLegacyChecklists) {
     state.checklists = JSON.parse(JSON.stringify(defaultState.checklists || []));
-    state.checklistTemplateVersion = 2;
+    state.checklistTemplateVersion = 3;
     if (state.weeklyChecks && typeof state.weeklyChecks === "object") {
       const validIds = new Set();
       state.checklists.forEach(cl => (cl.items || []).forEach(item => validIds.add(item.id)));
@@ -415,6 +410,14 @@ function ensureStateIntegrity(state) {
         }
       });
     }
+  } else if (state.checklistTemplateVersion !== 3) {
+    state.checklists.forEach(cl => {
+      if (cl && typeof cl === "object") {
+        delete cl.assignedTo;
+        delete cl.incharge;
+      }
+    });
+    state.checklistTemplateVersion = 3;
   }
   return state;
 }
@@ -2212,26 +2215,24 @@ function toggleNewCategoryForm() {
 }
 
 function createChecklistCategory() {
-  const title = document.getElementById("newCatTitle").value.trim();
-  const incharge = document.getElementById("newCatIncharge").value.trim() || "Assigned Crew";
+  const titleEl = document.getElementById("newCatTitle");
+  const title = titleEl ? titleEl.value.trim() : "";
 
   if (!title) {
-    alert("Please enter a category title (e.g. 7. Stage Lighting).");
+    alert("Please enter a category title (e.g. 6. Stage Lighting).");
     return;
   }
 
   const newCl = {
     id: "cl-" + Date.now(),
     title: title,
-    assignedTo: incharge,
     items: []
   };
 
   appState.checklists.push(newCl);
   saveState();
 
-  document.getElementById("newCatTitle").value = "";
-  document.getElementById("newCatIncharge").value = "";
+  if (titleEl) titleEl.value = "";
   toggleNewCategoryForm();
 
   renderChecklists();
@@ -2455,7 +2456,7 @@ function renderChecklists() {
 
   const bannerSub = document.getElementById("activeWeekBannerSub");
   if (bannerSub) {
-    bannerSub.textContent = `FLAG Media Team – Saturday Preparation Checklist for Sunday Service (${activeWeekObj.label}). Update each task once completed. 🙌`;
+    bannerSub.textContent = `FLAG Media Team – Saturday Preparation Checklist for Sunday Service (${activeWeekObj.label}). Any team member can complete and update tasks once done. 🙌`;
   }
 
   const weekProgText = document.getElementById("weekProgressText");
@@ -2507,7 +2508,6 @@ function renderChecklists() {
             <div class="cat-icon-chip">${icon}</div>
             <div style="flex: 1; min-width: 0;">
               <h4 class="cat-card-title">${escapeHtml(cl.title)}</h4>
-              <span class="cat-card-incharge">👤 ${escapeHtml(cl.assignedTo || 'Media Crew')}</span>
             </div>
             <span class="cat-status-badge ${allDone ? 'badge-complete' : 'badge-pending'}">
               ${completed}/${total}
@@ -2596,7 +2596,6 @@ function renderChecklists() {
         <div class="checklist-header">
           <div>
             <h3 class="checklist-title">${cl.title}</h3>
-            <p class="checklist-assigned">👤 Incharge: ${cl.assignedTo}</p>
           </div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <button type="button" class="btn-cat-complete ${allDone ? 'is-complete' : ''}" onclick="toggleCategoryChecklistDone('${cl.id}')" title="${allDone ? 'Click to reopen section' : '1-Tap to mark all ' + total + ' tasks complete'}">
@@ -4731,7 +4730,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
       const cloudState = snapshot.val();
       if (cloudState && !isSyncingFromCloud) {
         console.log("☁️ Real-time cloud sync received:", cloudState);
-        const needsChecklistMigration = cloudState.checklistTemplateVersion !== 2;
+        const needsChecklistMigration = cloudState.checklistTemplateVersion !== 3;
         isSyncingFromCloud = true;
         // Merge received cloud state into appState
         ensureStateIntegrity(cloudState);
