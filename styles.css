@@ -6347,3 +6347,582 @@ html.light-theme .btn-remember-switch {
 [data-theme="light"] th {
   /* Prevent any inherited dark-mode white text from persisting */
 }
+
+
+/* ================= MOBILE FIT & ALIGNMENT POLISH (v4.1) ================= */
+.grid-2col > *,
+.hero-stats-grid > *,
+.checklists-container > *,
+.category-readiness-grid > *,
+.schedule-cards-grid > *,
+.team-directory-grid > *,
+.analytics-metrics-grid > *,
+.workload-bars-grid > *,
+.gear-form-grid > *,
+.card {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    overflow-x: clip !important;
+    max-width: 100% !important;
+  }
+
+  .main-container {
+    padding: 14px 10px 28px !important;
+  }
+
+  .grid-2col {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  .table-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* ---- Top Navbar & Brand Fit ---- */
+  .nav-container {
+    gap: 8px !important;
+    padding: 10px !important;
+  }
+
+  .brand {
+    min-width: 0 !important;
+    gap: 8px !important;
+  }
+
+  .brand-logo-img {
+    width: 32px !important;
+    height: 32px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .brand-text {
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+
+  .brand-text h1 {
+    max-width: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 0.78rem !important;
+    line-height: 1.15 !important;
+  }
+
+  .brand-text p {
+    max-width: none !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 0.62rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .nav-actions {
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .nav-actions .theme-toggle-btn,
+  .nav-actions .cloud-sync-badge-pill {
+    padding: 4px 7px !important;
+    font-size: 0.68rem !important;
+    gap: 3px !important;
+  }
+
+  .nav-btn {
+    padding: 8px 4px !important;
+    font-size: 0.72rem !important;
+  }
+
+  /* ---- Hero 4 Stat Cards ---- */
+  .hero-stat-card {
+    padding: 12px !important;
+  }
+
+  .hero-stat-card .stat-content {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+  }
+
+  .hero-stat-card .stat-icon-wrapper {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.9rem !important;
+    border-radius: 8px !important;
+  }
+
+  .hero-stat-card .stat-info {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .hero-stat-card .stat-label {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    font-size: 0.67rem !important;
+    line-height: 1.25 !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  .hero-stat-card .stat-value {
+    font-size: 0.94rem !important;
+    line-height: 1.2 !important;
+    word-break: break-word !important;
+  }
+
+  /* ---- Active Month & Schedule Layout Switcher ---- */
+  .active-month-display-wrap {
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .active-month-pill {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 8px 12px !important;
+  }
+
+  .schedule-view-switcher {
+    display: flex !important;
+    width: 100% !important;
+    padding: 3px !important;
+  }
+
+  .sched-view-btn {
+    flex: 1 1 0 !important;
+    justify-content: center !important;
+    padding: 7px 10px !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+  }
+
+  .active-month-display-wrap > .btn,
+  .active-month-display-wrap > .header-tag {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* ---- Card Headers & Tags ---- */
+  .card-header {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+  }
+
+  .card-header .header-tag,
+  .card-header .call-time-badge {
+    max-width: 100% !important;
+    white-space: normal !important;
+    height: auto !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ---- Personal Filter & Duty Actions ---- */
+  .volunteer-summary-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    text-align: left !important;
+  }
+
+  .volunteer-summary-left {
+    width: 100% !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    text-align: left !important;
+  }
+
+  .duty-actions-strip {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .duty-actions-strip .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .my-duty-time-badge {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    white-space: normal !important;
+    line-height: 1.35 !important;
+    font-size: 0.74rem !important;
+    padding: 6px 10px !important;
+  }
+
+  /* ---- Schedule Service Cards ---- */
+  .schedule-cards-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .sched-card-top {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  .sched-role-row {
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .sched-role-label {
+    font-size: 0.78rem !important;
+    min-width: 0 !important;
+  }
+
+  /* ---- WhatsApp Announcement Compact Bar ---- */
+  .whatsapp-compact-card {
+    padding: 14px 12px !important;
+  }
+
+  .whatsapp-compact-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .whatsapp-compact-controls {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .wa-mini-select {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 6px 28px 6px 10px !important;
+    font-size: 0.78rem !important;
+    height: 36px !important;
+    text-overflow: ellipsis !important;
+  }
+
+  #waDateSelect {
+    grid-column: 1 / -1 !important;
+  }
+
+  .wa-mini-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 7px 8px !important;
+    font-size: 0.78rem !important;
+    height: 36px !important;
+    white-space: nowrap !important;
+  }
+
+  /* ---- Service Checklists & Readiness Command Box ---- */
+  .week-banner-top {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .week-banner-stats {
+    width: 100% !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .week-stat-box {
+    text-align: left !important;
+  }
+
+  .week-pills-wrap {
+    flex-wrap: wrap !important;
+    width: 100% !important;
+  }
+
+  .category-readiness-card {
+    padding: 16px 14px !important;
+  }
+
+  .category-readiness-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .checklist-status-filters {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 6px !important;
+  }
+
+  .status-filter-pill {
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 7px 10px !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+  }
+
+  .category-readiness-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .cat-readiness-card {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .cat-card-title {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.3 !important;
+    word-break: break-word !important;
+  }
+
+  .cat-card-incharge {
+    white-space: normal !important;
+    line-height: 1.3 !important;
+  }
+
+  .checklists-container {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  .checklist-box {
+    padding: 16px 14px !important;
+  }
+
+  .checklist-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .checklist-header > div:last-child {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .checklist-title {
+    font-size: 0.98rem !important;
+    line-height: 1.3 !important;
+    word-break: break-word !important;
+  }
+
+  .checklist-assigned {
+    flex-wrap: wrap !important;
+    line-height: 1.3 !important;
+  }
+
+  /* ---- Team Directory ---- */
+  .team-directory-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 14px !important;
+  }
+
+  #teamSkillFilters {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    width: 100% !important;
+    padding-bottom: 0 !important;
+    gap: 6px !important;
+  }
+
+  #teamSkillFilters .gear-filter-btn {
+    flex: 0 1 auto !important;
+  }
+
+  .team-card-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .team-card-actions:has(> :nth-child(3)) > *:first-child {
+    grid-column: 1 / -1 !important;
+  }
+
+  .team-card-actions .btn {
+    width: 100% !important;
+    min-height: 36px !important;
+    padding: 7px 10px !important;
+    font-size: 0.78rem !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  /* ---- Admin Console Fixes ---- */
+  #adminView .card-row > div:last-child {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+
+  .admin-header-card .card-row > div:first-child > div:first-child {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  .admin-header-card .card-row > div:last-child {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .admin-header-card .card-row > div:last-child .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 9px 8px !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap !important;
+    justify-content: center !important;
+  }
+
+  .admin-header-card .card-row > div:last-child .btn-danger {
+    grid-column: 1 / -1 !important;
+  }
+
+  .month-selector-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .month-selector-wrapper > div:first-child {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .month-selector-wrapper > div:first-child select {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .month-selector-wrapper .header-tag,
+  .month-selector-wrapper button {
+    width: 100% !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    height: auto !important;
+    min-height: 38px !important;
+  }
+
+  #adminView .schedule-table td:first-child .input-text {
+    min-width: 124px !important;
+    padding: 8px 10px !important;
+    text-align: center !important;
+  }
+
+  .admin-save-bar {
+    padding: 12px 14px !important;
+  }
+
+  .admin-save-bar button {
+    width: 100% !important;
+  }
+
+  .seasonal-toggle-banner {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .analytics-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .workload-bars-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 12px !important;
+  }
+
+  .modal-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 18px 15px !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-header h3 {
+    font-size: 1.04rem !important;
+    line-height: 1.3 !important;
+    word-break: break-word !important;
+  }
+
+  .modal-card .role-select {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 9px 32px 9px 10px !important;
+    font-size: 0.82rem !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .modal-card .input-text {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 0.82rem !important;
+  }
+
+  .modal-actions-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .modal-actions-row .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 9px 6px !important;
+    font-size: 0.74rem !important;
+    white-space: nowrap !important;
+    justify-content: center !important;
+  }
+
+  .modal-actions-row > button:nth-child(3):last-child {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-actions .theme-toggle-btn,
+  .nav-actions .cloud-sync-badge-pill {
+    padding: 4px 6px !important;
+    font-size: 0.65rem !important;
+  }
+
+  .hero-stat-card .stat-value {
+    font-size: 0.9rem !important;
+  }
+
+  .volunteer-duty-item {
+    padding: 12px !important;
+  }
+}

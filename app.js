@@ -1040,11 +1040,91 @@ function renderPublicSchedule() {
     });
   }
 
+  // Special Meetings Public (Mobile Card View)
+  const cs = document.getElementById("publicCardsSpecialMeetings");
+  if (cs) {
+    cs.innerHTML = "";
+    (appState.specialMeetings || []).forEach(r => {
+      const card = document.createElement("div");
+      card.className = "schedule-service-card card-accent-purple";
+      card.innerHTML = `
+        <div class="sched-card-top">
+          <div class="sched-card-date">🌟 ${r.title || 'Special Meeting'}</div>
+          <span class="duty-badge-time">📅 ${r.date}</span>
+        </div>
+        <div class="sched-card-roles">
+          <div class="sched-role-row">
+            <span class="sched-role-label">🎥 1st Cam:</span>
+            <div class="sched-role-val">${badgeForName(r.cam1)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">📹 2nd Cam:</span>
+            <div class="sched-role-val">${badgeForName(r.cam2)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">🎯 Gimble:</span>
+            <div class="sched-role-val">${badgeForName(r.gimble)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">💻 Live System:</span>
+            <div class="sched-role-val">${badgeForName(r.live)}</div>
+          </div>
+          <div class="sched-role-row">
+            <span class="sched-role-label">✂️ Spot Edit:</span>
+            <div class="sched-role-val">${badgeForName(r.spot)}</div>
+          </div>
+        </div>
+      `;
+      cs.appendChild(card);
+    });
+  }
+
   // Early Morning Prayer Public (Only shown if enabled)
   const publicMorningCard = document.getElementById("publicMorningPrayerCard");
   const isMorningPrayerActive = !!(appState.morningPrayer && appState.morningPrayer.enabled);
   if (publicMorningCard) {
     publicMorningCard.style.display = isMorningPrayerActive ? "block" : "none";
+  }
+
+  // Early Morning Prayer Public (Mobile Card View)
+  const cm = document.getElementById("publicCardsMorningPrayer");
+  if (cm) {
+    cm.innerHTML = "";
+    if (appState.morningPrayer && appState.morningPrayer.days) {
+      appState.morningPrayer.days.forEach(r => {
+        const card = document.createElement("div");
+        card.className = "schedule-service-card card-accent-morning";
+        card.innerHTML = `
+          <div class="sched-card-top">
+            <div class="sched-card-date">🌅 ${r.day}</div>
+            <span class="duty-badge-time">⏰ Call: 05:00 AM</span>
+          </div>
+          <div class="sched-card-roles">
+            <div class="sched-role-row">
+              <span class="sched-role-label">🎥 1st Cam:</span>
+              <div class="sched-role-val">${badgeForName(r.cam1)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">📹 2nd Cam:</span>
+              <div class="sched-role-val">${badgeForName(r.cam2)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">🎯 Gimble:</span>
+              <div class="sched-role-val">${badgeForName(r.gimbal)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">💻 Live Editor:</span>
+              <div class="sched-role-val">${badgeForName(r.liveEditor)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">✂️ Social Media:</span>
+              <div class="sched-role-val">${badgeForName(r.socialMedia)}</div>
+            </div>
+          </div>
+        `;
+        cm.appendChild(card);
+      });
+    }
   }
 
   const tm = document.getElementById("publicTbodyMorningPrayer");

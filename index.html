@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +13,24 @@
   <meta name="apple-mobile-web-app-title" content="FLAG Media">
   <link rel="apple-touch-icon" href="logo.png">
   <script>
-    (function() {
+    (function () {
       try {
         var t = localStorage.getItem("FLAG_MEDIA_THEME") || "dark";
         document.documentElement.setAttribute("data-theme", t);
         if (t === "light") {
           document.documentElement.classList.add("light-theme");
         }
-      } catch (e) {}
+      } catch (e) { }
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=4.0">
+  <link rel="stylesheet" href="styles.css?v=4.1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap"
+    rel="stylesheet">
 </head>
+
 <body>
 
   <!-- ================= TOP NAVIGATION BAR ================= -->
@@ -44,30 +48,49 @@
 
       <nav class="nav-links">
         <button class="nav-btn active" onclick="switchView('scheduleView', this)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
           <span class="nav-label-long">Service Schedule</span>
           <span class="nav-label-short">Schedule</span>
         </button>
         <button class="nav-btn" onclick="switchView('checklistsView', this)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
           <span class="nav-label-long">Service Checklists</span>
           <span class="nav-label-short">Checks</span>
           <span class="nav-badge-pill" id="checklistProgressBadge">0/34</span>
         </button>
         <button class="nav-btn" onclick="switchView('teamView', this)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
           <span class="nav-label-long">Media Team</span>
           <span class="nav-label-short">Team</span>
           <span class="nav-badge-pill" id="publicMemberCountBadge">17</span>
         </button>
         <button id="adminNavBtn" class="nav-btn btn-admin-nav" onclick="handleAdminNavClick(this)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          <span id="adminNavText"><span class="nav-label-long">Admin Console</span><span class="nav-label-short">Admin</span></span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span id="adminNavText"><span class="nav-label-long">Admin Console</span><span
+              class="nav-label-short">Admin</span></span>
         </button>
       </nav>
 
       <div class="nav-actions">
-        <button id="navInstallPwaBtn" class="theme-toggle-btn nav-install-btn" style="display: none; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); color: #34d399;" onclick="triggerPWAInstall()" title="Install Church App to Phone Home Screen">
+        <button id="navInstallPwaBtn" class="theme-toggle-btn nav-install-btn"
+          style="display: none; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); color: #34d399;"
+          onclick="triggerPWAInstall()" title="Install Church App to Phone Home Screen">
           <span style="font-size: 0.95rem;">📲</span>
           <span>App</span>
         </button>
@@ -75,12 +98,17 @@
           <span id="themeToggleIcon">☀️</span>
           <span id="themeToggleText">Light</span>
         </button>
-        <span id="navCloudSyncBadge" class="cloud-sync-badge-pill" onclick="quickOpenCloudSync()" title="Multi-Device Cloud Sync Status &bull; Click to configure sync across all phones">
+        <span id="navCloudSyncBadge" class="cloud-sync-badge-pill" onclick="quickOpenCloudSync()"
+          title="Multi-Device Cloud Sync Status &bull; Click to configure sync across all phones">
           <span class="sync-dot"></span>
           <span id="navCloudSyncText">☁️ Synced</span>
         </span>
         <button class="btn btn-secondary nav-print-btn" onclick="window.print()" title="Print clean schedule">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
           <span>Print</span>
         </button>
       </div>
@@ -95,8 +123,10 @@
       <img src="logo.png" alt="Full Life Centre AG Church Logo" class="print-logo">
       <div class="print-header-text">
         <h1 class="print-church-title">Full Life Centre Assembly of God Church</h1>
-        <h2 class="print-roster-title">Indoor Media Team &bull; Broadcast Schedule &mdash; <span id="printActiveMonthYear">October 2026</span></h2>
-        <p class="print-meta-info">⏰ Call Times &mdash; 1st Service: 05:30 AM (Starts 06:00 AM) &bull; 2nd Service: 08:00 AM (Starts 08:30 AM) &bull; 3rd Service: 10:30 AM (Starts 11:00 AM) &bull; Friday Fasting: 09:30 AM</p>
+        <h2 class="print-roster-title">Indoor Media Team &bull; Broadcast Schedule &mdash; <span
+            id="printActiveMonthYear">October 2026</span></h2>
+        <p class="print-meta-info">⏰ Call Times &mdash; 1st Service: 05:30 AM (Starts 06:00 AM) &bull; 2nd Service:
+          08:00 AM (Starts 08:30 AM) &bull; 3rd Service: 10:30 AM (Starts 11:00 AM) &bull; Friday Fasting: 09:30 AM</p>
       </div>
     </div>
 
@@ -121,7 +151,7 @@
 
     <!-- ================= VIEW 1: SCHEDULE BUILDER ================= -->
     <section id="scheduleView" class="view-panel active">
-      
+
       <!-- ================= ANIMATED HERO COMMAND CENTER ================= -->
       <div class="hero-banner">
         <!-- Floating Ambient Light Orbs -->
@@ -230,14 +260,18 @@
               <strong id="publicActiveMonthBadge" class="active-month-name">October 2026</strong>
             </div>
             <div class="schedule-view-switcher">
-              <button id="schedViewTableBtn" class="sched-view-btn active" onclick="setScheduleLayoutMode('table')" title="View Full Grid Table">
+              <button id="schedViewTableBtn" class="sched-view-btn active" onclick="setScheduleLayoutMode('table')"
+                title="View Full Grid Table">
                 📋 Table View
               </button>
-              <button id="schedViewCardBtn" class="sched-view-btn" onclick="setScheduleLayoutMode('card')" title="View Clean Mobile Service Cards">
+              <button id="schedViewCardBtn" class="sched-view-btn" onclick="setScheduleLayoutMode('card')"
+                title="View Clean Mobile Service Cards">
                 📱 Card View
               </button>
             </div>
-            <button class="btn btn-primary" onclick="exportScheduleImagePNG()" style="padding: 6px 14px; font-size: 0.82rem; background: linear-gradient(135deg, #0284c7, #0f766e); font-weight: 700; gap: 6px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);" title="Download High-Res PNG Schedule Image">
+            <button class="btn btn-primary" onclick="exportScheduleImagePNG()"
+              style="padding: 6px 14px; font-size: 0.82rem; background: linear-gradient(135deg, #0284c7, #0f766e); font-weight: 700; gap: 6px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);"
+              title="Download High-Res PNG Schedule Image">
               📸 Download Image (PNG)
             </button>
             <span class="header-tag tag-emerald" style="font-size: 0.8rem; padding: 6px 12px;">
@@ -251,21 +285,28 @@
       <div class="card my-schedule-card card-accent-amber">
         <div class="my-schedule-header">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <div class="badge-icon-chip" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">👤</div>
+            <div class="badge-icon-chip"
+              style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">👤</div>
             <div>
               <h3 class="section-title" style="font-size: 1.15rem;">My Serving Schedule (Personal Filter)</h3>
-              <p class="section-desc">Select your name to see your personal duties, call times, export to calendar, or request a swap.</p>
+              <p class="section-desc">Select your name to see your personal duties, call times, export to calendar, or
+                request a swap.</p>
             </div>
           </div>
           <div class="volunteer-filter-controls">
-            <select id="volunteerFilterSelect" class="role-select" style="min-width: 175px; font-weight: 700; border-color: rgba(245, 158, 11, 0.5);" onchange="onVolunteerFilterChange(this.value)">
+            <select id="volunteerFilterSelect" class="role-select"
+              style="min-width: 175px; font-weight: 700; border-color: rgba(245, 158, 11, 0.5);"
+              onchange="onVolunteerFilterChange(this.value)">
               <option value="">👤 Select Your Name...</option>
               <!-- Dynamically populated with team members -->
             </select>
-            <button class="btn btn-secondary" style="padding: 7px 12px; font-size: 0.82rem; gap: 5px; border-color: rgba(245, 158, 11, 0.4);" onclick="openSwapRequestModal()" title="Request schedule swap or report absence">
+            <button class="btn btn-secondary"
+              style="padding: 7px 12px; font-size: 0.82rem; gap: 5px; border-color: rgba(245, 158, 11, 0.4);"
+              onclick="openSwapRequestModal()" title="Request schedule swap or report absence">
               <span>🔄</span> Swap / Absence
             </button>
-            <button id="clearVolunteerFilterBtn" class="btn btn-secondary" style="display: none; padding: 7px 12px; font-size: 0.82rem;" onclick="clearVolunteerFilter()">
+            <button id="clearVolunteerFilterBtn" class="btn btn-secondary"
+              style="display: none; padding: 7px 12px; font-size: 0.82rem;" onclick="clearVolunteerFilter()">
               ✕ Show All
             </button>
           </div>
@@ -312,37 +353,48 @@
         <div class="whatsapp-compact-bar">
           <div class="whatsapp-mini-brand">
             <span class="whatsapp-dot-pulse"></span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#22c55e"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.059-2.072-.511-1.636-.68-2.684-2.339-2.766-2.449-.081-.11-.659-.877-.659-1.674 0-.797.417-1.19.565-1.353.148-.162.324-.203.432-.203.109 0 .217.001.312.006.101.005.234-.038.366.279.135.324.461 1.123.502 1.205.041.082.069.177.014.286-.055.109-.083.177-.164.273-.082.095-.172.213-.246.286-.082.081-.168.17-.072.335.096.164.428.706.918 1.142.631.562 1.163.736 1.328.818.164.082.261.071.358-.041.097-.112.417-.487.528-.654.111-.167.222-.139.373-.083.151.056.955.451 1.12.533.165.082.275.123.316.192.041.069.041.401-.103.806z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#22c55e">
+              <path
+                d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.059-2.072-.511-1.636-.68-2.684-2.339-2.766-2.449-.081-.11-.659-.877-.659-1.674 0-.797.417-1.19.565-1.353.148-.162.324-.203.432-.203.109 0 .217.001.312.006.101.005.234-.038.366.279.135.324.461 1.123.502 1.205.041.082.069.177.014.286-.055.109-.083.177-.164.273-.082.095-.172.213-.246.286-.082.081-.168.17-.072.335.096.164.428.706.918 1.142.631.562 1.163.736 1.328.818.164.082.261.071.358-.041.097-.112.417-.487.528-.654.111-.167.222-.139.373-.083.151.056.955.451 1.12.533.165.082.275.123.316.192.041.069.041.401-.103.806z" />
+            </svg>
             <strong class="whatsapp-card-title" style="font-size: 0.88rem;">WhatsApp Announcement</strong>
           </div>
 
           <div class="whatsapp-compact-controls">
-            <select id="waModeSelect" class="role-select wa-mini-select" onchange="onWhatsAppModeChange()" title="Filter single date or full month">
+            <select id="waModeSelect" class="role-select wa-mini-select" onchange="onWhatsAppModeChange()"
+              title="Filter single date or full month">
               <option value="single" selected>Specific Date</option>
               <option value="full">Full Month</option>
             </select>
 
-            <select id="waDayTypeSelect" class="role-select wa-mini-select" onchange="onWhatsAppDayTypeChange()" title="Select service type">
+            <select id="waDayTypeSelect" class="role-select wa-mini-select" onchange="onWhatsAppDayTypeChange()"
+              title="Select service type">
               <option value="sunday" selected>Sunday Service</option>
               <option value="friday">Friday Fasting</option>
               <option value="special">Special Meeting</option>
               <option value="morning" id="waMorningOption" style="display: none;">Early Morning Prayer</option>
             </select>
 
-            <select id="waDateSelect" class="role-select wa-mini-select" onchange="updateWhatsAppPreview()" title="Select date">
+            <select id="waDateSelect" class="role-select wa-mini-select" onchange="updateWhatsAppPreview()"
+              title="Select date">
               <!-- Populated dynamically with dates -->
             </select>
 
-            <button class="btn btn-whatsapp wa-mini-btn" onclick="copyWhatsAppSchedule()" title="Copy formatted WhatsApp text">
+            <button class="btn btn-whatsapp wa-mini-btn" onclick="copyWhatsAppSchedule()"
+              title="Copy formatted WhatsApp text">
               📋 Copy
             </button>
-            <button class="btn btn-whatsapp wa-mini-btn" style="background: #15803d;" onclick="openWhatsAppDirect()" title="Open directly in WhatsApp Web/App">
+            <button class="btn btn-whatsapp wa-mini-btn" style="background: #15803d;" onclick="openWhatsAppDirect()"
+              title="Open directly in WhatsApp Web/App">
               💬 Open
             </button>
-            <button id="waTogglePreviewBtn" class="btn btn-secondary wa-mini-btn" onclick="toggleWhatsAppPreview()" title="Show/hide live message preview">
+            <button id="waTogglePreviewBtn" class="btn btn-secondary wa-mini-btn" onclick="toggleWhatsAppPreview()"
+              title="Show/hide live message preview">
               👁️ Preview
             </button>
-            <button class="btn btn-whatsapp wa-mini-btn" style="background: linear-gradient(135deg, #d97706, #b45309); font-weight: 700; gap: 4px; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.35);" onclick="openSaturdayAlertModal()" title="1-Click WhatsApp duty reminder for tomorrow's serving crew">
+            <button class="btn btn-whatsapp wa-mini-btn"
+              style="background: linear-gradient(135deg, #d97706, #b45309); font-weight: 700; gap: 4px; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.35);"
+              onclick="openSaturdayAlertModal()" title="1-Click WhatsApp duty reminder for tomorrow's serving crew">
               ⏰ Saturday Alert
             </button>
           </div>
@@ -423,6 +475,7 @@
         <div class="card-header">
           <div class="header-tag tag-purple">🌟 Special Meetings & Conferences</div>
         </div>
+        <div id="publicCardsSpecialMeetings" class="schedule-cards-grid" style="display: none;"></div>
         <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
         <div class="table-wrap">
           <table class="schedule-table">
@@ -448,6 +501,7 @@
           <div id="publicMorningPrayerTitle" class="header-tag tag-amber">🌅 Early Morning Prayer Schedule</div>
           <span class="call-time-badge">⏰ Call Time: 05:00 AM Sharp</span>
         </div>
+        <div id="publicCardsMorningPrayer" class="schedule-cards-grid" style="display: none;"></div>
         <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
         <div class="table-wrap">
           <table class="schedule-table">
@@ -477,7 +531,8 @@
           <div>
             <strong class="sync-banner-title">Live Multi-Crew Real-Time Synchronization</strong>
             <p class="sync-banner-sub">
-              When any volunteer checks a task during service, it updates immediately on everyone's phones in real time so the whole crew knows what is completed and what is pending!
+              When any volunteer checks a task during service, it updates immediately on everyone's phones in real time
+              so the whole crew knows what is completed and what is pending!
             </p>
           </div>
         </div>
@@ -498,7 +553,8 @@
               📅 Sunday Checklist: Week 1 (04 Oct 2026)
             </h2>
             <p class="week-banner-sub" id="activeWeekBannerSub">
-              Sunday operational checklists. Volunteers can check off completed tasks during service. Week is configured in Admin Console.
+              Sunday operational checklists. Volunteers can check off completed tasks during service. Week is configured
+              in Admin Console.
             </p>
           </div>
 
@@ -524,10 +580,12 @@
           </div>
 
           <div class="week-actions-wrap">
-            <button class="btn btn-secondary btn-sm" onclick="resetChecklists()" title="Reset all checkmarks for this week">
+            <button class="btn btn-secondary btn-sm" onclick="resetChecklists()"
+              title="Reset all checkmarks for this week">
               🔄 Reset Checks
             </button>
-            <button class="btn btn-secondary btn-sm" onclick="markAllChecklistsDone()" title="Mark all tasks done for this week">
+            <button class="btn btn-secondary btn-sm" onclick="markAllChecklistsDone()"
+              title="Mark all tasks done for this week">
               ✅ Mark All Done
             </button>
           </div>
@@ -538,9 +596,12 @@
       <div class="card category-readiness-card card-accent-emerald" style="margin-bottom: 22px;">
         <div class="category-readiness-header">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <div class="badge-icon-chip" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); font-size: 1.3rem;">⚡</div>
+            <div class="badge-icon-chip"
+              style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); font-size: 1.3rem;">⚡
+            </div>
             <div>
-              <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: #fff;" class="cat-readiness-title">1-Tap Category Readiness Status</h3>
+              <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: #fff;" class="cat-readiness-title">1-Tap
+                Category Readiness Status</h3>
               <p style="font-size: 0.82rem; color: var(--text-muted); margin: 3px 0 0 0;" class="cat-readiness-sub">
                 Quick 1-tap completion for all 6 service areas. Mark sections complete or filter pending tasks.
               </p>
@@ -548,13 +609,16 @@
           </div>
           <!-- Task Status Filter Tabs -->
           <div class="checklist-status-filters" id="checklistStatusFilters">
-            <button class="status-filter-pill active" onclick="setChecklistStatusFilter('all', this)" id="filterAllTasksBtn">
+            <button class="status-filter-pill active" onclick="setChecklistStatusFilter('all', this)"
+              id="filterAllTasksBtn">
               📋 All Tasks (<span id="countAllTasks">34</span>)
             </button>
-            <button class="status-filter-pill pill-pending" onclick="setChecklistStatusFilter('pending', this)" id="filterPendingTasksBtn">
+            <button class="status-filter-pill pill-pending" onclick="setChecklistStatusFilter('pending', this)"
+              id="filterPendingTasksBtn">
               ⏳ Pending Only (<span id="countPendingTasks">34</span>)
             </button>
-            <button class="status-filter-pill pill-done" onclick="setChecklistStatusFilter('done', this)" id="filterDoneTasksBtn">
+            <button class="status-filter-pill pill-done" onclick="setChecklistStatusFilter('done', this)"
+              id="filterDoneTasksBtn">
               ✅ Done (<span id="countDoneTasks">0</span>)
             </button>
           </div>
@@ -578,14 +642,17 @@
       <div class="card header-card card-accent-blue" style="margin-bottom: 20px;">
         <div class="card-row">
           <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-            <div class="badge-icon-chip" style="background: rgba(59, 130, 246, 0.18); border-color: rgba(59, 130, 246, 0.4); font-size: 1.5rem;">👥</div>
+            <div class="badge-icon-chip"
+              style="background: rgba(59, 130, 246, 0.18); border-color: rgba(59, 130, 246, 0.4); font-size: 1.5rem;">👥
+            </div>
             <div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="header-tag tag-blue" style="font-weight: 800;">FULL LIFE CENTRE AG CHURCH</span>
                 <span class="call-time-badge">Leader: Lokesh</span>
               </div>
               <h2 class="section-title" style="margin-top: 6px;">Indoor Media Crew Directory</h2>
-              <p class="section-desc">Meet all dedicated volunteers serving across cameras, live broadcast switching, gimbals, spot editing, and equipment maintenance.</p>
+              <p class="section-desc">Meet all dedicated volunteers serving across cameras, live broadcast switching,
+                gimbals, spot editing, and equipment maintenance.</p>
             </div>
           </div>
           <div class="gear-incharge-badge">
@@ -597,11 +664,13 @@
       </div>
 
       <!-- Quick Search & Skill Filter Bar -->
-      <div class="card" style="margin-bottom: 20px; padding: 14px 18px;">
-        <div style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
-          <div style="flex: 1; min-width: 240px; position: relative;">
-            <input type="text" id="teamSearchInput" class="input-text" style="width: 100%; padding-left: 36px;" placeholder="🔍 Search member by name or skill..." oninput="filterTeamDirectory()">
-            <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; opacity: 0.6; pointer-events: none;">👤</span>
+      <div class="card team-filter-card" style="margin-bottom: 20px; padding: 14px 18px;">
+        <div class="team-filter-row" style="display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+          <div class="team-search-wrap" style="flex: 1 1 220px; min-width: 0; width: 100%; position: relative;">
+            <input type="text" id="teamSearchInput" class="input-text" style="width: 100%; padding-left: 36px;"
+              placeholder="Search name, role, or skill..." oninput="filterTeamDirectory()">
+            <span
+              style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; opacity: 0.6; pointer-events: none;">👤</span>
           </div>
           <div class="gear-filter-pills" id="teamSkillFilters">
             <button class="gear-filter-btn active" onclick="setTeamSkillFilter('all', this)">All Crew</button>
@@ -631,10 +700,12 @@
               <span class="call-time-badge">Leader: Lokesh</span>
             </div>
             <h2 class="section-title" style="margin-top: 6px;">Management & Edit Portal</h2>
-            <p class="section-desc">Change who does what, select role dropdowns, add/remove dates, manage team members, and customize checklists.</p>
+            <p class="section-desc">Change who does what, select role dropdowns, add/remove dates, manage team members,
+              and customize checklists.</p>
           </div>
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <button class="btn btn-save-schedule" onclick="manualSaveSchedule()" title="Save all changes to browser storage">
+            <button class="btn btn-save-schedule" onclick="manualSaveSchedule()"
+              title="Save all changes to browser storage">
               💾 Save Schedule
             </button>
             <button class="btn btn-secondary" onclick="openChangePinModal()">
@@ -672,7 +743,8 @@
         <div class="admin-save-bar">
           <div class="save-status-info">
             <span class="save-dot"></span>
-            <span id="saveStatusIndicator">Auto-save active &bull; Click <strong>Save Schedule</strong> to lock in changes</span>
+            <span id="saveStatusIndicator">Auto-save active &bull; Click <strong>Save Schedule</strong> to lock in
+              changes</span>
           </div>
           <button class="btn btn-save-schedule" onclick="manualSaveSchedule()" title="Save all changes to schedule">
             💾 Save Schedule Now
@@ -683,15 +755,18 @@
         <div class="card header-card card-accent-amber" style="margin-bottom: 20px;">
           <div class="card-row">
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-              <div class="badge-icon-chip" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🗓️</div>
+              <div class="badge-icon-chip"
+                style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🗓️</div>
               <div>
                 <h3 class="section-title" style="font-size: 1.15rem;">Set Active Schedule Month (Admin Access)</h3>
-                <p class="section-desc">Select Month &amp; Year to configure and display on the public schedule. All Sunday and Friday dates will automatically generate.</p>
+                <p class="section-desc">Select Month &amp; Year to configure and display on the public schedule. All
+                  Sunday and Friday dates will automatically generate.</p>
               </div>
             </div>
             <div class="month-selector-wrapper">
               <div style="display: flex; align-items: center; gap: 8px;">
-                <select id="selectMonth" class="role-select" style="min-width: 140px; font-weight: 700;" onchange="onMonthYearChange()">
+                <select id="selectMonth" class="role-select" style="min-width: 140px; font-weight: 700;"
+                  onchange="onMonthYearChange()">
                   <option value="0">January</option>
                   <option value="1">February</option>
                   <option value="2">March</option>
@@ -706,7 +781,8 @@
                   <option value="11">December</option>
                 </select>
 
-                <select id="selectYear" class="role-select" style="min-width: 100px; font-weight: 700;" onchange="onMonthYearChange()">
+                <select id="selectYear" class="role-select" style="min-width: 100px; font-weight: 700;"
+                  onchange="onMonthYearChange()">
                   <option value="2025">2025</option>
                   <option value="2026" selected>2026</option>
                   <option value="2027">2027</option>
@@ -720,7 +796,8 @@
                 Auto-Generated Dates
               </span>
 
-              <button class="btn btn-secondary" onclick="regenerateCurrentMonthDates()" title="Re-calculate all Sundays & Fridays for this month">
+              <button class="btn btn-secondary" onclick="regenerateCurrentMonthDates()"
+                title="Re-calculate all Sundays & Fridays for this month">
                 🔄 Sync Dates
               </button>
             </div>
@@ -732,7 +809,8 @@
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div class="header-tag tag-blue">1st Service Assignment Editor (06:00 AM &ndash; 08:00 AM)</div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;" onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;"
+                onclick="manualSaveSchedule()">💾 Save</button>
               <button class="btn btn-primary" onclick="addNewSundayRow()">+ Add Sunday Date</button>
             </div>
           </div>
@@ -800,7 +878,8 @@
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div class="header-tag tag-emerald">Friday Fasting Prayer Assignment Editor</div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;" onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;"
+                onclick="manualSaveSchedule()">💾 Save</button>
               <button class="btn btn-secondary" onclick="addNewFridayRow()">+ Add Friday Date</button>
             </div>
           </div>
@@ -824,7 +903,8 @@
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div class="header-tag tag-purple">🌟 Special Meetings & Conferences Editor</div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;" onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;"
+                onclick="manualSaveSchedule()">💾 Save</button>
               <button class="btn btn-primary" onclick="addSpecialMeetingRow()">+ Add Special Meeting</button>
             </div>
           </div>
@@ -852,13 +932,15 @@
         <div class="card">
           <!-- Seasonal Visibility Toggle Banner -->
           <div class="seasonal-toggle-banner">
-            <div style="flex: 1; min-width: 250px;">
-              <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="flex: 1 1 220px; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                 <strong style="font-size: 0.95rem;">Early Morning Prayer Schedule</strong>
-                <span id="morningPrayerStatusBadge" class="header-tag tag-amber" style="font-size: 0.75rem;">🔴 Inactive (Hidden on Public Schedule)</span>
+                <span id="morningPrayerStatusBadge" class="header-tag tag-amber" style="font-size: 0.75rem;">🔴 Inactive
+                  (Hidden on Public Schedule)</span>
               </div>
               <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
-                Seasonal schedule (Monday – Saturday). When turned OFF, it is completely hidden from the public schedule. Turn it ON only when prayer campaign is active.
+                Seasonal schedule (Monday – Saturday). When turned OFF, it is completely hidden from the public
+                schedule. Turn it ON only when prayer campaign is active.
               </p>
             </div>
             <button id="toggleMorningPrayerBtn" class="btn btn-primary" onclick="toggleMorningPrayerVisibility()">
@@ -867,18 +949,27 @@
           </div>
 
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-            <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 260px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex: 1 1 240px; min-width: 0; flex-wrap: wrap; width: 100%;">
               <span class="header-tag tag-amber" style="white-space: nowrap;">Campaign Name:</span>
-              <input type="text" id="morningPrayerTitle" class="input-text" style="flex: 1; font-weight: 700; color: #38bdf8;" placeholder="Campaign Name (e.g. 21 Days Early Morning Prayer)" oninput="updateMorningTitle(this.value)">
+              <input type="text" id="morningPrayerTitle" class="input-text"
+                style="flex: 1 1 180px; min-width: 0; width: 100%; font-weight: 700; color: #38bdf8;"
+                placeholder="Campaign Name (e.g. 21 Days Early Morning Prayer)"
+                oninput="updateMorningTitle(this.value)">
             </div>
             <div style="display: flex; gap: 6px; flex-wrap: wrap; align-items: center;">
               <span style="font-size: 0.75rem; color: var(--text-dim); margin-right: 2px;">Title Presets:</span>
-              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="setMorningPrayerCampaign('21 Days Early Morning Prayer')">21 Days</button>
-              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="setMorningPrayerCampaign('40 Days Early Morning Prayer')">40 Days</button>
-              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="setMorningPrayerCampaign('14 Days Early Morning Prayer')">14 Days</button>
-              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="resetMorningPrayerToWeekdays()">🔄 Reset Mon - Sat</button>
-              <button class="btn btn-save-schedule" style="padding: 5px 10px; font-size: 0.75rem;" onclick="manualSaveSchedule()">💾 Save</button>
-              <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.75rem;" onclick="addMorningPrayerRow()">+ Add Day</button>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;"
+                onclick="setMorningPrayerCampaign('21 Days Early Morning Prayer')">21 Days</button>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;"
+                onclick="setMorningPrayerCampaign('40 Days Early Morning Prayer')">40 Days</button>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;"
+                onclick="setMorningPrayerCampaign('14 Days Early Morning Prayer')">14 Days</button>
+              <button class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.75rem;"
+                onclick="resetMorningPrayerToWeekdays()">🔄 Reset Mon - Sat</button>
+              <button class="btn btn-save-schedule" style="padding: 5px 10px; font-size: 0.75rem;"
+                onclick="manualSaveSchedule()">💾 Save</button>
+              <button class="btn btn-primary" style="padding: 5px 10px; font-size: 0.75rem;"
+                onclick="addMorningPrayerRow()">+ Add Day</button>
             </div>
           </div>
           <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
@@ -905,10 +996,12 @@
       <div id="adminMembersTab" class="admin-tab-content">
         <div class="card">
           <h3 class="card-inner-title">Add New Team Member</h3>
-          <p class="section-desc" style="margin-bottom: 14px;">Any new member added here instantly appears in every schedule dropdown across all services!</p>
+          <p class="section-desc" style="margin-bottom: 14px;">Any new member added here instantly appears in every
+            schedule dropdown across all services!</p>
           <div class="add-member-form">
             <input type="text" id="newMemberName" placeholder="Enter Full Name (e.g. John Peter)" class="input-text">
-            <input type="text" id="newMemberRole" placeholder="Primary Skill (e.g. Camera, Audio, Live, Gimble)" class="input-text">
+            <input type="text" id="newMemberRole" placeholder="Primary Skill (e.g. Camera, Audio, Live, Gimble)"
+              class="input-text">
             <input type="tel" id="newMemberPhone" placeholder="Mobile / WhatsApp (e.g. 7010368793)" class="input-text">
             <button class="btn btn-primary" onclick="addNewMember()">
               + Add to Team
@@ -924,7 +1017,8 @@
               <span class="call-time-badge" id="workloadMonthBadge">Active Month</span>
             </div>
             <div style="font-size: 0.82rem; color: var(--text-muted);">
-              Keeps scheduling fair across all <span id="workloadTotalMembers" style="color: #38bdf8; font-weight: 700;">10</span> volunteers
+              Keeps scheduling fair across all <span id="workloadTotalMembers"
+                style="color: #38bdf8; font-weight: 700;">10</span> volunteers
             </div>
           </div>
 
@@ -950,13 +1044,22 @@
 
           <!-- Member Workload Balancer Progress Bars -->
           <div style="margin-top: 18px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
               <h4 style="font-size: 0.95rem; font-weight: 700;">Volunteer Duty Load This Month:</h4>
               <div style="display: flex; gap: 10px; font-size: 0.75rem; color: var(--text-muted); flex-wrap: wrap;">
-                <span><span style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 2px;"></span> Optimal (2-3)</span>
-                <span><span style="display: inline-block; width: 10px; height: 10px; background: #f59e0b; border-radius: 2px;"></span> Heavy (4+)</span>
-                <span><span style="display: inline-block; width: 10px; height: 10px; background: #38bdf8; border-radius: 2px;"></span> Light (1)</span>
-                <span><span style="display: inline-block; width: 10px; height: 10px; background: #64748b; border-radius: 2px;"></span> Resting (0)</span>
+                <span><span
+                    style="display: inline-block; width: 10px; height: 10px; background: #10b981; border-radius: 2px;"></span>
+                  Optimal (2-3)</span>
+                <span><span
+                    style="display: inline-block; width: 10px; height: 10px; background: #f59e0b; border-radius: 2px;"></span>
+                  Heavy (4+)</span>
+                <span><span
+                    style="display: inline-block; width: 10px; height: 10px; background: #38bdf8; border-radius: 2px;"></span>
+                  Light (1)</span>
+                <span><span
+                    style="display: inline-block; width: 10px; height: 10px; background: #64748b; border-radius: 2px;"></span>
+                  Resting (0)</span>
               </div>
             </div>
             <div class="workload-bars-grid" id="workloadBarsList">
@@ -966,7 +1069,8 @@
 
           <!-- Role Distribution Pill Breakdown -->
           <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border);">
-            <div style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+            <div
+              style="font-size: 0.82rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
               Role Demand Breakdown Across All Services:
             </div>
             <div class="role-distribution-pills" id="roleDemandPills">
@@ -986,16 +1090,19 @@
         <div class="card card-accent-amber" style="margin-bottom: 20px;">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="badge-icon-chip" style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🛠️</div>
+              <div class="badge-icon-chip"
+                style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🛠️</div>
               <div>
                 <h3 class="section-title" style="font-size: 1.15rem;">Equipment Maintenance &amp; Fault Log</h3>
-                <p class="section-desc">Track broken cables, battery health, camera firmware, switcher issues, and send instant WhatsApp repair alerts.</p>
+                <p class="section-desc">Track broken cables, battery health, camera firmware, switcher issues, and send
+                  instant WhatsApp repair alerts.</p>
               </div>
             </div>
             <div class="gear-incharge-badge">
               <span style="font-size: 0.78rem; color: #94a3b8; display: block;">Equipment Incharge:</span>
               <strong style="color: #f59e0b; font-size: 0.95rem;">Yashwanth &amp; Sam Davit</strong>
-              <a href="https://wa.me/917010368793" target="_blank" rel="noopener" class="gear-phone-pill" title="WhatsApp Yashwanth">
+              <a href="https://wa.me/917010368793" target="_blank" rel="noopener" class="gear-phone-pill"
+                title="WhatsApp Yashwanth">
                 📱 7010368793
               </a>
             </div>
@@ -1005,12 +1112,14 @@
         <!-- Log New Gear Issue Form -->
         <div class="card" style="margin-bottom: 24px;">
           <h3 class="card-inner-title">+ Report Equipment Issue or Maintenance Need</h3>
-          <p class="section-desc" style="margin-bottom: 14px;">Log any gear issue noticed during rehearsal or Sunday service so the team can fix it before next Sunday.</p>
+          <p class="section-desc" style="margin-bottom: 14px;">Log any gear issue noticed during rehearsal or Sunday
+            service so the team can fix it before next Sunday.</p>
 
           <div class="gear-form-grid">
             <div>
               <label class="gear-form-label">Equipment Item / Gear:</label>
-              <select id="gearItemSelect" class="role-select" style="width: 100%;" onchange="checkGearCustomItem(this.value)">
+              <select id="gearItemSelect" class="role-select" style="width: 100%;"
+                onchange="checkGearCustomItem(this.value)">
                 <option value="Main Camera 1 (Sony A7 / FX3)">Main Camera 1 (Sony A7 / FX3)</option>
                 <option value="Camera 2 (Sony A6400 / A7)">Camera 2 (Sony A6400 / A7)</option>
                 <option value="3-Axis Motorized Gimbal (Ronin)">3-Axis Motorized Gimbal (Ronin)</option>
@@ -1023,7 +1132,8 @@
                 <option value="Director Field Monitor / Power Cable">Director Field Monitor / Power Cable</option>
                 <option value="Other / Custom Gear">Other / Custom Gear...</option>
               </select>
-              <input type="text" id="gearCustomItemInput" class="input-text" style="width: 100%; margin-top: 6px; display: none;" placeholder="Specify equipment name...">
+              <input type="text" id="gearCustomItemInput" class="input-text"
+                style="width: 100%; margin-top: 6px; display: none;" placeholder="Specify equipment name...">
             </div>
 
             <div>
@@ -1044,7 +1154,8 @@
 
             <div style="grid-column: 1 / -1;">
               <label class="gear-form-label">Problem Description &amp; Action Required:</label>
-              <input type="text" id="gearDescInput" class="input-text" style="width: 100%;" placeholder="e.g. HDMI port loose on Cam 2, needs new heavy duty braided micro-HDMI cable before Sunday morning">
+              <input type="text" id="gearDescInput" class="input-text" style="width: 100%;"
+                placeholder="e.g. HDMI port loose on Cam 2, needs new heavy duty braided micro-HDMI cable before Sunday morning">
             </div>
           </div>
 
@@ -1085,14 +1196,18 @@
             <span class="call-time-badge" id="adminActiveWeekBadge">Active: Week 1</span>
           </div>
           <p class="section-desc" style="margin-bottom: 14px;">
-            Choose which Sunday week to set for the service checklist. The volunteer checklist page will immediately update to this selected week.
+            Choose which Sunday week to set for the service checklist. The volunteer checklist page will immediately
+            update to this selected week.
           </p>
           <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
             <label style="font-size: 0.88rem; font-weight: 600;">Choose Checklist Week:</label>
-            <select id="adminActiveWeekSelect" class="role-select" style="min-width: 240px; font-weight: 600;" onchange="setAdminActiveWeek(this.value)">
+            <select id="adminActiveWeekSelect" class="role-select" style="min-width: 240px; font-weight: 600;"
+              onchange="setAdminActiveWeek(this.value)">
               <!-- populated dynamically -->
             </select>
-            <button class="btn btn-save-schedule" onclick="setAdminActiveWeek(document.getElementById('adminActiveWeekSelect').value)" title="Set selected week for checklist">
+            <button class="btn btn-save-schedule"
+              onclick="setAdminActiveWeek(document.getElementById('adminActiveWeekSelect').value)"
+              title="Set selected week for checklist">
               💾 Set Checklist Week
             </button>
             <button class="btn btn-secondary" onclick="resetChecklists()" title="Reset checks for active week">
@@ -1103,10 +1218,13 @@
 
         <div id="newCategoryCard" class="card card-accent-blue">
           <h3 class="card-inner-title">+ Create New Checklist Category</h3>
-          <p class="section-desc" style="margin-bottom: 12px;">Add custom checklist categories for your church operations.</p>
+          <p class="section-desc" style="margin-bottom: 12px;">Add custom checklist categories for your church
+            operations.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-            <input type="text" id="newCatTitle" placeholder="Category Title (e.g. 7. Stage Lighting)" class="input-text" style="flex: 2; min-width: 220px;">
-            <input type="text" id="newCatIncharge" placeholder="Incharge Role / Person" class="input-text" style="flex: 1; min-width: 180px;">
+            <input type="text" id="newCatTitle" placeholder="Category Title (e.g. 7. Stage Lighting)" class="input-text"
+              style="flex: 2; min-width: 220px;">
+            <input type="text" id="newCatIncharge" placeholder="Incharge Role / Person" class="input-text"
+              style="flex: 1; min-width: 180px;">
             <button class="btn btn-primary" onclick="createChecklistCategory()">Save Category</button>
           </div>
         </div>
@@ -1122,13 +1240,17 @@
         <div class="card card-accent-blue" style="margin-bottom: 24px;">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="badge-icon-chip" style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">☁️</div>
+              <div class="badge-icon-chip"
+                style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">☁️</div>
               <div>
-                <h3 class="section-title" style="font-size: 1.15rem;">Live Multi-Device Cloud Sync (Netlify &amp; Mobile)</h3>
-                <p class="section-desc">Connect free Google Firebase Realtime Database so changes saved by Admin instantly sync to all team members' phones across Netlify.</p>
+                <h3 class="section-title" style="font-size: 1.15rem;">Live Multi-Device Cloud Sync (Netlify &amp;
+                  Mobile)</h3>
+                <p class="section-desc">Connect free Google Firebase Realtime Database so changes saved by Admin
+                  instantly sync to all team members' phones across Netlify.</p>
               </div>
             </div>
-            <div id="cloudStatusBadge" class="header-tag tag-amber" style="font-size: 0.82rem; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
+            <div id="cloudStatusBadge" class="header-tag tag-amber"
+              style="font-size: 0.82rem; padding: 6px 14px; display: inline-flex; align-items: center; gap: 6px;">
               <span class="sync-dot"></span>
               <span id="cloudStatusText">🟡 Local Mode (Ready to Connect)</span>
             </div>
@@ -1139,19 +1261,25 @@
               Firebase Realtime Database URL:
             </label>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-              <input type="url" id="firebaseDbUrlInput" class="input-text" style="flex: 1; min-width: 260px;" value="https://flag-church-media-default-rtdb.firebaseio.com" placeholder="https://your-church-app-default-rtdb.firebaseio.com">
-              <button class="btn btn-primary" onclick="saveAndConnectFirebase()" title="Connect to Firebase Realtime Database">
+              <input type="url" id="firebaseDbUrlInput" class="input-text" style="flex: 1; min-width: 260px;"
+                value="https://flag-church-media-default-rtdb.firebaseio.com"
+                placeholder="https://your-church-app-default-rtdb.firebaseio.com">
+              <button class="btn btn-primary" onclick="saveAndConnectFirebase()"
+                title="Connect to Firebase Realtime Database">
                 🔗 Connect &amp; Enable Cloud Sync
               </button>
-              <button class="btn btn-save-schedule" onclick="syncLocalToCloudNow()" id="btnSyncCloudNow" style="display: none;" title="Push current schedule to Cloud immediately">
+              <button class="btn btn-save-schedule" onclick="syncLocalToCloudNow()" id="btnSyncCloudNow"
+                style="display: none;" title="Push current schedule to Cloud immediately">
                 🔄 Sync Now
               </button>
-              <button class="btn btn-secondary" onclick="disconnectFirebase()" id="btnDisconnectCloud" style="display: none;" title="Disconnect from Firebase">
+              <button class="btn btn-secondary" onclick="disconnectFirebase()" id="btnDisconnectCloud"
+                style="display: none;" title="Disconnect from Firebase">
                 🔌 Disconnect
               </button>
             </div>
             <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
-              💡 Once connected, clicking <strong>💾 Save Schedule</strong> will automatically push updates to the cloud and refresh every volunteer's phone in real time!
+              💡 Once connected, clicking <strong>💾 Save Schedule</strong> will automatically push updates to the cloud
+              and refresh every volunteer's phone in real time!
             </p>
           </div>
 
@@ -1164,22 +1292,31 @@
               <div class="guide-steps">
                 <ol style="margin-left: 20px; display: flex; flex-direction: column; gap: 8px;">
                   <li>
-                    Open <strong><a href="https://console.firebase.google.com" target="_blank" rel="noopener" style="color: #38bdf8; text-decoration: underline;">Firebase Console</a></strong> (sign in with any free Google account).
+                    Open <strong><a href="https://console.firebase.google.com" target="_blank" rel="noopener"
+                        style="color: #38bdf8; text-decoration: underline;">Firebase Console</a></strong> (sign in with
+                    any free Google account).
                   </li>
                   <li>
-                    Click <strong>+ Add project</strong>, enter a name (e.g. <code>flag-church-media</code>), and click Continue until the project is created.
+                    Click <strong>+ Add project</strong>, enter a name (e.g. <code>flag-church-media</code>), and click
+                    Continue until the project is created.
                   </li>
                   <li>
-                    In the left navigation menu, click <strong>Build</strong> ➔ <strong>Realtime Database</strong> ➔ click <strong>Create Database</strong>.
+                    In the left navigation menu, click <strong>Build</strong> ➔ <strong>Realtime Database</strong> ➔
+                    click <strong>Create Database</strong>.
                   </li>
                   <li>
-                    Select your nearest region (e.g. <em>Singapore</em> or <em>United States</em>), click <strong>Next</strong>, then choose <strong>"Start in test mode"</strong> (allows read &amp; write) and click <strong>Enable</strong>.
+                    Select your nearest region (e.g. <em>Singapore</em> or <em>United States</em>), click
+                    <strong>Next</strong>, then choose <strong>"Start in test mode"</strong> (allows read &amp; write)
+                    and click <strong>Enable</strong>.
                   </li>
                   <li>
-                    Copy the Database URL displayed at the top of your database page (it looks like: <code>https://flag-church-media-default-rtdb.asia-southeast1.firebasedatabase.app</code> or <code>https://flag-church-media-default-rtdb.firebaseio.com</code>).
+                    Copy the Database URL displayed at the top of your database page (it looks like:
+                    <code>https://flag-church-media-default-rtdb.asia-southeast1.firebasedatabase.app</code> or
+                    <code>https://flag-church-media-default-rtdb.firebaseio.com</code>).
                   </li>
                   <li>
-                    Paste that URL into the box above and click <strong>🔗 Connect &amp; Enable Cloud Sync</strong>. That's it!
+                    Paste that URL into the box above and click <strong>🔗 Connect &amp; Enable Cloud Sync</strong>.
+                    That's it!
                   </li>
                 </ol>
               </div>
@@ -1195,7 +1332,8 @@
             </div>
           </div>
           <p class="section-desc" style="margin-bottom: 12px;">
-            Want to sync your current schedule immediately without setting up Firebase? Generate a 1-click sync link! When volunteers tap the link in WhatsApp, their phones will automatically update to your latest schedule.
+            Want to sync your current schedule immediately without setting up Firebase? Generate a 1-click sync link!
+            When volunteers tap the link in WhatsApp, their phones will automatically update to your latest schedule.
           </p>
           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <button class="btn btn-whatsapp" onclick="shareRosterSyncWhatsApp()">
@@ -1210,7 +1348,8 @@
         <!-- Full File JSON Backup & Restore -->
         <div class="card">
           <h3 class="card-inner-title">Data Backup &amp; Restore (JSON File)</h3>
-          <p class="section-desc" style="margin-bottom: 16px;">Download a complete offline backup file of your schedules, team members, gear issues, and checklists to move between computers or save as safe backup.</p>
+          <p class="section-desc" style="margin-bottom: 16px;">Download a complete offline backup file of your
+            schedules, team members, gear issues, and checklists to move between computers or save as safe backup.</p>
           <div style="display: flex; gap: 12px; flex-wrap: wrap;">
             <button class="btn btn-primary" onclick="exportDataJSON()">
               💾 Download Full Backup (.JSON)
@@ -1218,7 +1357,8 @@
             <button class="btn btn-secondary" onclick="document.getElementById('importFileInput').click()">
               📂 Restore Backup from File
             </button>
-            <input type="file" id="importFileInput" style="display: none;" accept=".json" onchange="importDataJSON(event)">
+            <input type="file" id="importFileInput" style="display: none;" accept=".json"
+              onchange="importDataJSON(event)">
           </div>
         </div>
       </div>
@@ -1238,7 +1378,9 @@
       </p>
 
       <div style="margin-bottom: 20px;">
-        <input type="password" id="adminPinInput" placeholder="Enter PIN" class="input-text" style="width: 100%; text-align: center; font-size: 1.3rem; letter-spacing: 4px;" maxlength="8" onkeydown="if(event.key==='Enter') unlockAdminWithPin()">
+        <input type="password" id="adminPinInput" placeholder="Enter PIN" class="input-text"
+          style="width: 100%; text-align: center; font-size: 1.3rem; letter-spacing: 4px;" maxlength="8"
+          onkeydown="if(event.key==='Enter') unlockAdminWithPin()">
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px;">
@@ -1263,7 +1405,8 @@
         </div>
         <div>
           <label style="font-size: 0.8rem; color: var(--text-muted);">New PIN:</label>
-          <input type="password" id="newPinInput" placeholder="New PIN (e.g. 4 digits)" class="input-text" style="width: 100%;">
+          <input type="password" id="newPinInput" placeholder="New PIN (e.g. 4 digits)" class="input-text"
+            style="width: 100%;">
         </div>
       </div>
 
@@ -1287,14 +1430,16 @@
 
       <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Person 1:</label>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Person
+            1:</label>
           <select id="modalPairSelect1" class="role-select" style="width: 100%;"></select>
         </div>
 
         <div style="text-align: center; font-weight: 800; color: #38bdf8; font-size: 1.2rem;">&</div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Person 2:</label>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 4px;">Person
+            2:</label>
           <select id="modalPairSelect2" class="role-select" style="width: 100%;"></select>
         </div>
       </div>
@@ -1322,27 +1467,37 @@
 
       <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Full Name:</label>
-          <input type="text" id="editMemberName" class="input-text" style="width: 100%; font-weight: 700; color: #38bdf8;" placeholder="e.g. John Peter">
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Full
+            Name:</label>
+          <input type="text" id="editMemberName" class="input-text"
+            style="width: 100%; font-weight: 700; color: #38bdf8;" placeholder="e.g. John Peter">
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Primary Skill / Role:</label>
-          <input type="text" id="editMemberRole" class="input-text" style="width: 100%;" placeholder="e.g. Camera 1 & 2, Gimble, Live System">
+          <label
+            style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Primary
+            Skill / Role:</label>
+          <input type="text" id="editMemberRole" class="input-text" style="width: 100%;"
+            placeholder="e.g. Camera 1 & 2, Gimble, Live System">
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp / Mobile Number (Optional):</label>
-          <input type="tel" id="editMemberPhone" class="input-text" style="width: 100%;" placeholder="e.g. 7010368793 (10 digits)">
+          <label
+            style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp /
+            Mobile Number (Optional):</label>
+          <input type="tel" id="editMemberPhone" class="input-text" style="width: 100%;"
+            placeholder="e.g. 7010368793 (10 digits)">
         </div>
 
-        <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.28); border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: #93c5fd; display: flex; align-items: center; gap: 8px;">
+        <div
+          style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.28); border-radius: 8px; padding: 10px 12px; font-size: 0.78rem; color: #93c5fd; display: flex; align-items: center; gap: 8px;">
           <span>🔄</span>
-          <span><strong>Auto-Sync:</strong> Existing schedule assignments for this member will automatically update to the new name!</span>
+          <span><strong>Auto-Sync:</strong> Existing schedule assignments for this member will automatically update to
+            the new name!</span>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <div class="modal-actions-row" style="display: flex; justify-content: flex-end; gap: 10px;">
         <button class="btn btn-secondary" onclick="closeEditMemberModal()">Cancel</button>
         <button class="btn btn-primary" onclick="saveMemberEdit()">Save Changes</button>
       </div>
@@ -1360,17 +1515,22 @@
         <button class="modal-close" onclick="closeSwapRequestModal()">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-        Can't make it to your scheduled slot? Generate a quick church-official message to send to the Media WhatsApp group or Leader Lokesh:
+        Can't make it to your scheduled slot? Generate a quick church-official message to send to the Media WhatsApp
+        group or Leader Lokesh:
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
         <div id="swapVolunteerSelectWrap">
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Your Name (Volunteer):</label>
-          <select id="swapVolunteerSelect" class="role-select" style="width: 100%;" onchange="onSwapVolunteerSelectChange(this.value)"></select>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Your
+            Name (Volunteer):</label>
+          <select id="swapVolunteerSelect" class="role-select" style="width: 100%;"
+            onchange="onSwapVolunteerSelectChange(this.value)"></select>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Request Type:</label>
+          <label
+            style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Request
+            Type:</label>
           <select id="swapTypeSelect" class="role-select" style="width: 100%;" onchange="updateSwapPreview()">
             <option value="swap">🔄 Request Shift Swap / Cover</option>
             <option value="absence">🚫 Report Absence / Emergency</option>
@@ -1378,31 +1538,42 @@
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Scheduled Shift:</label>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select
+            Scheduled Shift:</label>
           <select id="swapDutySelect" class="role-select" style="width: 100%;" onchange="updateSwapPreview()"></select>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Reason / Note:</label>
-          <input type="text" id="swapReasonInput" class="input-text" style="width: 100%;" placeholder="e.g. Out of station / urgent personal work / health" oninput="updateSwapPreview()">
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Reason
+            / Note:</label>
+          <input type="text" id="swapReasonInput" class="input-text" style="width: 100%;"
+            placeholder="e.g. Out of station / personal work" oninput="updateSwapPreview()">
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Suggested Substitute / Covered By (Optional):</label>
-          <input type="text" id="swapReplacementInput" class="input-text" style="width: 100%;" placeholder="e.g. Bro. Balaji agreed to cover / Looking for volunteer" oninput="updateSwapPreview()">
+          <label
+            style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Suggested
+            Substitute / Covered By (Optional):</label>
+          <input type="text" id="swapReplacementInput" class="input-text" style="width: 100%;"
+            placeholder="e.g. Bro. Balaji agreed to cover" oninput="updateSwapPreview()">
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp Message Preview:</label>
+          <label
+            style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp
+            Message Preview:</label>
           <pre id="swapMessagePreview" class="whatsapp-bubble-mini" style="max-height: 150px;"></pre>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+      <div class="modal-actions-row" style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="closeSwapRequestModal()">Cancel</button>
         <button class="btn btn-whatsapp" onclick="copySwapMessage()">📋 Copy</button>
-        <button class="btn btn-whatsapp" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="sendSwapToLeaderWhatsApp()" title="Send directly to Leader Lokesh on WhatsApp">👤 Send to Leader</button>
-        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSwapToWhatsApp()" title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
+        <button class="btn btn-whatsapp" style="background: linear-gradient(135deg, #0284c7, #0369a1);"
+          onclick="sendSwapToLeaderWhatsApp()" title="Send directly to Leader Lokesh on WhatsApp">👤 Send to
+          Leader</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSwapToWhatsApp()"
+          title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
       </div>
     </div>
   </div>
@@ -1430,7 +1601,8 @@
         <div class="ios-step-card">
           <div class="ios-step-num">2</div>
           <div class="ios-step-text">
-            Scroll down and tap <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">➕</span>.
+            Scroll down and tap <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span
+              class="ios-icon-pill">➕</span>.
           </div>
         </div>
         <div class="ios-step-card">
@@ -1457,30 +1629,38 @@
         <button class="modal-close" onclick="closeDirectReminderModal()">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-        Send a personal reminder directly to <strong id="reminderVolunteerName" style="color: #38bdf8;">Volunteer</strong> for their upcoming duty:
+        Send a personal reminder directly to <strong id="reminderVolunteerName"
+          style="color: #38bdf8;">Volunteer</strong> for their upcoming duty:
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Scheduled Duty to Remind:</label>
-          <select id="reminderDutySelect" class="role-select" style="width: 100%;" onchange="updateDirectReminderPreview()"></select>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select
+            Scheduled Duty to Remind:</label>
+          <select id="reminderDutySelect" class="role-select" style="width: 100%;"
+            onchange="updateDirectReminderPreview()"></select>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Volunteer WhatsApp Number (Optional):</label>
-          <input type="tel" id="reminderPhoneInput" class="input-text" style="width: 100%;" placeholder="e.g. 919876543210 (with country code)" oninput="updateDirectReminderPreview()">
+          <label
+            style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Volunteer
+            WhatsApp Number (Optional):</label>
+          <input type="tel" id="reminderPhoneInput" class="input-text" style="width: 100%;"
+            placeholder="e.g. 919876543210 (with country code)" oninput="updateDirectReminderPreview()">
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Direct Message Preview:</label>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Direct
+            Message Preview:</label>
           <pre id="directReminderPreview" class="whatsapp-bubble-mini" style="max-height: 160px;"></pre>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
+      <div class="modal-actions-row" style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="closeDirectReminderModal()">Cancel</button>
         <button class="btn btn-whatsapp" onclick="copyDirectReminderMessage()">📋 Copy Message</button>
-        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendDirectReminderWhatsApp()">💬 Send via WhatsApp</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendDirectReminderWhatsApp()">💬 Send via
+          WhatsApp</button>
       </div>
     </div>
   </div>
@@ -1496,26 +1676,34 @@
         <button class="modal-close" onclick="closeSaturdayAlertModal()">&times;</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px;">
-        Generate an official pre-service alert with 05:30 AM call times, prayer reminders, and serving assignments for tomorrow's crew:
+        Generate an official pre-service alert with 05:30 AM call times, prayer reminders, and serving assignments for
+        tomorrow's crew:
       </p>
 
       <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select Service Date to Remind:</label>
-          <select id="saturdayAlertDateSelect" class="role-select" style="width: 100%; font-weight: 700;" onchange="updateSaturdayAlertModalPreview()"></select>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Select
+            Service Date to Remind:</label>
+          <select id="saturdayAlertDateSelect" class="role-select" style="width: 100%; font-weight: 700;"
+            onchange="updateSaturdayAlertModalPreview()"></select>
         </div>
 
         <div>
-          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp Broadcast Message Preview:</label>
-          <pre id="saturdayAlertPreview" class="whatsapp-bubble-mini" style="max-height: 250px; font-size: 0.78rem;"></pre>
+          <label
+            style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">WhatsApp
+            Broadcast Message Preview:</label>
+          <pre id="saturdayAlertPreview" class="whatsapp-bubble-mini"
+            style="max-height: 250px; font-size: 0.78rem;"></pre>
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+      <div class="modal-actions-row" style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="closeSaturdayAlertModal()">Close</button>
         <button class="btn btn-whatsapp" onclick="copySaturdayAlertText()">📋 Copy</button>
-        <button class="btn btn-whatsapp" style="background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="sendSaturdayAlertToLeader()" title="Send preview to Leader Lokesh on WhatsApp">👤 To Leader</button>
-        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSaturdayAlertWhatsApp()" title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
+        <button class="btn btn-whatsapp" style="background: linear-gradient(135deg, #0284c7, #0369a1);"
+          onclick="sendSaturdayAlertToLeader()" title="Send preview to Leader Lokesh on WhatsApp">👤 To Leader</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSaturdayAlertWhatsApp()"
+          title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
       </div>
     </div>
   </div>
@@ -1530,6 +1718,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=4.0"></script>
+  <script src="app.js?v=4.1"></script>
 </body>
+
 </html>
