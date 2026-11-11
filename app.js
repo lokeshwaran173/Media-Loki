@@ -1,24 +1,27 @@
 // FLAG Church - Indoor Media Application Logic
 
 // Official Full Life Centre AG Church Indoor Media Crew Directory & Contacts
+const DEFAULT_MEMBER_ROLE = "Media Crew Member";
+const CURRENT_MEMBER_ROLES_VERSION = 1;
+
 const OFFICIAL_CREW_DIRECTORY = [
-  { name: "Lokesh", role: "Leader & Gimble", phone: "+91 70103 68793" },
-  { name: "Balaji", role: "Camera 1 & 2", phone: "+91 80560 44254" },
-  { name: "Shyam David", role: "Gimble & Live System", phone: "+91 86818 54526" },
-  { name: "Sam Joshua", role: "Charging Incharge & Camera", phone: "+91 81110 63598" },
-  { name: "Praveen doss", role: "2nd Service Cam & Live", phone: "+91 78100 33166" },
-  { name: "Sanjay", role: "Gimble & Camera", phone: "+91 70928 15470" },
-  { name: "Mathew", role: "Camera & Live System", phone: "+91 96001 34194" },
-  { name: "Jose", role: "Camera & Media Operations", phone: "+91 85319 72562" },
-  { name: "Joshua", role: "Spot Editing & Media", phone: "+91 78718 97417" },
-  { name: "Karthik", role: "Live System & Media Tech", phone: "+91 74181 48641" },
-  { name: "Kailash", role: "Camera & Spot Editing", phone: "+91 79045 07246" },
-  { name: "Aandross", role: "2nd Service Cam & Live", phone: "+91 86675 67203" },
-  { name: "Anand", role: "Live in System", phone: "+91 63791 69115" },
-  { name: "Aaron", role: "Camera & Live System", phone: "+91 88078 04614" },
-  { name: "Yashwanth", role: "Live in System & Battery Incharge", phone: "+91 70103 68793" },
-  { name: "Andrew", role: "Camera 1 & 3rd Service", phone: "" },
-  { name: "Franklin", role: "Camera 1 & 3rd Service", phone: "" }
+  { name: "Lokesh", role: DEFAULT_MEMBER_ROLE, phone: "+91 70103 68793" },
+  { name: "Balaji", role: DEFAULT_MEMBER_ROLE, phone: "+91 80560 44254" },
+  { name: "Shyam David", role: DEFAULT_MEMBER_ROLE, phone: "+91 86818 54526" },
+  { name: "Sam Joshua", role: DEFAULT_MEMBER_ROLE, phone: "+91 81110 63598" },
+  { name: "Praveen doss", role: DEFAULT_MEMBER_ROLE, phone: "+91 78100 33166" },
+  { name: "Sanjay", role: DEFAULT_MEMBER_ROLE, phone: "+91 70928 15470" },
+  { name: "Mathew", role: DEFAULT_MEMBER_ROLE, phone: "+91 96001 34194" },
+  { name: "Jose", role: DEFAULT_MEMBER_ROLE, phone: "+91 85319 72562" },
+  { name: "Joshua", role: DEFAULT_MEMBER_ROLE, phone: "+91 78718 97417" },
+  { name: "Karthik", role: DEFAULT_MEMBER_ROLE, phone: "+91 74181 48641" },
+  { name: "Kailash", role: DEFAULT_MEMBER_ROLE, phone: "+91 79045 07246" },
+  { name: "Aandross", role: DEFAULT_MEMBER_ROLE, phone: "+91 86675 67203" },
+  { name: "Anand", role: DEFAULT_MEMBER_ROLE, phone: "+91 63791 69115" },
+  { name: "Aaron", role: DEFAULT_MEMBER_ROLE, phone: "+91 88078 04614" },
+  { name: "Yashwanth", role: DEFAULT_MEMBER_ROLE, phone: "+91 70103 68793" },
+  { name: "Andrew", role: DEFAULT_MEMBER_ROLE, phone: "" },
+  { name: "Franklin", role: DEFAULT_MEMBER_ROLE, phone: "" }
 ];
 
 function isAliasMatch(strA, strB) {
@@ -61,7 +64,7 @@ function syncOfficialCrewPhoneNumbers(state) {
       if (official.name !== existing.name && ["Shyam Davit", "Sam Davit", "Praveen", "Andross"].includes(existing.name)) {
         existing.name = official.name;
       }
-      if (official.role && (!existing.role || existing.role === "Media Volunteer")) {
+      if (official.role && (!existing.role || existing.role === "Media Volunteer" || existing.role === "Media Crew")) {
         existing.role = official.role;
       }
     } else {
@@ -118,6 +121,7 @@ const defaultState = {
       { id: 6, day: "Saturday", cam1: "Yashwanth", cam2: "Andrew", gimbal: "Shyam Davit", liveEditor: "Praveen", socialMedia: "Joshua" }
     ]
   },
+  memberRolesVersion: CURRENT_MEMBER_ROLES_VERSION,
   checklistTemplateVersion: 3,
   checklists: [
     {
@@ -423,6 +427,14 @@ function ensureStateIntegrity(state) {
     if (state.members.length === 0) {
       state.members = JSON.parse(JSON.stringify(defaultState.members));
     }
+  }
+  if (!state.memberRolesVersion || state.memberRolesVersion < CURRENT_MEMBER_ROLES_VERSION) {
+    state.members.forEach(m => {
+      if (m && typeof m === "object") {
+        m.role = DEFAULT_MEMBER_ROLE;
+      }
+    });
+    state.memberRolesVersion = CURRENT_MEMBER_ROLES_VERSION;
   }
   syncOfficialCrewPhoneNumbers(state);
 
@@ -1977,7 +1989,7 @@ function openAvailabilityModal(memberName) {
 
   if (select) {
     select.innerHTML = members.map(m =>
-      `<option value="${escapeHtml(m.name)}" ${m.name === preferred ? "selected" : ""}>👤 ${escapeHtml(m.name)} (${escapeHtml(m.role || "Crew")})</option>`
+      `<option value="${escapeHtml(m.name)}" ${m.name === preferred ? "selected" : ""}>👤 ${escapeHtml(m.name)} (${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)})</option>`
     ).join("");
   }
   currentAvailabilityMember = preferred;
@@ -2801,7 +2813,7 @@ function renderMembers() {
         <div class="member-avatar" style="background: ${avatarBg};">${initials}</div>
         <div class="member-info" style="min-width: 0;">
           <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.name}</h4>
-          <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.role || 'Media Volunteer'}</p>
+          <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.role || DEFAULT_MEMBER_ROLE}</p>
           ${m.phone ? `
             <div style="margin-top: 3px;">
               <span style="font-size: 0.72rem; color: #4ade80; font-family: var(--font-mono); font-weight: 700; background: rgba(34, 197, 94, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(34, 197, 94, 0.28); display: inline-flex; align-items: center; gap: 4px;">
@@ -2850,6 +2862,17 @@ function filterTeamDirectory() {
   renderPublicTeamDirectory();
 }
 
+function memberMatchesSkillFilter(member, skillFilter) {
+  if (!skillFilter || skillFilter === "all") return true;
+  const roleStr = ((member && member.role) || "").toLowerCase();
+  if (skillFilter === "camera") return roleStr.includes("cam") || roleStr.includes("camera");
+  if (skillFilter === "live") return roleStr.includes("live") || roleStr.includes("system");
+  if (skillFilter === "gimble") return roleStr.includes("gimble") || roleStr.includes("gimbal");
+  if (skillFilter === "charging") return roleStr.includes("charg") || roleStr.includes("battery");
+  if (skillFilter === "spot") return roleStr.includes("spot") || roleStr.includes("edit");
+  return true;
+}
+
 function renderPublicTeamDirectory() {
   const container = document.getElementById("publicTeamGrid");
   const countEl = document.getElementById("teamDirectoryCount");
@@ -2862,6 +2885,20 @@ function renderPublicTeamDirectory() {
   const totalMembers = membersList.length;
   if (countEl) countEl.textContent = `${totalMembers} Crew Members`;
   if (badgeEl) badgeEl.textContent = totalMembers;
+
+  // Show only skill filter pills that currently match at least one member's role
+  const filterBtns = document.querySelectorAll("#teamSkillFilters .gear-filter-btn");
+  let activeFilterStillVisible = currentTeamSkillFilter === "all";
+  filterBtns.forEach(btn => {
+    const skill = btn.getAttribute("data-skill") || "all";
+    const hasMatch = skill === "all" || membersList.some(m => memberMatchesSkillFilter(m, skill));
+    btn.style.display = hasMatch ? "" : "none";
+    if (skill === currentTeamSkillFilter && hasMatch) activeFilterStillVisible = true;
+  });
+  if (!activeFilterStillVisible) {
+    currentTeamSkillFilter = "all";
+    filterBtns.forEach(btn => btn.classList.toggle("active", (btn.getAttribute("data-skill") || "all") === "all"));
+  }
 
   if (!container) return;
 
@@ -2881,15 +2918,7 @@ function renderPublicTeamDirectory() {
 
   // Filter by skill chip
   if (typeof currentTeamSkillFilter !== "undefined" && currentTeamSkillFilter !== "all") {
-    filtered = filtered.filter(m => {
-      const roleStr = (m.role || "").toLowerCase();
-      if (currentTeamSkillFilter === "camera") return roleStr.includes("cam") || roleStr.includes("camera");
-      if (currentTeamSkillFilter === "live") return roleStr.includes("live") || roleStr.includes("system");
-      if (currentTeamSkillFilter === "gimble") return roleStr.includes("gimble") || roleStr.includes("gimbal");
-      if (currentTeamSkillFilter === "charging") return roleStr.includes("charg") || roleStr.includes("battery");
-      if (currentTeamSkillFilter === "spot") return roleStr.includes("spot") || roleStr.includes("edit");
-      return true;
-    });
+    filtered = filtered.filter(m => memberMatchesSkillFilter(m, currentTeamSkillFilter));
   }
 
   // Filter by search text
@@ -2960,8 +2989,8 @@ function renderPublicTeamDirectory() {
           </div>
           <div class="team-meta-info">
             <h3>${escapeQuotes(rawName)}</h3>
-            <span class="team-role-pill" title="${escapeQuotes(m.role || 'Media Volunteer')}">
-              ${escapeQuotes(m.role || 'Media Volunteer')}
+            <span class="team-role-pill" title="${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}">
+              ${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}
             </span>
           </div>
         </div>
@@ -2988,7 +3017,7 @@ function renderPublicTeamDirectory() {
             👤 View Duties
           </button>
           ${intlDigits ? `
-            <a href="tel:+${intlDigits}" class="btn btn-secondary btn-sm" style="padding: 6px 10px; gap: 4px;" title="Call ${escapeQuotes(rawName)} directly">
+            <a href="tel:+${intlDigits}" class="btn btn-secondary btn-sm" style="text-decoration: none; padding: 6px 10px; gap: 4px;" title="Call ${escapeQuotes(rawName)} directly">
               📞 Call
             </a>
           ` : ''}
@@ -3050,7 +3079,7 @@ function saveMemberEdit() {
   const roleInput = document.getElementById("editMemberRole");
   const phoneInput = document.getElementById("editMemberPhone");
   const newName = nameInput.value.trim();
-  const newRole = roleInput.value.trim() || "Media Volunteer";
+  const newRole = roleInput.value.trim() || DEFAULT_MEMBER_ROLE;
   const newPhone = phoneInput ? phoneInput.value.trim() : "";
   const oldName = appState.members[editingMemberIdx].name;
 
@@ -3178,7 +3207,7 @@ function addNewMember() {
     return;
   }
 
-  appState.members.push({ name, role: role || "Media Crew", phone });
+  appState.members.push({ name, role: role || DEFAULT_MEMBER_ROLE, phone });
   saveState();
   nameInput.value = "";
   roleInput.value = "";
@@ -4697,7 +4726,7 @@ function renderVolunteerPersonalBox(name, duties) {
   const box = document.getElementById("volunteerPersonalBox");
   if (!box) return;
 
-  const memberObj = (appState.members || []).find(m => m.name.toLowerCase() === name.toLowerCase()) || { name, role: 'Media Volunteer' };
+  const memberObj = (appState.members || []).find(m => m.name.toLowerCase() === name.toLowerCase()) || { name, role: DEFAULT_MEMBER_ROLE };
   const dutyCount = duties.length;
   const awayInMonth = getMemberAwayDatesInMonth(memberObj.name);
 
@@ -4752,7 +4781,7 @@ function renderVolunteerPersonalBox(name, duties) {
         <div>
           <h3 class="greeting-title">Hello, <span class="highlight-name">${escapeHtml(memberObj.name)}</span></h3>
           <p class="greeting-sub">
-            <span class="header-tag tag-purple" style="font-size: 0.74rem; padding: 2px 7px;">${escapeHtml(memberObj.role || 'Media Crew')}</span>
+            <span class="header-tag tag-purple" style="font-size: 0.74rem; padding: 2px 7px;">${escapeHtml(memberObj.role || DEFAULT_MEMBER_ROLE)}</span>
             • 🎯 <strong>${dutyCount}</strong> ${dutyCount === 1 ? 'duty' : 'duties'} scheduled this month
           </p>
           <div class="device-remember-pill" title="Saved on your device for instant access">
@@ -6322,7 +6351,10 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
       const cloudState = snapshot.val();
       if (cloudState && !isSyncingFromCloud) {
         console.log("☁️ Real-time cloud sync received:", cloudState);
-        const needsCloudCleanup = cloudState.checklistTemplateVersion !== 3 || ("adminPin" in cloudState);
+        const needsCloudCleanup = cloudState.checklistTemplateVersion !== 3
+          || !cloudState.memberRolesVersion
+          || cloudState.memberRolesVersion < CURRENT_MEMBER_ROLES_VERSION
+          || ("adminPin" in cloudState);
         isSyncingFromCloud = true;
         // Merge received cloud state into appState
         ensureStateIntegrity(cloudState);

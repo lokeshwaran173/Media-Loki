@@ -1,9 +1,9 @@
-const CACHE_NAME = 'flag-media-cache-v4.8';
+const CACHE_NAME = 'flag-media-cache-v4.9';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
-  'styles.css?v=4.8',
-  'app.js?v=4.8',
+  'styles.css?v=4.9',
+  'app.js?v=4.9',
   'logo.png',
   'icon-192.png',
   'icon-512.png',

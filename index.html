@@ -23,7 +23,7 @@
       } catch (e) { }
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=4.8">
+  <link rel="stylesheet" href="styles.css?v=4.9">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -718,12 +718,12 @@
               style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.9rem; opacity: 0.6; pointer-events: none;">👤</span>
           </div>
           <div class="gear-filter-pills" id="teamSkillFilters">
-            <button class="gear-filter-btn active" onclick="setTeamSkillFilter('all', this)">All Crew</button>
-            <button class="gear-filter-btn" onclick="setTeamSkillFilter('camera', this)">Camera</button>
-            <button class="gear-filter-btn" onclick="setTeamSkillFilter('live', this)">Live System</button>
-            <button class="gear-filter-btn" onclick="setTeamSkillFilter('gimble', this)">Gimble</button>
-            <button class="gear-filter-btn" onclick="setTeamSkillFilter('charging', this)">Battery / Charging</button>
-            <button class="gear-filter-btn" onclick="setTeamSkillFilter('spot', this)">Editing</button>
+            <button class="gear-filter-btn active" data-skill="all" onclick="setTeamSkillFilter('all', this)">All Crew</button>
+            <button class="gear-filter-btn" data-skill="camera" onclick="setTeamSkillFilter('camera', this)">Camera</button>
+            <button class="gear-filter-btn" data-skill="live" onclick="setTeamSkillFilter('live', this)">Live System</button>
+            <button class="gear-filter-btn" data-skill="gimble" onclick="setTeamSkillFilter('gimble', this)">Gimble</button>
+            <button class="gear-filter-btn" data-skill="charging" onclick="setTeamSkillFilter('charging', this)">Battery / Charging</button>
+            <button class="gear-filter-btn" data-skill="spot" onclick="setTeamSkillFilter('spot', this)">Editing</button>
           </div>
         </div>
       </div>
@@ -1071,7 +1071,7 @@
             schedule dropdown across all services!</p>
           <div class="add-member-form">
             <input type="text" id="newMemberName" placeholder="Enter Full Name (e.g. John Peter)" class="input-text">
-            <input type="text" id="newMemberRole" placeholder="Primary Skill (e.g. Camera, Audio, Live, Gimble)"
+            <input type="text" id="newMemberRole" placeholder="Role (default: Media Crew Member)"
               class="input-text">
             <input type="tel" id="newMemberPhone" placeholder="Mobile / WhatsApp (e.g. 7010368793)" class="input-text">
             <button class="btn btn-primary" onclick="addNewMember()">
@@ -1547,7 +1547,7 @@
             style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Primary
             Skill / Role:</label>
           <input type="text" id="editMemberRole" class="input-text" style="width: 100%;"
-            placeholder="e.g. Camera 1 & 2, Gimble, Live System">
+            placeholder="e.g. Media Crew Member, Camera, Live System">
         </div>
 
         <div>
@@ -1872,7 +1872,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=4.8"></script>
+  <script src="app.js?v=4.9"></script>
 </body>
 
 </html>
