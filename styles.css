@@ -7049,11 +7049,85 @@ html.light-theme .checklist-instruction-text strong {
 }
 
 .task-checked-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: 999px;
+  padding: 2px 9px;
+  margin-top: 4px;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #34d399;
+  color: #6ee7b7;
   line-height: 1.3;
   word-break: break-word;
+}
+
+.task-checked-meta strong {
+  color: #34d399;
+  font-weight: 800;
+}
+
+.task-checked-meta-muted {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #cbd5e1;
+}
+
+.cat-checked-by {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6ee7b7;
+  margin-top: 2px;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.cat-checked-by-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 999px;
+  padding: 2px 9px;
+  margin-top: 4px;
+  word-break: break-word;
+}
+
+.actor-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.actor-pick-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 38px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background: rgba(30, 41, 59, 0.9);
+  color: #f8fafc;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 9px;
+  white-space: nowrap;
+}
+
+.actor-pick-btn:hover {
+  background: rgba(37, 99, 235, 0.28);
+  border-color: #38bdf8;
 }
 
 /* 3. Open Shift Cover Requests Board */
@@ -7427,4 +7501,51 @@ html.light-theme .cover-req-claimed-note {
     flex: 1 1 auto !important;
     justify-content: center !important;
   }
+
+  .actor-picker-grid {
+    gap: 6px;
+  }
+
+  .actor-pick-btn {
+    height: 38px !important;
+    padding: 6px 8px !important;
+    font-size: 0.76rem !important;
+  }
+}
+
+[data-theme="light"] .task-checked-meta,
+html.light-theme .task-checked-meta,
+[data-theme="light"] .cat-checked-by-pill,
+html.light-theme .cat-checked-by-pill {
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+  color: #065f46 !important;
+}
+
+[data-theme="light"] .task-checked-meta strong,
+html.light-theme .task-checked-meta strong,
+[data-theme="light"] .cat-checked-by,
+html.light-theme .cat-checked-by {
+  color: #047857 !important;
+}
+
+[data-theme="light"] .task-checked-meta-muted,
+html.light-theme .task-checked-meta-muted {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] .actor-pick-btn,
+html.light-theme .actor-pick-btn {
+  background: #f8fafc !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .actor-pick-btn:hover,
+html.light-theme .actor-pick-btn:hover {
+  background: #e0f2fe !important;
+  border-color: #0284c7 !important;
+  color: #0369a1 !important;
 }

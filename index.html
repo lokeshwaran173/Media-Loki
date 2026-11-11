@@ -23,7 +23,7 @@
       } catch (e) { }
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=4.4">
+  <link rel="stylesheet" href="styles.css?v=4.5">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -600,11 +600,11 @@
           </div>
 
           <div class="checklist-actor-wrap">
-            <label for="checklistActorSelect" class="checklist-actor-label">🙋 Checking as:</label>
+            <label for="checklistActorSelect" class="checklist-actor-label">👤 Who is checking?</label>
             <select id="checklistActorSelect" class="role-select checklist-actor-select"
               onchange="onVolunteerFilterChange(this.value, false)"
-              title="Select your name so teammates see who completed each task">
-              <option value="">👤 Select Name...</option>
+              title="Pick your name so teammates see who checked each task in the checklist">
+              <option value="">Tap to pick your name...</option>
             </select>
           </div>
 
@@ -1748,6 +1748,26 @@
     </div>
   </div>
 
+  <!-- ================= CHECKLIST ACTOR NAME PICKER MODAL ================= -->
+  <div id="checklistActorModal" class="modal-overlay" onclick="if(event.target === this) closeChecklistActorModal()">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">🙋</span>
+          <h3>Who Checked This Task?</h3>
+        </div>
+        <button class="modal-close" onclick="closeChecklistActorModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 14px;">
+        Tap your name once so everyone on the team sees who completed each task inside the checklist:
+      </p>
+      <div id="checklistActorPickerGrid" class="actor-picker-grid"></div>
+      <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
+        <button class="btn btn-secondary" onclick="closeChecklistActorModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= TOAST NOTIFICATION ================= -->
   <div id="toast" class="toast-box">
     <span id="toastIcon">✔️</span>
@@ -1758,7 +1778,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=4.4"></script>
+  <script src="app.js?v=4.5"></script>
 </body>
 
 </html>

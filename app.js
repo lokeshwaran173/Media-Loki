@@ -2454,11 +2454,65 @@ function setChecklistStatusFilter(filter, btnEl) {
   renderChecklists();
 }
 
-function getActiveChecklistActor() {
-  let saved = window.currentVolunteerFilter || "";
+let pendingChecklistAction = null;
+
+function getSavedMemberActorName() {
+  let saved = (window.currentVolunteerFilter || "").trim();
   if (!saved) {
-    try { saved = localStorage.getItem("FLAG_SAVED_VOLUNTEER_NAME") || ""; } catch (e) {}
+    try { saved = (localStorage.getItem("FLAG_SAVED_VOLUNTEER_NAME") || "").trim(); } catch (e) {}
   }
+  return saved;
+}
+
+function hasSelectedChecklistActor() {
+  return !!getSavedMemberActorName() || isAdminLoggedIn;
+}
+
+/**
+ * Ensures we know which team member is checking tasks before saving a checkmark.
+ */
+function requireChecklistActorThen(actionFn) {
+  if (hasSelectedChecklistActor()) {
+    actionFn();
+    return;
+  }
+  pendingChecklistAction = actionFn;
+  renderChecklists(); // Keep UI checkboxes accurate until actor picks their name
+
+  const grid = document.getElementById("checklistActorPickerGrid");
+  if (grid) {
+    const memberNames = (appState.members || []).map(m => m.name).sort((a, b) => a.localeCompare(b));
+    grid.innerHTML = memberNames.map(name => `
+      <button type="button" class="btn actor-pick-btn" onclick="selectActorAndContinue('${escapeQuotes(name)}')">
+        👤 ${escapeHtml(name)}
+      </button>
+    `).join("");
+  }
+
+  const modal = document.getElementById("checklistActorModal");
+  if (modal) modal.style.display = "flex";
+}
+
+function closeChecklistActorModal() {
+  pendingChecklistAction = null;
+  const modal = document.getElementById("checklistActorModal");
+  if (modal) modal.style.display = "none";
+}
+
+function selectActorAndContinue(name) {
+  if (!name) return;
+  const nextAction = pendingChecklistAction;
+  pendingChecklistAction = null;
+  const modal = document.getElementById("checklistActorModal");
+  if (modal) modal.style.display = "none";
+  onVolunteerFilterChange(name, false);
+  if (typeof nextAction === "function") {
+    nextAction();
+  }
+}
+
+function getActiveChecklistActor() {
+  const saved = getSavedMemberActorName();
   if (saved) return saved;
   return isAdminLoggedIn ? "Lokesh (Admin)" : "Media Team";
 }
@@ -2520,15 +2574,24 @@ function toggleCategoryChecklistDone(clId) {
   const allCurrentlyDone = cl.items.every(i => !!checks[i.id]);
   const newStatus = !allCurrentlyDone;
 
-  const itemStatusMap = {};
-  cl.items.forEach(i => { itemStatusMap[i.id] = newStatus; });
-  applyChecklistItemStates(viewDate, itemStatusMap);
+  const commitCategoryToggle = () => {
+    const itemStatusMap = {};
+    cl.items.forEach(i => { itemStatusMap[i.id] = newStatus; });
+    applyChecklistItemStates(viewDate, itemStatusMap);
 
-  const cleanTitle = cl.title.replace(/^\d+\.\s*/, '');
+    const cleanTitle = cl.title.replace(/^\d+\.\s*/, '');
+    if (newStatus) {
+      const actor = getActiveChecklistActor();
+      showToast(`✅ "${cleanTitle}" marked complete by ${actor}!`);
+    } else {
+      showToast(`⏳ "${cleanTitle}" reopened & synced live!`);
+    }
+  };
+
   if (newStatus) {
-    showToast(`✅ "${cleanTitle}" marked complete (${cl.items.length}/${cl.items.length} tasks) & synced live!`);
+    requireChecklistActorThen(commitCategoryToggle);
   } else {
-    showToast(`⏳ "${cleanTitle}" reopened & synced live!`);
+    commitCategoryToggle();
   }
 }
 
@@ -2626,11 +2689,16 @@ function renderChecklists() {
       const icon = catIcons[cl.id] || "📋";
       const total = cl.items ? cl.items.length : 0;
       let completed = 0;
+      const checkersSet = new Set();
       if (cl.items) {
         cl.items.forEach(i => {
-          if (checks[i.id]) completed++;
+          if (checks[i.id]) {
+            completed++;
+            if (checkMeta[i.id]?.by) checkersSet.add(checkMeta[i.id].by);
+          }
         });
       }
+      const checkersList = Array.from(checkersSet);
       const allDone = total > 0 && completed === total;
       const catPct = total === 0 ? 0 : Math.round((completed / total) * 100);
 
@@ -2640,6 +2708,7 @@ function renderChecklists() {
             <div class="cat-icon-chip">${icon}</div>
             <div style="flex: 1; min-width: 0;">
               <h4 class="cat-card-title">${escapeHtml(cl.title)}</h4>
+              ${checkersList.length ? `<div class="cat-checked-by">👤 ${escapeHtml(checkersList.join(", "))}</div>` : ''}
             </div>
             <span class="cat-status-badge ${allDone ? 'badge-complete' : 'badge-pending'}">
               ${completed}/${total}
@@ -2683,11 +2752,16 @@ function renderChecklists() {
   function buildChecklistHtml(cl, isAdmin) {
     const total = cl.items ? cl.items.length : 0;
     let completed = 0;
+    const sectionCheckersSet = new Set();
     if (cl.items) {
       cl.items.forEach(i => {
-        if (checks[i.id]) completed++;
+        if (checks[i.id]) {
+          completed++;
+          if (checkMeta[i.id]?.by) sectionCheckersSet.add(checkMeta[i.id].by);
+        }
       });
     }
+    const sectionCheckers = Array.from(sectionCheckersSet);
     const allDone = total > 0 && completed === total;
     const catPct = total === 0 ? 0 : Math.round((completed / total) * 100);
 
@@ -2704,8 +2778,10 @@ function renderChecklists() {
         visibleItemCount++;
 
         const meta = checkMeta[item.id];
-        const metaBadgeHtml = (isDone && meta && meta.by)
-          ? `<span class="task-checked-meta">✓ Checked by <strong>${escapeHtml(meta.by)}</strong>${meta.at ? ` • ${escapeHtml(meta.at)}` : ''}</span>`
+        const metaBadgeHtml = isDone
+          ? (meta && meta.by
+              ? `<span class="task-checked-meta">👤 Checked by <strong>${escapeHtml(meta.by)}</strong>${meta.at ? ` • ${escapeHtml(meta.at)}` : ''}</span>`
+              : `<span class="task-checked-meta task-checked-meta-muted">✓ Completed</span>`)
           : '';
 
         taskHtml += `
@@ -2736,6 +2812,7 @@ function renderChecklists() {
         <div class="checklist-header">
           <div>
             <h3 class="checklist-title">${cl.title}</h3>
+            ${sectionCheckers.length ? `<div class="cat-checked-by-pill">👤 Checked by: <strong>${escapeHtml(sectionCheckers.join(", "))}</strong></div>` : ''}
           </div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <button type="button" class="btn-cat-complete ${allDone ? 'is-complete' : ''}" onclick="toggleCategoryChecklistDone('${cl.id}')" title="${allDone ? 'Click to reopen section' : '1-Tap to mark all ' + total + ' tasks complete'}">
@@ -2794,8 +2871,21 @@ function toggleCheckItem(clId, itemId) {
   const checks = (appState.weeklyChecks && appState.weeklyChecks[viewDate]) || {};
   const nextStatus = !checks[itemId];
 
-  applyChecklistItemStates(viewDate, { [itemId]: nextStatus });
-  showToast(nextStatus ? "✅ Task marked complete & synced live to all crew!" : "⏳ Task marked pending & synced live!");
+  const commitItemToggle = () => {
+    applyChecklistItemStates(viewDate, { [itemId]: nextStatus });
+    if (nextStatus) {
+      const actor = getActiveChecklistActor();
+      showToast(`✅ Checked by ${actor} & synced live to all crew!`);
+    } else {
+      showToast("⏳ Task marked pending & synced live!");
+    }
+  };
+
+  if (nextStatus) {
+    requireChecklistActorThen(commitItemToggle);
+  } else {
+    commitItemToggle();
+  }
 }
 
 function resetChecklists() {
@@ -2829,18 +2919,20 @@ function resetChecklists() {
 }
 
 function markAllChecklistsDone() {
-  const viewDate = currentViewingWeekDate();
-  const weeks = getServiceWeeks();
-  const wObj = weeks.find(w => w.date === viewDate);
-  const wName = wObj ? wObj.label : viewDate;
+  requireChecklistActorThen(() => {
+    const viewDate = currentViewingWeekDate();
+    const weeks = getServiceWeeks();
+    const wObj = weeks.find(w => w.date === viewDate);
+    const wName = wObj ? wObj.label : viewDate;
 
-  const itemStatusMap = {};
-  (appState.checklists || []).forEach(cl => {
-    (cl.items || []).forEach(i => { itemStatusMap[i.id] = true; });
+    const itemStatusMap = {};
+    (appState.checklists || []).forEach(cl => {
+      (cl.items || []).forEach(i => { itemStatusMap[i.id] = true; });
+    });
+
+    applyChecklistItemStates(viewDate, itemStatusMap);
+    showToast(`All items marked done by ${getActiveChecklistActor()} for ${wName}!`);
   });
-
-  applyChecklistItemStates(viewDate, itemStatusMap);
-  showToast(`All items marked done for ${wName}!`);
 }
 
 /**
@@ -3611,7 +3703,7 @@ function initVolunteerFilter() {
   };
 
   if (select) select.innerHTML = buildOptions("👤 Select Your Name...");
-  if (actorSelect) actorSelect.innerHTML = buildOptions("👤 Select Name...");
+  if (actorSelect) actorSelect.innerHTML = buildOptions("Tap to pick your name...");
 }
 
 function onVolunteerFilterChange(name, shouldScroll = true) {
