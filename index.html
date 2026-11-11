@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="FLAG Media">
-  <link rel="apple-touch-icon" href="logo.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
   <script>
     (function () {
       try {
@@ -23,7 +23,7 @@
       } catch (e) { }
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=4.6">
+  <link rel="stylesheet" href="styles.css?v=4.7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -320,6 +320,11 @@
               style="padding: 7px 12px; font-size: 0.82rem; gap: 5px; border-color: rgba(245, 158, 11, 0.4);"
               onclick="openSwapRequestModal()" title="Request schedule swap or report absence">
               <span>🔄</span> Swap / Absence
+            </button>
+            <button class="btn btn-secondary"
+              style="padding: 7px 12px; font-size: 0.82rem; gap: 5px; border-color: rgba(239, 68, 68, 0.38);"
+              onclick="openAvailabilityModal()" title="Mark upcoming dates when you are unavailable / away">
+              <span>🚫</span> Away Dates
             </button>
             <button id="clearVolunteerFilterBtn" class="btn btn-secondary"
               style="display: none; padding: 7px 12px; font-size: 0.82rem;" onclick="clearVolunteerFilter()">
@@ -779,16 +784,22 @@
 
       <!-- SUB-TAB 1: SCHEDULE EDITOR (DROPDOWNS) -->
       <div id="adminScheduleTab" class="admin-tab-content active">
-        <!-- Dedicated Green Save Action Bar -->
+        <!-- Dedicated Green Save Action Bar + Undo -->
         <div class="admin-save-bar">
           <div class="save-status-info">
             <span class="save-dot"></span>
             <span id="saveStatusIndicator">Auto-save active &bull; Click <strong>Save Schedule</strong> to lock in
               changes</span>
           </div>
-          <button class="btn btn-save-schedule" onclick="manualSaveSchedule()" title="Save all changes to schedule">
-            💾 Save Schedule Now
-          </button>
+          <div class="admin-save-actions">
+            <button id="adminUndoScheduleBtn" type="button" class="btn btn-secondary btn-undo-schedule"
+              onclick="undoLastScheduleChange()" disabled title="No recent schedule changes to undo">
+              ↩️ Undo
+            </button>
+            <button class="btn btn-save-schedule" onclick="manualSaveSchedule()" title="Save all changes to schedule">
+              💾 Save Schedule Now
+            </button>
+          </div>
         </div>
 
         <!-- Month & Year Controls Bar (Admin Only Access) -->
@@ -842,7 +853,27 @@
               </button>
             </div>
           </div>
+
+          <!-- Smart Scheduling Tools Row -->
+          <div class="admin-smart-actions-row">
+            <span class="smart-actions-label">⚡ Smart Scheduler:</span>
+            <button type="button" class="btn btn-primary btn-sm" onclick="autoFillMonthSchedule(false)"
+              title="Fill only empty slots fairly based on team roles and away dates">
+              ✨ Auto-Fill Open Slots
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="autoFillMonthSchedule(true)"
+              title="Re-assign all slots across the month fairly (Undo snapshot saved automatically)">
+              🔀 Smart Rotate Full Month
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="openAvailabilityModal()"
+              title="View or manage team member unavailable / away dates">
+              🚫 Team Away Dates <span id="adminAwayCountBadge" class="mini-pill-badge">0</span>
+            </button>
+          </div>
         </div>
+
+        <!-- Live Schedule Conflict & Availability Health Banner -->
+        <div id="adminScheduleHealthCard" class="card admin-health-card"></div>
 
         <!-- 1st Service Table (Admin Dropdowns) -->
         <div class="card">
@@ -1788,6 +1819,49 @@
     </div>
   </div>
 
+  <!-- ================= VOLUNTEER AVAILABILITY / AWAY DATES MODAL ================= -->
+  <div id="availabilityModal" class="modal-overlay" onclick="if(event.target === this) closeAvailabilityModal()">
+    <div class="modal-card" style="max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">🚫</span>
+          <h3>Volunteer Availability &amp; Away Dates</h3>
+        </div>
+        <button class="modal-close" onclick="closeAvailabilityModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 12px;">
+        Mark dates when a team member is out of station or unavailable. Auto-Fill &amp; Conflict Alerts automatically avoid scheduling members on their Away dates:
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">Team Member:</label>
+          <select id="availabilityMemberSelect" class="role-select" style="width: 100%; font-weight: 700;"
+            onchange="onAvailabilityMemberChange(this.value)"></select>
+        </div>
+
+        <div>
+          <label style="font-size: 0.8rem; color: #94a3b8; font-weight: 600; display: block; margin-bottom: 6px;">Tap dates in the active schedule month to toggle Away / Available:</label>
+          <div id="availabilityDatesGrid" class="avail-dates-grid"></div>
+        </div>
+
+        <div class="avail-custom-date-row">
+          <input type="date" id="availabilityCustomDateInput" class="input-text" style="flex: 1; min-width: 0;">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addCustomAvailabilityAwayDate()">+ Mark Custom Date Away</button>
+        </div>
+
+        <div class="avail-team-summary-box">
+          <div class="avail-summary-title">📋 Team Away Dates Summary</div>
+          <div id="availabilityTeamSummary" class="avail-team-summary-list"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions-row" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn btn-primary" onclick="closeAvailabilityModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= TOAST NOTIFICATION ================= -->
   <div id="toast" class="toast-box">
     <span id="toastIcon">✔️</span>
@@ -1798,7 +1872,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=4.6"></script>
+  <script src="app.js?v=4.7"></script>
 </body>
 
 </html>

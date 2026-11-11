@@ -23,9 +23,14 @@ const OFFICIAL_CREW_DIRECTORY = [
 
 function isAliasMatch(strA, strB) {
   if (!strA || !strB) return false;
-  const a = strA.toLowerCase().trim();
-  const b = strB.toLowerCase().trim();
-  if (a === b || a.includes(b) || b.includes(a)) return true;
+  const splitParts = (s) => String(s)
+    .split(/\s*&\s*|\s+and\s+/i)
+    .map(p => p.replace(/\s*\([^)]*\)\s*/g, "").toLowerCase().trim())
+    .filter(Boolean);
+
+  const partsA = splitParts(strA);
+  const partsB = splitParts(strB);
+  if (partsA.length === 0 || partsB.length === 0) return false;
 
   const clusters = [
     ["shyam", "shyam david", "shyam davit"],
@@ -35,10 +40,13 @@ function isAliasMatch(strA, strB) {
     ["yashwanth", "yashwant"]
   ];
 
-  for (const group of clusters) {
-    const aInGroup = group.some(x => a === x || a.includes(x));
-    const bInGroup = group.some(x => b === x || b.includes(x));
-    if (aInGroup && bInGroup) return true;
+  for (const x of partsA) {
+    for (const y of partsB) {
+      if (x === y) return true;
+      for (const group of clusters) {
+        if (group.includes(x) && group.includes(y)) return true;
+      }
+    }
   }
   return false;
 }
@@ -181,6 +189,7 @@ const defaultState = {
   weeklyChecks: {},
   weeklyCheckMeta: {},
   swapRequests: [],
+  unavailability: {},
   activeWeekDatePinned: false
 };
 
@@ -446,6 +455,19 @@ function ensureStateIntegrity(state) {
   }
   if (!state.swapRequests || !Array.isArray(state.swapRequests)) {
     state.swapRequests = [];
+  }
+  if (!state.unavailability || typeof state.unavailability !== "object") {
+    state.unavailability = {};
+  } else {
+    const cleanUnavail = {};
+    Object.keys(state.unavailability).forEach(k => {
+      const list = state.unavailability[k];
+      if (Array.isArray(list)) {
+        const cleaned = [...new Set(list.map(d => String(d || "").trim()).filter(Boolean))];
+        if (cleaned.length > 0) cleanUnavail[k] = cleaned;
+      }
+    });
+    state.unavailability = cleanUnavail;
   }
   if ("adminPin" in state && state.adminPin) {
     try {
@@ -779,11 +801,12 @@ function generateScheduleForMonth(year, monthIndex) {
 
 // User button to force re-sync dates for current month
 function regenerateCurrentMonthDates() {
-  if (confirm(`Automatically re-generate all Sunday and Friday dates for ${getMonthName(appState.selectedMonth)} ${appState.selectedYear}?`)) {
+  if (confirm(`Automatically re-generate all Sunday and Friday dates for ${getMonthName(appState.selectedMonth)} ${appState.selectedYear}? (Current month slots will reset — you can press Undo right after if needed.)`)) {
+    pushScheduleUndoSnapshot(`Sync Dates (${getMonthName(appState.selectedMonth)} ${appState.selectedYear})`);
     generateScheduleForMonth(appState.selectedYear, appState.selectedMonth);
     saveState();
     renderAll();
-    showToast(`Re-generated all dates for ${getMonthName(appState.selectedMonth)}!`);
+    showToast(`Re-generated all dates for ${getMonthName(appState.selectedMonth)}! (Undo available)`);
   }
 }
 
@@ -833,16 +856,23 @@ function confirmModalPair() {
 
   const pairName = `${m1} & ${m2}`;
   const { serviceType, index, field } = modalTargetContext;
-  appState[serviceType][index][field] = pairName;
+  pushScheduleUndoSnapshot(`Pair: ${pairName}`);
+  if (serviceType === "morningPrayer" && appState.morningPrayer && appState.morningPrayer.days && appState.morningPrayer.days[index]) {
+    appState.morningPrayer.days[index][field] = pairName;
+  } else if (appState[serviceType] && appState[serviceType][index]) {
+    appState[serviceType][index][field] = pairName;
+  }
 
   saveState();
   closePairModal();
   renderAll();
-  showToast(`Assigned ${pairName}!`);
+  if (!notifyIfSlotHasConflict(serviceType, index, field)) {
+    showToast(`Assigned ${pairName}!`);
+  }
 }
 
-// Helper to format clean names on Public Roster (Highlights selected volunteer with glowing amber)
-function badgeForName(name) {
+// Helper to format clean names on Public Roster (Highlights selected volunteer & Away alerts)
+function badgeForName(name, dateStr = "") {
   if (!name || name.trim() === "" || name.trim() === "-") {
     return `<span class="roster-empty">&mdash;</span>`;
   }
@@ -850,10 +880,18 @@ function badgeForName(name) {
     isAliasMatch(name, window.currentVolunteerFilter);
   const highlightClass = isPersonal ? " roster-highlight-personal" : "";
 
-  if (name.includes("&")) {
-    return `<span class="roster-name roster-pair${highlightClass}"><span class="roster-icon">👥</span><span>${name}</span></span>`;
+  let awayBadge = "";
+  if (dateStr) {
+    const awayPeople = splitAssignedNames(name).filter(p => isMemberUnavailableOnDate(p, dateStr));
+    if (awayPeople.length > 0) {
+      awayBadge = ` <span class="roster-away-flag" title="${escapeHtml(awayPeople.join(', '))} marked Away on ${escapeHtml(dateStr)}">🚫 Away</span>`;
+    }
   }
-  return `<span class="roster-name${highlightClass}"><span>${name}</span></span>`;
+
+  if (name.includes("&")) {
+    return `<span class="roster-name roster-pair${highlightClass}"><span class="roster-icon">👥</span><span>${name}</span>${awayBadge}</span>`;
+  }
+  return `<span class="roster-name${highlightClass}"><span>${name}</span>${awayBadge}</span>`;
 }
 
 // ================= RENDER PUBLIC READ-ONLY SCHEDULE (VOLUNTEER VIEW) =================
@@ -892,12 +930,12 @@ function renderPublicSchedule() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="date-chip date-chip-blue">${r.date}</span></td>
-        <td>${badgeForName(r.cam1)}</td>
-        <td>${badgeForName(r.cam2)}</td>
-        <td>${badgeForName(r.gimble)}</td>
-        <td>${badgeForName(r.live)}</td>
-        <td>${badgeForName(r.spot)}</td>
-        <td>${badgeForName(r.charging)}</td>
+        <td>${badgeForName(r.cam1, r.date)}</td>
+        <td>${badgeForName(r.cam2, r.date)}</td>
+        <td>${badgeForName(r.gimble, r.date)}</td>
+        <td>${badgeForName(r.live, r.date)}</td>
+        <td>${badgeForName(r.spot, r.date)}</td>
+        <td>${badgeForName(r.charging, r.date)}</td>
       `;
       t1.appendChild(tr);
     });
@@ -918,27 +956,27 @@ function renderPublicSchedule() {
         <div class="sched-card-roles">
           <div class="sched-role-row">
             <span class="sched-role-label">🎥 1st Cam:</span>
-            <div class="sched-role-val">${badgeForName(r.cam1)}</div>
+            <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">📹 2nd Cam:</span>
-            <div class="sched-role-val">${badgeForName(r.cam2)}</div>
+            <div class="sched-role-val">${badgeForName(r.cam2, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">🎯 Gimble:</span>
-            <div class="sched-role-val">${badgeForName(r.gimble)}</div>
+            <div class="sched-role-val">${badgeForName(r.gimble, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">💻 Live System:</span>
-            <div class="sched-role-val">${badgeForName(r.live)}</div>
+            <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">✂️ Spot Editing:</span>
-            <div class="sched-role-val">${badgeForName(r.spot)}</div>
+            <div class="sched-role-val">${badgeForName(r.spot, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">🔋 Battery & Charging:</span>
-            <div class="sched-role-val">${badgeForName(r.charging)}</div>
+            <div class="sched-role-val">${badgeForName(r.charging, r.date)}</div>
           </div>
         </div>
       `;
@@ -954,7 +992,7 @@ function renderPublicSchedule() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="date-chip date-chip-amber">${r.date}</span></td>
-        <td>${badgeForName(r.operator)}</td>
+        <td>${badgeForName(r.operator, r.date)}</td>
       `;
       t2.appendChild(tr);
     });
@@ -975,7 +1013,7 @@ function renderPublicSchedule() {
         <div class="sched-card-roles">
           <div class="sched-role-row">
             <span class="sched-role-label">🎥 Cam & Live Operator:</span>
-            <div class="sched-role-val">${badgeForName(r.operator)}</div>
+            <div class="sched-role-val">${badgeForName(r.operator, r.date)}</div>
           </div>
         </div>
       `;
@@ -991,7 +1029,7 @@ function renderPublicSchedule() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="date-chip date-chip-purple">${r.date}</span></td>
-        <td>${badgeForName(r.operator)}</td>
+        <td>${badgeForName(r.operator, r.date)}</td>
       `;
       t3.appendChild(tr);
     });
@@ -1012,7 +1050,7 @@ function renderPublicSchedule() {
         <div class="sched-card-roles">
           <div class="sched-role-row">
             <span class="sched-role-label">🎥 Cam & Live Operator:</span>
-            <div class="sched-role-val">${badgeForName(r.operator)}</div>
+            <div class="sched-role-val">${badgeForName(r.operator, r.date)}</div>
           </div>
         </div>
       `;
@@ -1028,8 +1066,8 @@ function renderPublicSchedule() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="date-chip date-chip-emerald">${r.date}</span></td>
-        <td>${badgeForName(r.cam1)}</td>
-        <td>${badgeForName(r.live)}</td>
+        <td>${badgeForName(r.cam1, r.date)}</td>
+        <td>${badgeForName(r.live, r.date)}</td>
       `;
       tf.appendChild(tr);
     });
@@ -1050,11 +1088,11 @@ function renderPublicSchedule() {
         <div class="sched-card-roles">
           <div class="sched-role-row">
             <span class="sched-role-label">🎥 1st Cam:</span>
-            <div class="sched-role-val">${badgeForName(r.cam1)}</div>
+            <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">💻 Live System:</span>
-            <div class="sched-role-val">${badgeForName(r.live)}</div>
+            <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
           </div>
         </div>
       `;
@@ -1071,11 +1109,11 @@ function renderPublicSchedule() {
       tr.innerHTML = `
         <td><strong style="color: #67e8f9; font-weight: 700;">🌟 ${r.title}</strong></td>
         <td><span class="date-chip date-chip-purple">${r.date}</span></td>
-        <td>${badgeForName(r.cam1)}</td>
-        <td>${badgeForName(r.cam2)}</td>
-        <td>${badgeForName(r.gimble)}</td>
-        <td>${badgeForName(r.live)}</td>
-        <td>${badgeForName(r.spot)}</td>
+        <td>${badgeForName(r.cam1, r.date)}</td>
+        <td>${badgeForName(r.cam2, r.date)}</td>
+        <td>${badgeForName(r.gimble, r.date)}</td>
+        <td>${badgeForName(r.live, r.date)}</td>
+        <td>${badgeForName(r.spot, r.date)}</td>
       `;
       ts.appendChild(tr);
     });
@@ -1096,23 +1134,23 @@ function renderPublicSchedule() {
         <div class="sched-card-roles">
           <div class="sched-role-row">
             <span class="sched-role-label">🎥 1st Cam:</span>
-            <div class="sched-role-val">${badgeForName(r.cam1)}</div>
+            <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">📹 2nd Cam:</span>
-            <div class="sched-role-val">${badgeForName(r.cam2)}</div>
+            <div class="sched-role-val">${badgeForName(r.cam2, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">🎯 Gimble:</span>
-            <div class="sched-role-val">${badgeForName(r.gimble)}</div>
+            <div class="sched-role-val">${badgeForName(r.gimble, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">💻 Live System:</span>
-            <div class="sched-role-val">${badgeForName(r.live)}</div>
+            <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
           </div>
           <div class="sched-role-row">
             <span class="sched-role-label">✂️ Spot Edit:</span>
-            <div class="sched-role-val">${badgeForName(r.spot)}</div>
+            <div class="sched-role-val">${badgeForName(r.spot, r.date)}</div>
           </div>
         </div>
       `;
@@ -1195,6 +1233,827 @@ function renderPublicSchedule() {
   updateScheduleLayoutVisibility();
 }
 
+// ================= SMARTER SCHEDULING, AVAILABILITY, CONFLICTS & UNDO (V4.7) =================
+const SCHEDULE_UNDO_STORAGE_KEY = "FLAG_MEDIA_SCHEDULE_UNDO_STACK";
+const MAX_SCHEDULE_UNDO = 15;
+let scheduleUndoStack = null;
+
+const SERVICE_DURATION_HOURS = {
+  firstService: 2.5,
+  secondService: 2.5,
+  thirdService: 2.5,
+  fridayPrayer: 3.5,
+  morningPrayer: 1.5,
+  specialMeetings: 3.0
+};
+
+const SLOT_ROLE_KEYWORDS = {
+  cam1: ["camera 1", "camera", "cam"],
+  cam2: ["camera 2", "camera", "cam"],
+  gimble: ["gimble", "gimbal", "leader"],
+  gimbal: ["gimbal", "gimble", "leader"],
+  live: ["live in system", "live system", "live", "system", "media tech"],
+  liveEditor: ["live in system", "live system", "live", "system"],
+  spot: ["spot editing", "spot", "reels", "edit"],
+  socialMedia: ["spot editing", "reels", "social", "edit"],
+  charging: ["charging", "battery"],
+  secondOperator: ["2nd service", "cam & live", "camera", "live"],
+  thirdOperator: ["3rd service", "solo", "camera", "live"]
+};
+
+function splitAssignedNames(val) {
+  if (!val) return [];
+  return String(val)
+    .split(/\s*&\s*|\s+and\s+/i)
+    .map(n => n.trim())
+    .filter(n => n && n !== "—" && n !== "--" && n !== "-");
+}
+
+function resolveCanonicalMemberName(rawName) {
+  const clean = (rawName || "").trim();
+  if (!clean) return "";
+  if (appState && Array.isArray(appState.members)) {
+    const found = appState.members.find(m => isAliasMatch(m.name, clean));
+    if (found) return found.name;
+  }
+  return clean;
+}
+
+function normalizeScheduleDateKey(dateStr) {
+  const raw = (dateStr || "").trim();
+  if (!raw) return "";
+  const months = {
+    jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
+    jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12"
+  };
+  const isoMatch = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (isoMatch) {
+    return `${isoMatch[1]}-${isoMatch[2].padStart(2, "0")}-${isoMatch[3].padStart(2, "0")}`;
+  }
+  const parts = raw.split(/[\s-]+/);
+  if (parts.length >= 3) {
+    const day = parts[0].replace(/\D/g, "");
+    const mKey = (parts[1] || "").slice(0, 3).toLowerCase();
+    const year = parts[2].replace(/\D/g, "");
+    if (day && months[mKey] && year.length === 4) {
+      return `${year}-${months[mKey]}-${day.padStart(2, "0")}`;
+    }
+  }
+  return "";
+}
+
+function formatDateKeyToDisplay(dateKey) {
+  const m = String(dateKey || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return dateKey || "";
+  const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monIdx = parseInt(m[2], 10) - 1;
+  return `${m[3]} ${shortMonths[monIdx] || "Jan"} ${m[1]}`;
+}
+
+function isMemberUnavailableOnDate(memberName, dateStr) {
+  const dateKey = normalizeScheduleDateKey(dateStr);
+  if (!memberName || !dateKey || !appState || !appState.unavailability) return false;
+
+  return Object.keys(appState.unavailability).some(key => {
+    if (!isAliasMatch(key, memberName)) return false;
+    const dates = appState.unavailability[key] || [];
+    return dates.some(d => normalizeScheduleDateKey(d) === dateKey);
+  });
+}
+
+function getMemberAwayDatesInMonth(memberName) {
+  if (!memberName || !appState || !appState.unavailability) return [];
+  const prefix = `${appState.selectedYear}-${String((appState.selectedMonth || 0) + 1).padStart(2, "0")}-`;
+  const results = [];
+  Object.keys(appState.unavailability).forEach(key => {
+    if (!isAliasMatch(key, memberName)) return;
+    (appState.unavailability[key] || []).forEach(d => {
+      const k = normalizeScheduleDateKey(d);
+      if (k && k.startsWith(prefix)) {
+        results.push(formatDateKeyToDisplay(k));
+      }
+    });
+  });
+  return [...new Set(results)];
+}
+
+function getAllActiveMonthAwayEntries() {
+  if (!appState || !appState.unavailability) return [];
+  const prefix = `${appState.selectedYear}-${String((appState.selectedMonth || 0) + 1).padStart(2, "0")}-`;
+  const entries = [];
+  Object.keys(appState.unavailability).forEach(memberKey => {
+    (appState.unavailability[memberKey] || []).forEach(d => {
+      const k = normalizeScheduleDateKey(d);
+      if (k && k.startsWith(prefix)) {
+        entries.push({ member: resolveCanonicalMemberName(memberKey), dateKey: k, dateLabel: formatDateKeyToDisplay(k) });
+      }
+    });
+  });
+  return entries.sort((a, b) => a.dateKey.localeCompare(b.dateKey) || a.member.localeCompare(b.member));
+}
+
+function toggleMemberAwayDate(memberName, dateStr) {
+  const canonicalMember = resolveCanonicalMemberName(memberName);
+  const dateKey = normalizeScheduleDateKey(dateStr);
+  if (!canonicalMember || !dateKey) return false;
+  if (!appState.unavailability || typeof appState.unavailability !== "object") {
+    appState.unavailability = {};
+  }
+
+  // Merge any alias keys under canonical name
+  const merged = [];
+  Object.keys(appState.unavailability).forEach(k => {
+    if (isAliasMatch(k, canonicalMember)) {
+      (appState.unavailability[k] || []).forEach(d => {
+        const dk = normalizeScheduleDateKey(d);
+        if (dk && !merged.includes(dk)) merged.push(dk);
+      });
+      if (k !== canonicalMember) delete appState.unavailability[k];
+    }
+  });
+
+  const idx = merged.indexOf(dateKey);
+  const markedAway = idx === -1;
+  if (markedAway) {
+    merged.push(dateKey);
+  } else {
+    merged.splice(idx, 1);
+  }
+  merged.sort();
+
+  if (merged.length > 0) {
+    appState.unavailability[canonicalMember] = merged.map(formatDateKeyToDisplay);
+  } else {
+    delete appState.unavailability[canonicalMember];
+  }
+
+  saveState(false, { unavailability: appState.unavailability });
+  renderAll();
+  return markedAway;
+}
+
+function analyzeScheduleConflicts() {
+  const errors = [];
+  const warnings = [];
+  const cellSeverity = {};
+  const rowMemberUsage = {};
+  const dateUsage = {};
+  const dateSundayServices = {};
+
+  if (!appState) return { errors, warnings, cellSeverity, dateUsage };
+
+  const bumpCell = (key, sev) => {
+    if (cellSeverity[key] === "error") return;
+    cellSeverity[key] = sev;
+  };
+
+  const inspectService = (serviceType, serviceLabel, rows, fields, isSundayMultiTrack) => {
+    (rows || []).forEach((row, rowIndex) => {
+      const dateStr = row.date || row.day || `Row ${rowIndex + 1}`;
+      const dateKey = normalizeScheduleDateKey(dateStr) || `label:${dateStr}`;
+      const rowKey = `${serviceType}:${rowIndex}`;
+      const seenInRow = {};
+
+      if (!rowMemberUsage[rowKey]) rowMemberUsage[rowKey] = new Set();
+      if (!dateUsage[dateKey]) dateUsage[dateKey] = {};
+
+      fields.forEach(field => {
+        const rawVal = row[field.key];
+        const names = splitAssignedNames(rawVal);
+        const slotKey = `${serviceType}:${rowIndex}:${field.key}`;
+
+        names.forEach(rawPerson => {
+          const person = resolveCanonicalMemberName(rawPerson);
+          rowMemberUsage[rowKey].add(person);
+          if (!dateUsage[dateKey][person]) dateUsage[dateKey][person] = [];
+          dateUsage[dateKey][person].push({ serviceType, serviceLabel, rowIndex, field: field.key, roleLabel: field.label });
+
+          if (!seenInRow[person]) seenInRow[person] = [];
+          seenInRow[person].push({ field: field.key, label: field.label, slotKey });
+
+          if (row.date && isMemberUnavailableOnDate(person, row.date)) {
+            bumpCell(slotKey, "error");
+            errors.push({
+              level: "error",
+              type: "unavailable",
+              serviceType,
+              rowIndex,
+              field: field.key,
+              date: row.date,
+              memberName: person,
+              message: `${row.date} (${serviceLabel} • ${field.label}): ${person} is marked Away / Unavailable`
+            });
+          }
+
+          if (isSundayMultiTrack && row.date) {
+            if (!dateSundayServices[dateKey]) dateSundayServices[dateKey] = {};
+            if (!dateSundayServices[dateKey][person]) dateSundayServices[dateKey][person] = [];
+            dateSundayServices[dateKey][person].push({ serviceType, serviceLabel, slotKey, date: row.date });
+          }
+        });
+      });
+
+      Object.keys(seenInRow).forEach(person => {
+        const slots = seenInRow[person];
+        if (slots.length > 1) {
+          slots.forEach(s => bumpCell(s.slotKey, "error"));
+          errors.push({
+            level: "error",
+            type: "double-booked",
+            serviceType,
+            rowIndex,
+            field: slots[0].field,
+            date: dateStr,
+            memberName: person,
+            message: `${dateStr} (${serviceLabel}): ${person} double-booked in ${slots.map(s => s.label).join(" + ")}`
+          });
+        }
+      });
+    });
+  };
+
+  inspectService("firstService", "1st Service", appState.firstService, [
+    { key: "cam1", label: "1st Cam" },
+    { key: "cam2", label: "2nd Cam" },
+    { key: "gimble", label: "Gimble" },
+    { key: "live", label: "Live System" },
+    { key: "spot", label: "Spot Editing" },
+    { key: "charging", label: "Charging" }
+  ], true);
+
+  inspectService("secondService", "2nd Service", appState.secondService, [
+    { key: "operator", label: "2nd Service Op" }
+  ], true);
+
+  inspectService("thirdService", "3rd Service", appState.thirdService, [
+    { key: "operator", label: "3rd Service Op" }
+  ], true);
+
+  inspectService("fridayPrayer", "Friday Prayer", appState.fridayPrayer, [
+    { key: "cam1", label: "1st Cam" },
+    { key: "live", label: "Live System" }
+  ], false);
+
+  inspectService("specialMeetings", "Special Meeting", appState.specialMeetings, [
+    { key: "cam1", label: "1st Cam" },
+    { key: "cam2", label: "2nd Cam" },
+    { key: "gimble", label: "Gimble" },
+    { key: "live", label: "Live System" },
+    { key: "spot", label: "Spot Editing" }
+  ], false);
+
+  if (appState.morningPrayer && appState.morningPrayer.enabled) {
+    inspectService("morningPrayer", "Morning Prayer", appState.morningPrayer.days, [
+      { key: "cam1", label: "1st Cam" },
+      { key: "cam2", label: "2nd Cam" },
+      { key: "gimbal", label: "Gimbal" },
+      { key: "liveEditor", label: "Live Editor" },
+      { key: "socialMedia", label: "Social Media" }
+    ], false);
+  }
+
+  // Flag multi-service Sunday overload (assigned across >1 distinct Sunday services on same date)
+  Object.keys(dateSundayServices).forEach(dateKey => {
+    const byPerson = dateSundayServices[dateKey];
+    Object.keys(byPerson).forEach(person => {
+      const entries = byPerson[person];
+      const distinctServices = [...new Set(entries.map(e => e.serviceType))];
+      if (distinctServices.length > 1) {
+        entries.forEach(e => bumpCell(e.slotKey, "warn"));
+        warnings.push({
+          level: "warning",
+          type: "multi-service",
+          date: entries[0].date,
+          memberName: person,
+          message: `${entries[0].date}: ${person} is scheduled across ${distinctServices.length} Sunday services (${entries.map(e => e.serviceLabel).filter((v, i, a) => a.indexOf(v) === i).join(" & ")})`
+        });
+      }
+    });
+  });
+
+  return { errors, warnings, cellSeverity, dateUsage, rowMemberUsage };
+}
+
+function getSlotContextAnnotations(serviceType, rowIndex, field) {
+  const info = { dateStr: "", dateKey: "", sameRowOtherNames: new Set(), sameDateNames: new Set() };
+  if (!appState || !serviceType || rowIndex === undefined || rowIndex === null) return info;
+
+  const row = serviceType === "morningPrayer"
+    ? (appState.morningPrayer && appState.morningPrayer.days ? appState.morningPrayer.days[rowIndex] : null)
+    : (appState[serviceType] ? appState[serviceType][rowIndex] : null);
+  if (!row) return info;
+
+  info.dateStr = row.date || "";
+  info.dateKey = normalizeScheduleDateKey(row.date || "");
+
+  Object.keys(row).forEach(k => {
+    if (k === "id" || k === "date" || k === "day" || k === "title" || k === field) return;
+    splitAssignedNames(row[k]).forEach(n => info.sameRowOtherNames.add(resolveCanonicalMemberName(n)));
+  });
+
+  if (info.dateKey) {
+    const collectDateRows = (type, rows, fields) => {
+      (rows || []).forEach((r, idx) => {
+        if (normalizeScheduleDateKey(r.date) !== info.dateKey) return;
+        fields.forEach(f => {
+          if (type === serviceType && idx === rowIndex && f === field) return;
+          splitAssignedNames(r[f]).forEach(n => info.sameDateNames.add(resolveCanonicalMemberName(n)));
+        });
+      });
+    };
+    collectDateRows("firstService", appState.firstService, ["cam1", "cam2", "gimble", "live", "spot", "charging"]);
+    collectDateRows("secondService", appState.secondService, ["operator"]);
+    collectDateRows("thirdService", appState.thirdService, ["operator"]);
+    collectDateRows("fridayPrayer", appState.fridayPrayer, ["cam1", "live"]);
+    collectDateRows("specialMeetings", appState.specialMeetings, ["cam1", "cam2", "gimble", "live", "spot"]);
+  }
+
+  return info;
+}
+
+function applyScheduleSelectConflictClasses(analysis) {
+  const result = analysis || analyzeScheduleConflicts();
+  document.querySelectorAll("#adminScheduleTab select[data-slot]").forEach(sel => {
+    sel.classList.remove("select-conflict-error", "select-conflict-warn");
+    const slotKey = sel.getAttribute("data-slot");
+    const sev = result.cellSeverity[slotKey];
+    if (sev === "error") sel.classList.add("select-conflict-error");
+    else if (sev === "warn") sel.classList.add("select-conflict-warn");
+  });
+}
+
+function renderAdminScheduleHealth() {
+  const card = document.getElementById("adminScheduleHealthCard");
+  if (!card) return;
+  const analysis = analyzeScheduleConflicts();
+  applyScheduleSelectConflictClasses(analysis);
+  updateAwayCountBadge();
+
+  const awayEntries = getAllActiveMonthAwayEntries();
+  const errCount = analysis.errors.length;
+  const warnCount = analysis.warnings.length;
+
+  card.classList.remove("health-error", "health-warn");
+  if (errCount > 0) card.classList.add("health-error");
+  else if (warnCount > 0) card.classList.add("health-warn");
+
+  let statusTitle = "✅ Schedule Health: Zero double-bookings or away-date conflicts";
+  let badgeHtml = `<span class="header-tag tag-emerald" style="font-size: 0.75rem;">Clean Roster</span>`;
+
+  if (errCount > 0) {
+    statusTitle = `🚨 Schedule Conflict Alert (${errCount} ${errCount === 1 ? "issue" : "issues"}${warnCount > 0 ? `, ${warnCount} overload` : ""})`;
+    badgeHtml = `<span class="header-tag tag-amber" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); font-size: 0.75rem;">Action Needed</span>`;
+  } else if (warnCount > 0) {
+    statusTitle = `⚠️ Workload Advisory (${warnCount} multi-service Sunday ${warnCount === 1 ? "assignment" : "assignments"})`;
+    badgeHtml = `<span class="header-tag tag-amber" style="font-size: 0.75rem;">Check Load</span>`;
+  }
+
+  let issuesHtml = "";
+  if (errCount > 0 || warnCount > 0) {
+    issuesHtml = `<div class="health-issues-list">` +
+      analysis.errors.map(e => `<div class="health-issue-item issue-error"><span>🔴</span><span>${escapeHtml(e.message)}</span></div>`).join("") +
+      analysis.warnings.map(w => `<div class="health-issue-item issue-warn"><span>⚠️</span><span>${escapeHtml(w.message)}</span></div>`).join("") +
+      `</div>`;
+  }
+
+  let awayHtml = "";
+  if (awayEntries.length > 0) {
+    awayHtml = `
+      <div class="health-away-strip">
+        <strong>🚫 Away this month:</strong>
+        ${awayEntries.map(a => `<span class="health-chip-away">${escapeHtml(a.member)} (${escapeHtml(a.dateLabel)})</span>`).join("")}
+      </div>
+    `;
+  }
+
+  card.innerHTML = `
+    <div class="health-header-row">
+      <div class="health-title">${statusTitle}</div>
+      ${badgeHtml}
+    </div>
+    ${issuesHtml}
+    ${awayHtml}
+  `;
+}
+
+function notifyIfSlotHasConflict(serviceType, rowIndex, field) {
+  const analysis = analyzeScheduleConflicts();
+  const target = analysis.errors.find(e => e.serviceType === serviceType && e.rowIndex === rowIndex && (e.field === field || e.type === "double-booked"))
+    || analysis.warnings.find(w => {
+      const row = appState[serviceType] && appState[serviceType][rowIndex];
+      return row && row.date && w.date === row.date && splitAssignedNames(row[field]).some(n => isAliasMatch(n, w.memberName));
+    });
+
+  if (target) {
+    showToast(`${target.level === "error" ? "🔴 Conflict" : "⚠️ Notice"}: ${target.message}`);
+    return true;
+  }
+  return false;
+}
+
+function updateAwayCountBadge() {
+  const badge = document.getElementById("adminAwayCountBadge");
+  if (!badge) return;
+  badge.textContent = getAllActiveMonthAwayEntries().length;
+}
+
+// ----------------- UNDO / SNAPSHOT ENGINE -----------------
+function loadUndoStack() {
+  if (scheduleUndoStack !== null) return scheduleUndoStack;
+  try {
+    const raw = localStorage.getItem(SCHEDULE_UNDO_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    scheduleUndoStack = Array.isArray(parsed) ? parsed : [];
+  } catch (e) {
+    scheduleUndoStack = [];
+  }
+  return scheduleUndoStack;
+}
+
+function saveUndoStack() {
+  try {
+    localStorage.setItem(SCHEDULE_UNDO_STORAGE_KEY, JSON.stringify((scheduleUndoStack || []).slice(-MAX_SCHEDULE_UNDO)));
+  } catch (e) {}
+}
+
+function pushScheduleUndoSnapshot(label) {
+  if (!appState) return;
+  const stack = loadUndoStack();
+  stack.push({
+    label: label || "Schedule Edit",
+    timestamp: Date.now(),
+    selectedMonth: appState.selectedMonth,
+    selectedYear: appState.selectedYear,
+    month: appState.month,
+    firstService: JSON.parse(JSON.stringify(appState.firstService || [])),
+    secondService: JSON.parse(JSON.stringify(appState.secondService || [])),
+    thirdService: JSON.parse(JSON.stringify(appState.thirdService || [])),
+    fridayPrayer: JSON.parse(JSON.stringify(appState.fridayPrayer || [])),
+    specialMeetings: JSON.parse(JSON.stringify(appState.specialMeetings || [])),
+    morningPrayer: JSON.parse(JSON.stringify(appState.morningPrayer || {}))
+  });
+  if (stack.length > MAX_SCHEDULE_UNDO) {
+    stack.splice(0, stack.length - MAX_SCHEDULE_UNDO);
+  }
+  saveUndoStack();
+  updateAdminUndoButton();
+}
+
+function undoLastScheduleChange() {
+  const stack = loadUndoStack();
+  if (stack.length === 0) {
+    showToast("Nothing to undo yet.");
+    return;
+  }
+  const snap = stack.pop();
+  saveUndoStack();
+
+  appState.selectedMonth = snap.selectedMonth;
+  appState.selectedYear = snap.selectedYear;
+  appState.month = snap.month;
+  appState.firstService = snap.firstService || [];
+  appState.secondService = snap.secondService || [];
+  appState.thirdService = snap.thirdService || [];
+  appState.fridayPrayer = snap.fridayPrayer || [];
+  appState.specialMeetings = snap.specialMeetings || [];
+  if (snap.morningPrayer) appState.morningPrayer = snap.morningPrayer;
+
+  initCalendarSelectors();
+  saveState();
+  renderAll();
+  showToast(`↩️ Undid: ${snap.label}`);
+}
+
+function updateAdminUndoButton() {
+  const btn = document.getElementById("adminUndoScheduleBtn");
+  if (!btn) return;
+  const stack = loadUndoStack();
+  if (stack.length === 0) {
+    btn.disabled = true;
+    btn.textContent = "↩️ Undo";
+    btn.title = "No recent schedule changes to undo";
+  } else {
+    const top = stack[stack.length - 1];
+    btn.disabled = false;
+    btn.textContent = `↩️ Undo (${stack.length})`;
+    btn.title = `Undo last change: ${top.label}`;
+  }
+}
+
+// ----------------- SMART FAIR AUTO-FILL / ROTATION -----------------
+function scoreMemberForSlot(memberObj, roleKeywordKey, dateStr, sundayIdx, tracker) {
+  const name = memberObj.name;
+  const roleStr = (memberObj.role || "").toLowerCase();
+  const keywords = SLOT_ROLE_KEYWORDS[roleKeywordKey] || [];
+  const matchesRole = keywords.some(kw => roleStr.includes(kw));
+
+  let score = 0;
+  if (matchesRole) score += 100;
+  // Penalize high existing workload heavily to keep monthly duty counts balanced
+  score -= (tracker.shiftCounts[name] || 0) * 18;
+  // Avoid scheduling back-to-back Sundays when equal alternatives exist
+  if (sundayIdx >= 0 && tracker.lastSundayIdx[name] === sundayIdx - 1) {
+    score -= 12;
+  }
+  // Slight preference against assigning 2nd/3rd Service on top of 1st Service on the same Sunday
+  const dKey = normalizeScheduleDateKey(dateStr);
+  if (dKey && tracker.assignedOnDate[dKey] && tracker.assignedOnDate[dKey].has(name)) {
+    score -= 45;
+  }
+  // Tiny diversity offset on same role
+  const roleUsageKey = `${roleKeywordKey}:${name}`;
+  score -= (tracker.roleRepeats[roleUsageKey] || 0) * 4;
+  return score;
+}
+
+function autoFillMonthSchedule(overwriteAll = false) {
+  if (!appState || !appState.members || appState.members.length === 0) {
+    showToast("Add crew members first before auto-filling.");
+    return;
+  }
+
+  const mName = getMonthName(appState.selectedMonth);
+  if (overwriteAll) {
+    if (!confirm(`Smart Rotate ALL Sunday & Friday slots for ${mName} ${appState.selectedYear}?\n\nThis fairly balances crew roles and automatically skips members marked Away. An Undo snapshot will be saved first.`)) {
+      return;
+    }
+  }
+
+  if (!appState.firstService || appState.firstService.length === 0) {
+    generateScheduleForMonth(appState.selectedYear, appState.selectedMonth);
+  }
+
+  pushScheduleUndoSnapshot(overwriteAll ? `Smart Rotate (${mName} ${appState.selectedYear})` : `Auto-Fill Open Slots (${mName})`);
+
+  const tracker = {
+    shiftCounts: {},
+    lastSundayIdx: {},
+    assignedOnDate: {},
+    roleRepeats: {}
+  };
+  appState.members.forEach(m => { tracker.shiftCounts[m.name] = 0; });
+
+  const recordPick = (memberName, dateStr, sundayIdx, roleKeywordKey, rowAssignedSet) => {
+    const canonical = resolveCanonicalMemberName(memberName);
+    if (!canonical) return;
+    tracker.shiftCounts[canonical] = (tracker.shiftCounts[canonical] || 0) + 1;
+    if (sundayIdx >= 0) tracker.lastSundayIdx[canonical] = sundayIdx;
+    const dKey = normalizeScheduleDateKey(dateStr);
+    if (dKey) {
+      if (!tracker.assignedOnDate[dKey]) tracker.assignedOnDate[dKey] = new Set();
+      tracker.assignedOnDate[dKey].add(canonical);
+    }
+    if (roleKeywordKey) {
+      const rKey = `${roleKeywordKey}:${canonical}`;
+      tracker.roleRepeats[rKey] = (tracker.roleRepeats[rKey] || 0) + 1;
+    }
+    if (rowAssignedSet) rowAssignedSet.add(canonical);
+  };
+
+  // Seed pre-existing kept slots into tracker first so Open Slot Fill balances around them
+  if (!overwriteAll) {
+    const seedRows = (rows, fields, isSunday) => {
+      (rows || []).forEach((row, idx) => {
+        fields.forEach(f => {
+          splitAssignedNames(row[f]).forEach(n => recordPick(n, row.date, isSunday ? idx : -1, f, null));
+        });
+      });
+    };
+    seedRows(appState.firstService, ["cam1", "cam2", "gimble", "live", "spot", "charging"], true);
+    seedRows(appState.secondService, ["operator"], true);
+    seedRows(appState.thirdService, ["operator"], true);
+    seedRows(appState.fridayPrayer, ["cam1", "live"], false);
+  }
+
+  let filledCount = 0;
+  let skippedUnavailableCount = 0;
+
+  const pickBestForSlot = (dateStr, sundayIdx, roleKeywordKey, rowAssignedSet) => {
+    // Pool 1: Available + not in this service row
+    let candidates = appState.members.filter(m =>
+      !rowAssignedSet.has(m.name) && !isMemberUnavailableOnDate(m.name, dateStr)
+    );
+    // Pool 2 fallback: Available on another row if row size somehow exceeded team size
+    if (candidates.length === 0) {
+      candidates = appState.members.filter(m => !isMemberUnavailableOnDate(m.name, dateStr));
+    }
+    if (candidates.length === 0) {
+      skippedUnavailableCount++;
+      return "";
+    }
+
+    let best = candidates[0];
+    let bestScore = -Infinity;
+    candidates.forEach(m => {
+      const s = scoreMemberForSlot(m, roleKeywordKey, dateStr, sundayIdx, tracker);
+      if (s > bestScore) {
+        bestScore = s;
+        best = m;
+      }
+    });
+    return best.name;
+  };
+
+  // Fill Sundays (1st, 2nd, 3rd Services)
+  const firstFields = ["cam1", "cam2", "gimble", "live", "spot", "charging"];
+  (appState.firstService || []).forEach((row, idx) => {
+    const rowUsed = new Set();
+    if (!overwriteAll) {
+      firstFields.forEach(f => splitAssignedNames(row[f]).forEach(n => rowUsed.add(resolveCanonicalMemberName(n))));
+    }
+    firstFields.forEach(f => {
+      if (overwriteAll || !row[f] || !String(row[f]).trim()) {
+        const chosen = pickBestForSlot(row.date, idx, f, rowUsed);
+        row[f] = chosen;
+        if (chosen) {
+          recordPick(chosen, row.date, idx, f, rowUsed);
+          filledCount++;
+        }
+      }
+    });
+  });
+
+  (appState.secondService || []).forEach((row, idx) => {
+    if (overwriteAll || !row.operator || !String(row.operator).trim()) {
+      const rowUsed = new Set();
+      const chosen = pickBestForSlot(row.date, idx, "secondOperator", rowUsed);
+      row.operator = chosen;
+      if (chosen) {
+        recordPick(chosen, row.date, idx, "secondOperator", rowUsed);
+        filledCount++;
+      }
+    }
+  });
+
+  (appState.thirdService || []).forEach((row, idx) => {
+    if (overwriteAll || !row.operator || !String(row.operator).trim()) {
+      const rowUsed = new Set();
+      const chosen = pickBestForSlot(row.date, idx, "thirdOperator", rowUsed);
+      row.operator = chosen;
+      if (chosen) {
+        recordPick(chosen, row.date, idx, "thirdOperator", rowUsed);
+        filledCount++;
+      }
+    }
+  });
+
+  // Fill Fridays
+  (appState.fridayPrayer || []).forEach(row => {
+    const rowUsed = new Set();
+    const fields = ["cam1", "live"];
+    if (!overwriteAll) {
+      fields.forEach(f => splitAssignedNames(row[f]).forEach(n => rowUsed.add(resolveCanonicalMemberName(n))));
+    }
+    fields.forEach(f => {
+      if (overwriteAll || !row[f] || !String(row[f]).trim()) {
+        const chosen = pickBestForSlot(row.date, -1, f, rowUsed);
+        row[f] = chosen;
+        if (chosen) {
+          recordPick(chosen, row.date, -1, f, rowUsed);
+          filledCount++;
+        }
+      }
+    });
+  });
+
+  saveState();
+  renderAll();
+  if (filledCount === 0 && skippedUnavailableCount === 0) {
+    showToast("✅ All slots are already filled! Use 'Smart Rotate Full Month' to re-balance everything.");
+  } else {
+    showToast(`✨ ${overwriteAll ? "Rotated" : "Auto-filled"} ${filledCount} slots fairly (respecting roles & Away dates)!`);
+  }
+}
+
+// ----------------- VOLUNTEER AVAILABILITY MODAL -----------------
+let currentAvailabilityMember = "";
+
+function openAvailabilityModal(memberName) {
+  const members = (appState && appState.members) || [];
+  const select = document.getElementById("availabilityMemberSelect");
+  const preferred = resolveCanonicalMemberName(memberName || currentAvailabilityMember || window.currentVolunteerFilter || (members[0] ? members[0].name : ""));
+
+  if (select) {
+    select.innerHTML = members.map(m =>
+      `<option value="${escapeHtml(m.name)}" ${m.name === preferred ? "selected" : ""}>👤 ${escapeHtml(m.name)} (${escapeHtml(m.role || "Crew")})</option>`
+    ).join("");
+  }
+  currentAvailabilityMember = preferred;
+  renderAvailabilityModalContent();
+
+  const modal = document.getElementById("availabilityModal");
+  if (modal) modal.classList.add("show");
+}
+
+function closeAvailabilityModal() {
+  const modal = document.getElementById("availabilityModal");
+  if (modal) modal.classList.remove("show");
+}
+
+function onAvailabilityMemberChange(memberName) {
+  currentAvailabilityMember = resolveCanonicalMemberName(memberName);
+  renderAvailabilityModalContent();
+}
+
+function toggleModalAwayDate(dateStr) {
+  if (!currentAvailabilityMember) return;
+  const markedAway = toggleMemberAwayDate(currentAvailabilityMember, dateStr);
+  renderAvailabilityModalContent();
+
+  const dutiesOnDate = getVolunteerDuties(currentAvailabilityMember).filter(d =>
+    normalizeScheduleDateKey(d.date) === normalizeScheduleDateKey(dateStr)
+  );
+  if (markedAway && dutiesOnDate.length > 0) {
+    showToast(`🚫 Marked Away on ${dateStr}. Note: you are scheduled (${dutiesOnDate[0].serviceShort}) — tap Swap / Absence to notify the team!`);
+  } else {
+    showToast(markedAway ? `🚫 Marked ${currentAvailabilityMember} Away on ${dateStr}` : `✅ ${currentAvailabilityMember} marked Available on ${dateStr}`);
+  }
+}
+
+function addCustomAvailabilityAwayDate() {
+  const input = document.getElementById("availabilityCustomDateInput");
+  if (!input || !input.value) {
+    showToast("Please choose a calendar date first.");
+    return;
+  }
+  const formatted = formatDateKeyToDisplay(input.value);
+  if (!isMemberUnavailableOnDate(currentAvailabilityMember, formatted)) {
+    toggleModalAwayDate(formatted);
+  } else {
+    showToast(`${currentAvailabilityMember} is already marked Away on ${formatted}.`);
+  }
+  input.value = "";
+}
+
+function renderAvailabilityModalContent() {
+  const grid = document.getElementById("availabilityDatesGrid");
+  const summaryEl = document.getElementById("availabilityTeamSummary");
+  if (!grid) return;
+
+  // Collect all unique dates in active month (Sundays, Fridays, Special Meetings + member's custom away dates)
+  const dateMap = new Map();
+  const addDateOption = (rawDate, tag) => {
+    const key = normalizeScheduleDateKey(rawDate);
+    if (!key) return;
+    if (!dateMap.has(key)) {
+      dateMap.set(key, { dateKey: key, label: formatDateKeyToDisplay(key), tags: new Set() });
+    }
+    if (tag) dateMap.get(key).tags.add(tag);
+  };
+
+  (appState.firstService || []).forEach(r => addDateOption(r.date, "Sunday"));
+  (appState.fridayPrayer || []).forEach(r => addDateOption(r.date, "Friday"));
+  (appState.specialMeetings || []).forEach(r => addDateOption(r.date, r.title || "Special"));
+  if (appState.unavailability && currentAvailabilityMember) {
+    Object.keys(appState.unavailability).forEach(k => {
+      if (isAliasMatch(k, currentAvailabilityMember)) {
+        (appState.unavailability[k] || []).forEach(d => addDateOption(d, "Custom"));
+      }
+    });
+  }
+
+  const duties = currentAvailabilityMember ? getVolunteerDuties(currentAvailabilityMember) : [];
+  const dutyByDate = {};
+  duties.forEach(d => {
+    const dk = normalizeScheduleDateKey(d.date);
+    if (dk) dutyByDate[dk] = d;
+  });
+
+  const sortedDates = Array.from(dateMap.values()).sort((a, b) => a.dateKey.localeCompare(b.dateKey));
+  if (sortedDates.length === 0) {
+    grid.innerHTML = `<div style="color: var(--text-muted); font-size: 0.82rem;">No dated services loaded in this month. Use the date picker below.</div>`;
+  } else {
+    grid.innerHTML = sortedDates.map(item => {
+      const isAway = currentAvailabilityMember && isMemberUnavailableOnDate(currentAvailabilityMember, item.label);
+      const assignedDuty = dutyByDate[item.dateKey];
+      const tagStr = Array.from(item.tags).join(" • ");
+      return `
+        <button type="button" class="avail-date-pill ${isAway ? "is-away" : ""} ${assignedDuty ? "has-duty" : ""}"
+          onclick="toggleModalAwayDate('${escapeQuotes(item.label)}')">
+          <span class="avail-pill-date">${isAway ? "🚫" : "✅"} ${escapeHtml(item.label)}</span>
+          <span class="avail-pill-sub">${escapeHtml(tagStr)} &bull; ${isAway ? "Away (Tap to clear)" : "Available"}</span>
+          ${assignedDuty ? `<span class="avail-pill-duty-warn">📋 Scheduled: ${escapeHtml(assignedDuty.serviceShort)}</span>` : ""}
+        </button>
+      `;
+    }).join("");
+  }
+
+  if (summaryEl) {
+    const allAway = getAllActiveMonthAwayEntries();
+    if (allAway.length === 0) {
+      summaryEl.innerHTML = `<span style="font-size: 0.78rem; color: var(--text-muted);">No team members are marked Away for ${escapeHtml(getMonthName(appState.selectedMonth))} ${appState.selectedYear}. Everyone is available!</span>`;
+    } else {
+      summaryEl.innerHTML = allAway.map(entry => `
+        <span class="avail-team-chip">
+          <span><strong>${escapeHtml(entry.member)}</strong>: ${escapeHtml(entry.dateLabel)}</span>
+          <button type="button" class="avail-chip-remove" title="Remove away mark"
+            onclick="toggleMemberAwayDate('${escapeQuotes(entry.member)}', '${escapeQuotes(entry.dateLabel)}'); renderAvailabilityModalContent();">&times;</button>
+        </span>
+      `).join("");
+    }
+  }
+}
+
 // Master Render
 function renderAll() {
   const mName = getMonthName(appState.selectedMonth);
@@ -1215,6 +2074,8 @@ function renderAll() {
   renderFridayService();
   renderSpecialMeetings();
   renderMorningPrayer();
+  renderAdminScheduleHealth();
+  updateAdminUndoButton();
   renderMembers();
   renderPublicTeamDirectory();
   renderWorkloadAnalytics();
@@ -1245,14 +2106,23 @@ function renderAll() {
   if (printActiveMonthYear) printActiveMonthYear.textContent = `${mName} ${appState.selectedYear}`;
 }
 
-// Generate Clean Dropdown Options (Members Only + On-Demand Pair Option)
-function getMemberOptions(selectedVal) {
+// Generate Clean Dropdown Options (Members Only + Conflict/Away Hints + On-Demand Pair Option)
+function getMemberOptions(selectedVal, serviceType, rowIndex, field) {
   let html = `<option value="">-- Select Member --</option>`;
+  const ctx = getSlotContextAnnotations(serviceType, rowIndex, field);
 
-  // 1. List individual members
+  // 1. List individual members with conflict/availability annotations
   appState.members.forEach(m => {
     const isSel = (m.name === selectedVal) ? "selected" : "";
-    html += `<option value="${m.name}" ${isSel}>${m.name}</option>`;
+    let hint = "";
+    if (ctx.dateStr && isMemberUnavailableOnDate(m.name, ctx.dateStr)) {
+      hint = " (🚫 Away)";
+    } else if (ctx.sameRowOtherNames.has(m.name)) {
+      hint = " (🔴 In this service)";
+    } else if (ctx.sameDateNames.has(m.name)) {
+      hint = " (⚠️ Busy on date)";
+    }
+    html += `<option value="${m.name}" ${isSel}>${m.name}${hint}</option>`;
   });
 
   // 2. If this slot currently has two persons assigned (e.g. "Balaji & Lokesh"), keep it selected
@@ -1277,7 +2147,17 @@ function onScheduleDropdownChange(serviceType, index, field, value) {
     openPairModal(serviceType, index, field);
     return;
   }
+  pushScheduleUndoSnapshot(`Role Edit (${serviceType})`);
   updateRole(serviceType, index, field, value);
+  renderPublicSchedule();
+  render1stService();
+  render2ndService();
+  render3rdService();
+  renderFridayService();
+  renderSpecialMeetings();
+  renderAdminScheduleHealth();
+  renderWorkloadAnalytics();
+  notifyIfSlotHasConflict(serviceType, index, field);
 }
 
 // ================= RENDER 1ST SERVICE =================
@@ -1292,32 +2172,32 @@ function render1stService() {
         <input type="text" class="input-text" style="width: 110px; font-weight: 600;" value="${row.date}" onchange="updateDate('firstService', ${index}, this.value)">
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('firstService', ${index}, 'cam1', this.value)">
+        <select class="role-select" data-slot="firstService:${index}:cam1" onchange="onScheduleDropdownChange('firstService', ${index}, 'cam1', this.value)">
           ${getMemberOptions(row.cam1, 'firstService', index, 'cam1')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('firstService', ${index}, 'cam2', this.value)">
+        <select class="role-select" data-slot="firstService:${index}:cam2" onchange="onScheduleDropdownChange('firstService', ${index}, 'cam2', this.value)">
           ${getMemberOptions(row.cam2, 'firstService', index, 'cam2')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('firstService', ${index}, 'gimble', this.value)">
+        <select class="role-select" data-slot="firstService:${index}:gimble" onchange="onScheduleDropdownChange('firstService', ${index}, 'gimble', this.value)">
           ${getMemberOptions(row.gimble, 'firstService', index, 'gimble')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('firstService', ${index}, 'live', this.value)">
+        <select class="role-select" data-slot="firstService:${index}:live" onchange="onScheduleDropdownChange('firstService', ${index}, 'live', this.value)">
           ${getMemberOptions(row.live, 'firstService', index, 'live')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('firstService', ${index}, 'spot', this.value)">
+        <select class="role-select" data-slot="firstService:${index}:spot" onchange="onScheduleDropdownChange('firstService', ${index}, 'spot', this.value)">
           ${getMemberOptions(row.spot, 'firstService', index, 'spot')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('firstService', ${index}, 'charging', this.value)">
+        <select class="role-select" data-slot="firstService:${index}:charging" onchange="onScheduleDropdownChange('firstService', ${index}, 'charging', this.value)">
           ${getMemberOptions(row.charging, 'firstService', index, 'charging')}
         </select>
       </td>
@@ -1343,7 +2223,7 @@ function render2ndService() {
         <input type="text" class="input-text" style="width: 110px; font-weight: 600;" value="${row.date}" onchange="updateDate('secondService', ${index}, this.value)">
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('secondService', ${index}, 'operator', this.value)">
+        <select class="role-select" data-slot="secondService:${index}:operator" onchange="onScheduleDropdownChange('secondService', ${index}, 'operator', this.value)">
           ${getMemberOptions(row.operator, 'secondService', index, 'operator')}
         </select>
       </td>
@@ -1369,7 +2249,7 @@ function render3rdService() {
         <input type="text" class="input-text" style="width: 110px; font-weight: 600;" value="${row.date}" onchange="updateDate('thirdService', ${index}, this.value)">
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('thirdService', ${index}, 'operator', this.value)">
+        <select class="role-select" data-slot="thirdService:${index}:operator" onchange="onScheduleDropdownChange('thirdService', ${index}, 'operator', this.value)">
           ${getMemberOptions(row.operator, 'thirdService', index, 'operator')}
         </select>
       </td>
@@ -1395,12 +2275,12 @@ function renderFridayService() {
         <input type="text" class="input-text" style="width: 120px; font-weight: 600;" value="${row.date}" onchange="updateDate('fridayPrayer', ${index}, this.value)">
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('fridayPrayer', ${index}, 'cam1', this.value)">
+        <select class="role-select" data-slot="fridayPrayer:${index}:cam1" onchange="onScheduleDropdownChange('fridayPrayer', ${index}, 'cam1', this.value)">
           ${getMemberOptions(row.cam1, 'fridayPrayer', index, 'cam1')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('fridayPrayer', ${index}, 'live', this.value)">
+        <select class="role-select" data-slot="fridayPrayer:${index}:live" onchange="onScheduleDropdownChange('fridayPrayer', ${index}, 'live', this.value)">
           ${getMemberOptions(row.live, 'fridayPrayer', index, 'live')}
         </select>
       </td>
@@ -1432,27 +2312,27 @@ function renderSpecialMeetings() {
         <input type="text" class="input-text" style="width: 110px;" value="${row.date || ''}" placeholder="Date" onchange="updateSpecialMeeting(${index}, 'date', this.value)">
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'cam1', this.value)">
+        <select class="role-select" data-slot="specialMeetings:${index}:cam1" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'cam1', this.value)">
           ${getMemberOptions(row.cam1, 'specialMeetings', index, 'cam1')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'cam2', this.value)">
+        <select class="role-select" data-slot="specialMeetings:${index}:cam2" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'cam2', this.value)">
           ${getMemberOptions(row.cam2, 'specialMeetings', index, 'cam2')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'gimble', this.value)">
+        <select class="role-select" data-slot="specialMeetings:${index}:gimble" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'gimble', this.value)">
           ${getMemberOptions(row.gimble, 'specialMeetings', index, 'gimble')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'live', this.value)">
+        <select class="role-select" data-slot="specialMeetings:${index}:live" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'live', this.value)">
           ${getMemberOptions(row.live, 'specialMeetings', index, 'live')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'spot', this.value)">
+        <select class="role-select" data-slot="specialMeetings:${index}:spot" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'spot', this.value)">
           ${getMemberOptions(row.spot, 'specialMeetings', index, 'spot')}
         </select>
       </td>
@@ -1493,12 +2373,11 @@ function updateSpecialMeeting(index, field, value) {
 
 function removeSpecialMeeting(index) {
   if (confirm("Remove this special meeting?")) {
+    pushScheduleUndoSnapshot("Remove Special Meeting");
     appState.specialMeetings.splice(index, 1);
     saveState();
-    renderSpecialMeetings();
-    populateWhatsAppDateSelect();
-    updateWhatsAppPreview();
-    showToast("Special meeting removed.");
+    renderAll();
+    showToast("Special meeting removed. (Undo available)");
   }
 }
 
@@ -1565,28 +2444,28 @@ function renderMorningPrayer() {
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="updateMorningPrayerRole(${index}, 'cam1', this.value)">
-          ${getMemberOptions(row.cam1)}
+        <select class="role-select" data-slot="morningPrayer:${index}:cam1" onchange="updateMorningPrayerRole(${index}, 'cam1', this.value)">
+          ${getMemberOptions(row.cam1, 'morningPrayer', index, 'cam1')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="updateMorningPrayerRole(${index}, 'cam2', this.value)">
-          ${getMemberOptions(row.cam2)}
+        <select class="role-select" data-slot="morningPrayer:${index}:cam2" onchange="updateMorningPrayerRole(${index}, 'cam2', this.value)">
+          ${getMemberOptions(row.cam2, 'morningPrayer', index, 'cam2')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="updateMorningPrayerRole(${index}, 'gimbal', this.value)">
-          ${getMemberOptions(row.gimbal)}
+        <select class="role-select" data-slot="morningPrayer:${index}:gimbal" onchange="updateMorningPrayerRole(${index}, 'gimbal', this.value)">
+          ${getMemberOptions(row.gimbal, 'morningPrayer', index, 'gimbal')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="updateMorningPrayerRole(${index}, 'liveEditor', this.value)">
-          ${getMemberOptions(row.liveEditor)}
+        <select class="role-select" data-slot="morningPrayer:${index}:liveEditor" onchange="updateMorningPrayerRole(${index}, 'liveEditor', this.value)">
+          ${getMemberOptions(row.liveEditor, 'morningPrayer', index, 'liveEditor')}
         </select>
       </td>
       <td>
-        <select class="role-select" onchange="updateMorningPrayerRole(${index}, 'socialMedia', this.value)">
-          ${getMemberOptions(row.socialMedia)}
+        <select class="role-select" data-slot="morningPrayer:${index}:socialMedia" onchange="updateMorningPrayerRole(${index}, 'socialMedia', this.value)">
+          ${getMemberOptions(row.socialMedia, 'morningPrayer', index, 'socialMedia')}
         </select>
       </td>
       <td>
@@ -1640,6 +2519,7 @@ function setMorningPrayerCampaign(name) {
 
 function resetMorningPrayerToWeekdays() {
   if (confirm("Reset schedule to standard Monday through Saturday (6 days)?")) {
+    pushScheduleUndoSnapshot("Reset Morning Prayer");
     const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     appState.morningPrayer.days = weekDays.map((d, i) => ({
       id: Date.now() + i,
@@ -1652,15 +2532,15 @@ function resetMorningPrayerToWeekdays() {
     }));
     saveState();
     renderAll();
-    showToast("Reset to Monday - Saturday!");
+    showToast("Reset to Monday - Saturday! (Undo available)");
   }
 }
 
 function updateMorningPrayer(index, field, value) {
+  pushScheduleUndoSnapshot("Morning Prayer Edit");
   appState.morningPrayer.days[index][field] = value;
   saveState();
-  renderPublicSchedule();
-  updateWhatsAppPreview();
+  renderAll();
 }
 
 function updateMorningPrayerRole(index, field, value) {
@@ -1669,10 +2549,10 @@ function updateMorningPrayerRole(index, field, value) {
     openPairModal("morningPrayer", index, field);
     return;
   }
+  pushScheduleUndoSnapshot("Morning Prayer Role Edit");
   appState.morningPrayer.days[index][field] = value;
   saveState();
-  renderPublicSchedule();
-  updateWhatsAppPreview();
+  renderAll();
 }
 
 function addMorningPrayerRow() {
@@ -1697,10 +2577,11 @@ function addMorningPrayerRow() {
 
 function removeMorningPrayerRow(index) {
   if (confirm("Remove this day from the morning prayer schedule?")) {
+    pushScheduleUndoSnapshot("Remove Morning Prayer Row");
     appState.morningPrayer.days.splice(index, 1);
     saveState();
     renderAll();
-    showToast("Day removed.");
+    showToast("Day removed. (Undo available)");
   }
 }
 
@@ -1723,8 +2604,10 @@ function updateRole(serviceType, index, field, value) {
 }
 
 function updateDate(serviceType, index, value) {
+  pushScheduleUndoSnapshot(`Edit Date (${serviceType})`);
   appState[serviceType][index].date = value;
   saveState();
+  renderAll();
 }
 
 function updateMonthTitle(val) {
@@ -1737,6 +2620,7 @@ function addNewSundayRow() {
   const newDate = prompt("Enter the new Sunday date (e.g. 01 Nov 2026):", "01 Nov 2026");
   if (!newDate) return;
 
+  pushScheduleUndoSnapshot(`Add Sunday (${newDate})`);
   const newId = Date.now();
   appState.firstService.push({
     id: newId,
@@ -1762,9 +2646,7 @@ function addNewSundayRow() {
   });
 
   saveState();
-  render1stService();
-  render2ndService();
-  render3rdService();
+  renderAll();
   showToast(`Added Sunday ${newDate} to schedule!`);
 }
 
@@ -1773,6 +2655,7 @@ function addNewFridayRow() {
   const newDate = prompt("Enter the new Friday date (e.g. 06 Nov 2026):", "06 Nov 2026");
   if (!newDate) return;
 
+  pushScheduleUndoSnapshot(`Add Friday (${newDate})`);
   appState.fridayPrayer.push({
     id: Date.now(),
     date: newDate,
@@ -1781,20 +2664,18 @@ function addNewFridayRow() {
   });
 
   saveState();
-  renderFridayService();
+  renderAll();
   showToast(`Added Friday ${newDate}!`);
 }
 
 // Remove Row
 function removeRow(serviceType, index) {
   if (confirm("Remove this date from the schedule?")) {
+    pushScheduleUndoSnapshot(`Remove Date Row`);
     appState[serviceType].splice(index, 1);
     saveState();
-    if (serviceType === 'firstService') render1stService();
-    if (serviceType === 'secondService') render2ndService();
-    if (serviceType === 'thirdService') render3rdService();
-    if (serviceType === 'fridayPrayer') renderFridayService();
-    showToast("Date removed.");
+    renderAll();
+    showToast("Date removed. (Undo available)");
   }
 }
 
@@ -3774,6 +4655,7 @@ function renderVolunteerPersonalBox(name, duties) {
 
   const memberObj = (appState.members || []).find(m => m.name.toLowerCase() === name.toLowerCase()) || { name, role: 'Media Volunteer' };
   const dutyCount = duties.length;
+  const awayInMonth = getMemberAwayDatesInMonth(memberObj.name);
 
   let dutiesHtml = "";
   if (dutyCount === 0) {
@@ -3785,18 +4667,20 @@ function renderVolunteerPersonalBox(name, duties) {
   } else {
     dutiesHtml = `
       <div class="volunteer-duties-grid">
-        ${duties.map((d, dIdx) => `
+        ${duties.map((d, dIdx) => {
+          const isAwayDuty = isMemberUnavailableOnDate(memberObj.name, d.date);
+          return `
           <div class="volunteer-duty-item">
-            <span class="duty-badge-time">⏰ Call: ${escapeHtml(d.callTime)} | Starts: ${escapeHtml(d.serviceStart)}</span>
-            <div class="duty-date">📅 ${escapeHtml(d.date)}</div>
+            <span class="duty-badge-time">⏰ Call: ${escapeHtml(d.callTime)} | Service: ${escapeHtml(d.serviceStart)}${d.serviceEnd && d.serviceEnd !== 'TBD' ? ' – ' + escapeHtml(d.serviceEnd) : ''}</span>
+            <div class="duty-date">📅 ${escapeHtml(d.date)} ${isAwayDuty ? '<span class="roster-away-flag">🚫 Marked Away</span>' : ''}</div>
             <div class="duty-service">${escapeHtml(d.service)}</div>
             <div class="duty-role">${escapeHtml(d.role)}</div>
             ${d.assignedText && d.assignedText.includes('&') ? `<div style="font-size: 0.76rem; opacity: 0.85; margin-top: 2px;">👥 Paired with: <strong>${escapeHtml(d.assignedText)}</strong></div>` : ''}
             <div class="duty-actions-strip">
-              <button type="button" class="btn-duty-action" onclick="addSingleDutyToGoogleCalendar('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}')" title="Add this shift directly to Google Calendar">
+              <button type="button" class="btn-duty-action" onclick="addSingleDutyToGoogleCalendar('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Add this shift directly to Google Calendar">
                 📅 Google Cal
               </button>
-              <button type="button" class="btn-duty-action" onclick="downloadSingleDutyIcs('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}')" title="Download .ics event with Saturday 12h, 60m & 15m alarms">
+              <button type="button" class="btn-duty-action" onclick="downloadSingleDutyIcs('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Download .ics event with Saturday 12h, 60m & 15m alarms">
                 📱 iCal
               </button>
               <button type="button" class="btn-duty-action btn-duty-swap" onclick="openSwapForSpecificDuty('${escapeQuotes(memberObj.name)}', ${dIdx})" title="Request a swap or report absence for this specific shift">
@@ -3804,10 +4688,18 @@ function renderVolunteerPersonalBox(name, duties) {
               </button>
             </div>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
     `;
   }
+
+  const awayStripHtml = awayInMonth.length > 0 ? `
+    <div class="personal-away-strip">
+      <span>🚫 <strong>Marked Away (${awayInMonth.length}):</strong> ${awayInMonth.map(d => escapeHtml(d)).join(', ')}</span>
+      <button type="button" class="btn-remember-switch" onclick="openAvailabilityModal('${escapeQuotes(memberObj.name)}')">Edit Away Dates</button>
+    </div>
+  ` : '';
 
   box.innerHTML = `
     <div class="volunteer-summary-header">
@@ -3832,6 +4724,9 @@ function renderVolunteerPersonalBox(name, duties) {
         <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.84rem;" onclick="downloadVolunteerCalendar('${escapeQuotes(memberObj.name)}')">
           📱 Phone Calendar (.ics)
         </button>
+        <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.84rem; border-color: rgba(239, 68, 68, 0.4);" onclick="openAvailabilityModal('${escapeQuotes(memberObj.name)}')">
+          🚫 My Away Dates
+        </button>
         <button class="btn btn-warning" style="padding: 8px 14px; font-size: 0.84rem; background: linear-gradient(135deg, #d97706, #b45309);" onclick="openSwapRequestModal('${escapeQuotes(memberObj.name)}')">
           🔄 Request Swap / Absence
         </button>
@@ -3840,6 +4735,7 @@ function renderVolunteerPersonalBox(name, duties) {
         </button>
       </div>
     </div>
+    ${awayStripHtml}
     ${dutiesHtml}
   `;
   box.style.display = "block";
@@ -3847,18 +4743,52 @@ function renderVolunteerPersonalBox(name, duties) {
 
 // ================= FEATURE 1: 📅 GOOGLE CALENDAR & PHONE (.ICS) EXPORTS =================
 
+function parseClockMinutes(clockStr) {
+  const tm = String(clockStr || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
+  if (!tm) return null;
+  let hours = parseInt(tm[1], 10);
+  const minutes = parseInt(tm[2], 10);
+  const meridiem = (tm[3] || "").toUpperCase();
+  if (meridiem === "PM" && hours < 12) hours += 12;
+  if (meridiem === "AM" && hours === 12) hours = 0;
+  return (hours * 60) + minutes;
+}
+
+function inferServiceDurationHours(serviceHint, callTimeStr, serviceEndStr) {
+  const startMins = parseClockMinutes(callTimeStr);
+  const endMins = parseClockMinutes(serviceEndStr);
+  if (startMins !== null && endMins !== null && endMins > startMins) {
+    return Math.round(((endMins - startMins) / 60) * 100) / 100;
+  }
+  const s = String(serviceHint || "").toLowerCase();
+  if (s.includes("friday")) return SERVICE_DURATION_HOURS.fridayPrayer;
+  if (s.includes("morning")) return SERVICE_DURATION_HOURS.morningPrayer;
+  if (s.includes("special") || s.includes("🌟")) return SERVICE_DURATION_HOURS.specialMeetings;
+  return SERVICE_DURATION_HOURS.firstService;
+}
+
 // Robust UTC Parser for Indian Standard Time (IST, UTC+05:30)
-function parseDutyUtc(dateStr, timeStr) {
+function parseDutyUtc(dateStr, timeStr, serviceEndStr = "", serviceHint = "") {
   const months = {
     jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
     jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11
   };
-  let year = new Date().getFullYear();
-  let month = new Date().getMonth();
-  let day = 1;
+  const weekdayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const now = new Date();
+  let year = now.getFullYear();
+  let month = now.getMonth();
+  let day = now.getDate();
 
-  const parts = (dateStr || '').trim().split(/[\s-]+/);
-  if (parts.length >= 3) {
+  const rawDate = (dateStr || "").trim();
+  const weekdayIdx = weekdayNames.indexOf(rawDate.toLowerCase());
+  const parts = rawDate.split(/[\s-]+/);
+  if (weekdayIdx !== -1) {
+    const diff = (weekdayIdx - now.getDay() + 7) % 7;
+    const nextMatch = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+    year = nextMatch.getFullYear();
+    month = nextMatch.getMonth();
+    day = nextMatch.getDate();
+  } else if (parts.length >= 3) {
     if (parts[0].length === 4) {
       // YYYY-MM-DD
       year = parseInt(parts[0], 10);
@@ -3873,24 +4803,21 @@ function parseDutyUtc(dateStr, timeStr) {
     }
   }
 
-  let hours = 8;
-  let minutes = 0;
-  if (timeStr) {
-    const tm = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-    if (tm) {
-      hours = parseInt(tm[1], 10);
-      minutes = parseInt(tm[2], 10);
-      const meridiem = (tm[3] || '').toUpperCase();
-      if (meridiem === 'PM' && hours < 12) hours += 12;
-      if (meridiem === 'AM' && hours === 12) hours = 0;
-    }
+  let hours = 18;
+  let minutes = 30;
+  const parsedStart = parseClockMinutes(timeStr);
+  if (parsedStart !== null) {
+    hours = Math.floor(parsedStart / 60);
+    minutes = parsedStart % 60;
   }
+
+  const durationHours = inferServiceDurationHours(serviceHint, timeStr, serviceEndStr);
 
   // Offset: IST is UTC+05:30, so UTC time = IST time - 5 hours 30 mins
   const istOffsetMs = 5.5 * 60 * 60 * 1000;
   const utcMs = Date.UTC(year, month, day, hours, minutes, 0) - istOffsetMs;
   const startUtc = new Date(utcMs);
-  const endUtc = new Date(utcMs + (2.5 * 60 * 60 * 1000)); // Default 2.5 hours shift
+  const endUtc = new Date(utcMs + (durationHours * 60 * 60 * 1000));
 
   const pad = n => String(n).padStart(2, '0');
   const formatUtc = (d) => `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}00Z`;
@@ -3899,16 +4826,17 @@ function parseDutyUtc(dateStr, timeStr) {
     startUtc: formatUtc(startUtc),
     endUtc: formatUtc(endUtc),
     startDate: startUtc,
-    endDate: endUtc
+    endDate: endUtc,
+    durationHours
   };
 }
 
 // 1-Click Google Calendar Direct URL Generator
-function addSingleDutyToGoogleCalendar(date, service, role, callTime, prayerTime, volunteerName) {
-  const utc = parseDutyUtc(date, callTime);
+function addSingleDutyToGoogleCalendar(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
+  const utc = parseDutyUtc(date, callTime, serviceEnd, service);
   const title = `FLAG Media: ${role} (${service})`;
   const location = "Full Life Centre AG Church, Indoor Media Desk";
-  const details = `Full Life Centre AG Church - Indoor Media Ministry\n\n👤 Volunteer: ${volunteerName || 'Media Team'}\n⛪ Service: ${service}\n🎬 Scheduled Role: ${role}\n⏰ Call Time: ${callTime}\n🙏 Team Prayer: ${prayerTime || '15 mins before call'}\n📍 Location: Indoor Media Desk\n\n"Whatever you do, work at it with all your heart as for the Lord." - Colossians 3:23 🙏✨`;
+  const details = `Full Life Centre AG Church - Indoor Media Ministry\n\n👤 Volunteer: ${volunteerName || 'Media Team'}\n⛪ Service: ${service}\n🎬 Scheduled Role: ${role}\n⏰ Call Time: ${callTime}${serviceEnd && serviceEnd !== 'TBD' ? `\n🏁 Service Ends: ${serviceEnd}` : ''}\n🙏 Team Prayer: ${prayerTime || '15 mins before call'}\n📍 Location: Indoor Media Desk\n\n"Whatever you do, work at it with all your heart as for the Lord." - Colossians 3:23 🙏✨`;
 
   const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${utc.startUtc}/${utc.endUtc}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
   
@@ -3934,7 +4862,8 @@ function addVolunteerNextDutyToGoogleCalendar(name) {
     nextDuty.role,
     nextDuty.callTime,
     nextDuty.prayerTime,
-    volunteer
+    volunteer,
+    nextDuty.serviceEnd || ""
   );
   if (duties.length > 1) {
     showToast(`📅 Adding duty 1 of ${duties.length} to Google Calendar. Use individual shift buttons below for other dates!`);
@@ -3942,12 +4871,12 @@ function addVolunteerNextDutyToGoogleCalendar(name) {
 }
 
 // Single-Duty .ics Generator with Saturday 12h, 60-min & 15-min Alarms
-function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunteerName) {
+function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
   const nowStamp = `${pad(now.getUTCFullYear())}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
 
-  const utc = parseDutyUtc(date, callTime);
+  const utc = parseDutyUtc(date, callTime, serviceEnd, service);
   const uid = `flag-media-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@fulllifecentre.church`;
   const summary = `FLAG Media: ${role} (${service})`;
   const description = `Full Life Centre AG Church - Indoor Media Duty\\nService: ${service}\\nRole: ${role}\\nCall Time: ${callTime}\\nTeam Prayer: ${prayerTime || '15 mins before call'}\\nAssigned: ${volunteerName}\\n\\nPlease arrive promptly. God bless your ministry!`;
@@ -4021,7 +4950,7 @@ function downloadVolunteerCalendar(name) {
 
   let icsEvents = [];
   duties.forEach((d, idx) => {
-    const utc = parseDutyUtc(d.date, d.callTime);
+    const utc = parseDutyUtc(d.date, d.callTime, d.serviceEnd || "", d.service || "");
 
     const uid = `flag-media-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 8)}@fulllifecentre.church`;
     const summary = `FLAG Media: ${d.role} (${d.serviceShort})`;
