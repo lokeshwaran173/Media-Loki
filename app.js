@@ -927,6 +927,7 @@ function renderPublicSchedule() {
   if (t1) {
     t1.innerHTML = "";
     (appState.firstService || []).forEach(r => {
+      const prepDate = getPreviousDayDateStr(r.date) || r.date;
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><span class="date-chip date-chip-blue">${r.date}</span></td>
@@ -935,7 +936,7 @@ function renderPublicSchedule() {
         <td>${badgeForName(r.gimble, r.date)}</td>
         <td>${badgeForName(r.live, r.date)}</td>
         <td>${badgeForName(r.spot, r.date)}</td>
-        <td>${badgeForName(r.charging, r.date)}</td>
+        <td>${badgeForName(r.charging, prepDate)}</td>
       `;
       t1.appendChild(tr);
     });
@@ -946,6 +947,7 @@ function renderPublicSchedule() {
   if (c1) {
     c1.innerHTML = "";
     (appState.firstService || []).forEach(r => {
+      const prepDate = getPreviousDayDateStr(r.date) || r.date;
       const card = document.createElement("div");
       card.className = "schedule-service-card card-accent-blue";
       card.innerHTML = `
@@ -975,8 +977,8 @@ function renderPublicSchedule() {
             <div class="sched-role-val">${badgeForName(r.spot, r.date)}</div>
           </div>
           <div class="sched-role-row">
-            <span class="sched-role-label">🔋 Battery & Charging:</span>
-            <div class="sched-role-val">${badgeForName(r.charging, r.date)}</div>
+            <span class="sched-role-label">🔋 Battery & Charging (Sat):</span>
+            <div class="sched-role-val">${badgeForName(r.charging, prepDate)}</div>
           </div>
         </div>
       `;
@@ -1244,7 +1246,8 @@ const SERVICE_DURATION_HOURS = {
   thirdService: 2.5,
   fridayPrayer: 3.5,
   morningPrayer: 1.5,
-  specialMeetings: 3.0
+  specialMeetings: 3.0,
+  saturdayPrep: 1.0
 };
 
 const SLOT_ROLE_KEYWORDS = {
@@ -1308,6 +1311,15 @@ function formatDateKeyToDisplay(dateKey) {
   const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const monIdx = parseInt(m[2], 10) - 1;
   return `${m[3]} ${shortMonths[monIdx] || "Jan"} ${m[1]}`;
+}
+
+function getPreviousDayDateStr(dateStr) {
+  const key = normalizeScheduleDateKey(dateStr);
+  if (!key) return "";
+  const [y, m, d] = key.split("-").map(Number);
+  const prev = new Date(Date.UTC(y, m - 1, d - 1));
+  const prevKey = `${prev.getUTCFullYear()}-${String(prev.getUTCMonth() + 1).padStart(2, "0")}-${String(prev.getUTCDate()).padStart(2, "0")}`;
+  return formatDateKeyToDisplay(prevKey);
 }
 
 function isMemberUnavailableOnDate(memberName, dateStr) {
@@ -1421,17 +1433,27 @@ function analyzeScheduleConflicts() {
         const rawVal = row[field.key];
         const names = splitAssignedNames(rawVal);
         const slotKey = `${serviceType}:${rowIndex}:${field.key}`;
+        const isSatPrep = Boolean(field.saturdayPrep);
+        // Saturday prep roles (like Camera Charging) happen the day before Sunday service
+        const effectiveDateStr = (isSatPrep && row.date) ? (getPreviousDayDateStr(row.date) || row.date) : row.date;
+        const effectiveDateKey = normalizeScheduleDateKey(effectiveDateStr) || dateKey;
+
+        if (!dateUsage[effectiveDateKey]) dateUsage[effectiveDateKey] = {};
 
         names.forEach(rawPerson => {
           const person = resolveCanonicalMemberName(rawPerson);
-          rowMemberUsage[rowKey].add(person);
-          if (!dateUsage[dateKey][person]) dateUsage[dateKey][person] = [];
-          dateUsage[dateKey][person].push({ serviceType, serviceLabel, rowIndex, field: field.key, roleLabel: field.label });
+          if (!isSatPrep) {
+            rowMemberUsage[rowKey].add(person);
+          }
+          if (!dateUsage[effectiveDateKey][person]) dateUsage[effectiveDateKey][person] = [];
+          dateUsage[effectiveDateKey][person].push({ serviceType, serviceLabel, rowIndex, field: field.key, roleLabel: field.label });
 
-          if (!seenInRow[person]) seenInRow[person] = [];
-          seenInRow[person].push({ field: field.key, label: field.label, slotKey });
+          if (!isSatPrep) {
+            if (!seenInRow[person]) seenInRow[person] = [];
+            seenInRow[person].push({ field: field.key, label: field.label, slotKey });
+          }
 
-          if (row.date && isMemberUnavailableOnDate(person, row.date)) {
+          if (effectiveDateStr && isMemberUnavailableOnDate(person, effectiveDateStr)) {
             bumpCell(slotKey, "error");
             errors.push({
               level: "error",
@@ -1439,13 +1461,13 @@ function analyzeScheduleConflicts() {
               serviceType,
               rowIndex,
               field: field.key,
-              date: row.date,
+              date: effectiveDateStr,
               memberName: person,
-              message: `${row.date} (${serviceLabel} • ${field.label}): ${person} is marked Away / Unavailable`
+              message: `${effectiveDateStr} (${serviceLabel} • ${field.label}): ${person} is marked Away / Unavailable`
             });
           }
 
-          if (isSundayMultiTrack && row.date) {
+          if (!isSatPrep && isSundayMultiTrack && row.date) {
             if (!dateSundayServices[dateKey]) dateSundayServices[dateKey] = {};
             if (!dateSundayServices[dateKey][person]) dateSundayServices[dateKey][person] = [];
             dateSundayServices[dateKey][person].push({ serviceType, serviceLabel, slotKey, date: row.date });
@@ -1463,6 +1485,7 @@ function analyzeScheduleConflicts() {
             serviceType,
             rowIndex,
             field: slots[0].field,
+            fields: slots.map(s => s.field),
             date: dateStr,
             memberName: person,
             message: `${dateStr} (${serviceLabel}): ${person} double-booked in ${slots.map(s => s.label).join(" + ")}`
@@ -1478,7 +1501,7 @@ function analyzeScheduleConflicts() {
     { key: "gimble", label: "Gimble" },
     { key: "live", label: "Live System" },
     { key: "spot", label: "Spot Editing" },
-    { key: "charging", label: "Charging" }
+    { key: "charging", label: "Charging (Sat Prep)", saturdayPrep: true }
   ], true);
 
   inspectService("secondService", "2nd Service", appState.secondService, [
@@ -1535,7 +1558,7 @@ function analyzeScheduleConflicts() {
 }
 
 function getSlotContextAnnotations(serviceType, rowIndex, field) {
-  const info = { dateStr: "", dateKey: "", sameRowOtherNames: new Set(), sameDateNames: new Set() };
+  const info = { dateStr: "", dateKey: "", sameRowOtherNames: new Set(), sameDateNames: new Set(), isSaturdayPrep: false };
   if (!appState || !serviceType || rowIndex === undefined || rowIndex === null) return info;
 
   const row = serviceType === "morningPrayer"
@@ -1543,29 +1566,34 @@ function getSlotContextAnnotations(serviceType, rowIndex, field) {
     : (appState[serviceType] ? appState[serviceType][rowIndex] : null);
   if (!row) return info;
 
-  info.dateStr = row.date || "";
-  info.dateKey = normalizeScheduleDateKey(row.date || "");
+  const isSatChargingSlot = serviceType === "firstService" && field === "charging";
+  info.isSaturdayPrep = isSatChargingSlot;
+  info.dateStr = isSatChargingSlot && row.date ? (getPreviousDayDateStr(row.date) || row.date) : (row.date || "");
+  info.dateKey = normalizeScheduleDateKey(info.dateStr);
 
-  Object.keys(row).forEach(k => {
-    if (k === "id" || k === "date" || k === "day" || k === "title" || k === field) return;
-    splitAssignedNames(row[k]).forEach(n => info.sameRowOtherNames.add(resolveCanonicalMemberName(n)));
-  });
+  if (!isSatChargingSlot) {
+    Object.keys(row).forEach(k => {
+      if (k === "id" || k === "date" || k === "day" || k === "title" || k === field) return;
+      if (serviceType === "firstService" && k === "charging") return;
+      splitAssignedNames(row[k]).forEach(n => info.sameRowOtherNames.add(resolveCanonicalMemberName(n)));
+    });
 
-  if (info.dateKey) {
-    const collectDateRows = (type, rows, fields) => {
-      (rows || []).forEach((r, idx) => {
-        if (normalizeScheduleDateKey(r.date) !== info.dateKey) return;
-        fields.forEach(f => {
-          if (type === serviceType && idx === rowIndex && f === field) return;
-          splitAssignedNames(r[f]).forEach(n => info.sameDateNames.add(resolveCanonicalMemberName(n)));
+    if (info.dateKey) {
+      const collectDateRows = (type, rows, fields) => {
+        (rows || []).forEach((r, idx) => {
+          if (normalizeScheduleDateKey(r.date) !== info.dateKey) return;
+          fields.forEach(f => {
+            if (type === serviceType && idx === rowIndex && f === field) return;
+            splitAssignedNames(r[f]).forEach(n => info.sameDateNames.add(resolveCanonicalMemberName(n)));
+          });
         });
-      });
-    };
-    collectDateRows("firstService", appState.firstService, ["cam1", "cam2", "gimble", "live", "spot", "charging"]);
-    collectDateRows("secondService", appState.secondService, ["operator"]);
-    collectDateRows("thirdService", appState.thirdService, ["operator"]);
-    collectDateRows("fridayPrayer", appState.fridayPrayer, ["cam1", "live"]);
-    collectDateRows("specialMeetings", appState.specialMeetings, ["cam1", "cam2", "gimble", "live", "spot"]);
+      };
+      collectDateRows("firstService", appState.firstService, ["cam1", "cam2", "gimble", "live", "spot"]);
+      collectDateRows("secondService", appState.secondService, ["operator"]);
+      collectDateRows("thirdService", appState.thirdService, ["operator"]);
+      collectDateRows("fridayPrayer", appState.fridayPrayer, ["cam1", "live"]);
+      collectDateRows("specialMeetings", appState.specialMeetings, ["cam1", "cam2", "gimble", "live", "spot"]);
+    }
   }
 
   return info;
@@ -1638,11 +1666,12 @@ function renderAdminScheduleHealth() {
 
 function notifyIfSlotHasConflict(serviceType, rowIndex, field) {
   const analysis = analyzeScheduleConflicts();
-  const target = analysis.errors.find(e => e.serviceType === serviceType && e.rowIndex === rowIndex && (e.field === field || e.type === "double-booked"))
-    || analysis.warnings.find(w => {
+  const isSatPrepSlot = serviceType === "firstService" && field === "charging";
+  const target = analysis.errors.find(e => e.serviceType === serviceType && e.rowIndex === rowIndex && (e.field === field || (Array.isArray(e.fields) && e.fields.includes(field))))
+    || (!isSatPrepSlot && analysis.warnings.find(w => {
       const row = appState[serviceType] && appState[serviceType][rowIndex];
       return row && row.date && w.date === row.date && splitAssignedNames(row[field]).some(n => isAliasMatch(n, w.memberName));
-    });
+    }));
 
   if (target) {
     showToast(`${target.level === "error" ? "🔴 Conflict" : "⚠️ Notice"}: ${target.message}`);
@@ -1815,7 +1844,9 @@ function autoFillMonthSchedule(overwriteAll = false) {
     const seedRows = (rows, fields, isSunday) => {
       (rows || []).forEach((row, idx) => {
         fields.forEach(f => {
-          splitAssignedNames(row[f]).forEach(n => recordPick(n, row.date, isSunday ? idx : -1, f, null));
+          const isSatPrep = isSunday && f === "charging";
+          const effectiveDate = isSatPrep && row.date ? (getPreviousDayDateStr(row.date) || row.date) : row.date;
+          splitAssignedNames(row[f]).forEach(n => recordPick(n, effectiveDate, isSatPrep ? -1 : (isSunday ? idx : -1), f, null));
         });
       });
     };
@@ -1854,14 +1885,14 @@ function autoFillMonthSchedule(overwriteAll = false) {
     return best.name;
   };
 
-  // Fill Sundays (1st, 2nd, 3rd Services)
-  const firstFields = ["cam1", "cam2", "gimble", "live", "spot", "charging"];
+  // Fill Sundays (1st, 2nd, 3rd Services) and Saturday Charging Prep
+  const sundayFirstFields = ["cam1", "cam2", "gimble", "live", "spot"];
   (appState.firstService || []).forEach((row, idx) => {
     const rowUsed = new Set();
     if (!overwriteAll) {
-      firstFields.forEach(f => splitAssignedNames(row[f]).forEach(n => rowUsed.add(resolveCanonicalMemberName(n))));
+      sundayFirstFields.forEach(f => splitAssignedNames(row[f]).forEach(n => rowUsed.add(resolveCanonicalMemberName(n))));
     }
-    firstFields.forEach(f => {
+    sundayFirstFields.forEach(f => {
       if (overwriteAll || !row[f] || !String(row[f]).trim()) {
         const chosen = pickBestForSlot(row.date, idx, f, rowUsed);
         row[f] = chosen;
@@ -1871,6 +1902,17 @@ function autoFillMonthSchedule(overwriteAll = false) {
         }
       }
     });
+
+    // Camera Charging Incharge happens on Saturday before Sunday service (does not clash with Sunday slots)
+    if (overwriteAll || !row.charging || !String(row.charging).trim()) {
+      const prepDate = row.date ? (getPreviousDayDateStr(row.date) || row.date) : row.date;
+      const chosen = pickBestForSlot(prepDate, -1, "charging", new Set());
+      row.charging = chosen;
+      if (chosen) {
+        recordPick(chosen, prepDate, -1, "charging", null);
+        filledCount++;
+      }
+    }
   });
 
   (appState.secondService || []).forEach((row, idx) => {
@@ -4406,19 +4448,21 @@ function getVolunteerDuties(name) {
     ];
     rolesMap.forEach(rm => {
       if (matches(r[rm.key])) {
+        const isSatPrep = rm.key === 'charging';
+        const dutyDate = isSatPrep ? (getPreviousDayDateStr(r.date) || r.date) : r.date;
         duties.push({
-          date: r.date,
-          service: '1st Service (06:00 AM – 08:00 AM)',
-          serviceShort: '1st Service',
+          date: dutyDate,
+          service: isSatPrep ? `Saturday Prep (For Sun ${r.date} 1st Service)` : '1st Service (06:00 AM – 08:00 AM)',
+          serviceShort: isSatPrep ? 'Saturday Prep' : '1st Service',
           serviceType: 'firstService',
           role: rm.label,
           rawRole: rm.key,
           assignedText: r[rm.key],
-          callTime: '05:30 AM',
-          prayerTime: '05:45 AM',
-          serviceStart: '06:00 AM',
-          serviceEnd: '08:00 AM',
-          colorTag: 'tag-blue'
+          callTime: isSatPrep ? '06:00 PM' : '05:30 AM',
+          prayerTime: isSatPrep ? 'Prep Day (Sat)' : '05:45 AM',
+          serviceStart: isSatPrep ? '06:00 PM' : '06:00 AM',
+          serviceEnd: isSatPrep ? '07:00 PM' : '08:00 AM',
+          colorTag: isSatPrep ? 'tag-emerald' : 'tag-blue'
         });
       }
     });
@@ -4761,6 +4805,7 @@ function inferServiceDurationHours(serviceHint, callTimeStr, serviceEndStr) {
     return Math.round(((endMins - startMins) / 60) * 100) / 100;
   }
   const s = String(serviceHint || "").toLowerCase();
+  if (s.includes("saturday")) return SERVICE_DURATION_HOURS.saturdayPrep;
   if (s.includes("friday")) return SERVICE_DURATION_HOURS.fridayPrayer;
   if (s.includes("morning")) return SERVICE_DURATION_HOURS.morningPrayer;
   if (s.includes("special") || s.includes("🌟")) return SERVICE_DURATION_HOURS.specialMeetings;
