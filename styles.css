@@ -3652,17 +3652,23 @@ body {
 
   .week-actions-wrap {
     width: 100% !important;
-    display: flex !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 8px !important;
   }
 
   .week-actions-wrap .btn {
-    flex: 1 !important;
+    width: 100% !important;
     min-width: 0 !important;
     text-align: center !important;
     justify-content: center !important;
     padding: 8px 6px !important;
     font-size: 0.76rem !important;
+    white-space: nowrap !important;
+  }
+
+  .week-actions-wrap > button:nth-child(odd):last-child {
+    grid-column: 1 / -1 !important;
   }
 
   /* Checklists Mobile Touch Targets */
@@ -6906,7 +6912,7 @@ html.light-theme .btn-remember-switch {
     justify-content: center !important;
   }
 
-  .modal-actions-row > button:nth-child(3):last-child {
+  .modal-actions-row > button:nth-child(odd):last-child {
     grid-column: 1 / -1 !important;
   }
 }
@@ -6961,4 +6967,464 @@ html.light-theme .checklist-instruction-text {
 [data-theme="light"] .checklist-instruction-text strong,
 html.light-theme .checklist-instruction-text strong {
   color: #047857 !important;
+}
+
+/* ==========================================================================
+   V4.4 WORKFLOW, COVER BOARD, CHECKLIST ATTRIBUTION & PWA UPDATE STYLES
+   ========================================================================== */
+
+/* 1. PWA Update Ready Banner */
+.pwa-update-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.92) 0%, rgba(15, 23, 42, 0.98) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35), 0 0 18px rgba(16, 185, 129, 0.18);
+  animation: slideDown 0.3s ease-out;
+}
+
+.pwa-update-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  flex-shrink: 0;
+}
+
+/* 2. Checklist Actor Selector & Attribution Metadata */
+.checklist-actor-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.checklist-actor-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #cbd5e1;
+  white-space: nowrap;
+}
+
+.checklist-actor-select {
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
+  min-width: 170px;
+  max-width: 100%;
+  flex: 1 1 180px;
+  outline: none;
+}
+
+.checklist-actor-select:focus {
+  border-color: var(--border-focus);
+}
+
+.task-content-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.task-checked-meta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #34d399;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+/* 3. Open Shift Cover Requests Board */
+.cover-board-card {
+  background: linear-gradient(135deg, rgba(20, 30, 52, 0.92), rgba(13, 20, 36, 0.96));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35), 0 0 20px rgba(245, 158, 11, 0.08);
+}
+
+.cover-board-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.cover-board-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+.cover-board-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: #fbbf24;
+  line-height: 1.25;
+}
+
+.cover-board-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.cover-board-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cover-request-item {
+  background: rgba(11, 18, 32, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-left: 3px solid #f59e0b;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cover-request-item:has(.cover-status-claimed) {
+  border-left-color: #10b981;
+}
+
+.cover-req-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cover-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.cover-status-open {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.38);
+}
+
+.cover-status-absence {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.38);
+}
+
+.cover-status-claimed {
+  background: rgba(16, 185, 129, 0.16);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.38);
+}
+
+.cover-req-time {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.cover-req-summary {
+  font-size: 0.88rem;
+  color: #e2e8f0;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+.cover-highlight {
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+.cover-req-reason {
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 2px solid rgba(148, 163, 184, 0.45);
+  padding: 5px 9px;
+  border-radius: 0 6px 6px 0;
+  word-break: break-word;
+}
+
+.cover-req-claimed-note {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  padding: 6px 10px;
+  border-radius: 8px;
+  word-break: break-word;
+}
+
+.cover-req-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 2px;
+}
+
+.cover-req-actions .btn {
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.cover-claim-select {
+  background: var(--bg-input);
+  color: var(--text-main);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  height: 34px;
+  min-width: 150px;
+  max-width: 100%;
+  flex: 1 1 160px;
+  outline: none;
+}
+
+/* 4. Light Mode Overrides for V4.4 Components */
+[data-theme="light"] .pwa-update-card,
+html.light-theme .pwa-update-card {
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%) !important;
+  border: 1.5px solid #34d399 !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.14) !important;
+}
+
+[data-theme="light"] .pwa-update-icon,
+html.light-theme .pwa-update-icon {
+  background: #ffffff !important;
+  border-color: #6ee7b7 !important;
+}
+
+[data-theme="light"] .pwa-update-card .pwa-app-title,
+html.light-theme .pwa-update-card .pwa-app-title {
+  color: #065f46 !important;
+}
+
+[data-theme="light"] .pwa-update-card .pwa-app-sub,
+html.light-theme .pwa-update-card .pwa-app-sub {
+  color: #047857 !important;
+}
+
+[data-theme="light"] .checklist-actor-wrap,
+html.light-theme .checklist-actor-wrap {
+  background: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .checklist-actor-label,
+html.light-theme .checklist-actor-label {
+  color: #334155 !important;
+}
+
+[data-theme="light"] .checklist-actor-select,
+html.light-theme .checklist-actor-select,
+[data-theme="light"] .cover-claim-select,
+html.light-theme .cover-claim-select {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .task-checked-meta,
+html.light-theme .task-checked-meta {
+  color: #047857 !important;
+}
+
+[data-theme="light"] .cover-board-card,
+html.light-theme .cover-board-card {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+  border: 1.5px solid #fcd34d !important;
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.1) !important;
+}
+
+[data-theme="light"] .cover-board-icon,
+html.light-theme .cover-board-icon {
+  background: #ffffff !important;
+  border-color: #fbbf24 !important;
+}
+
+[data-theme="light"] .cover-board-title,
+html.light-theme .cover-board-title {
+  color: #92400e !important;
+}
+
+[data-theme="light"] .cover-board-sub,
+html.light-theme .cover-board-sub {
+  color: #78350f !important;
+}
+
+[data-theme="light"] .cover-request-item,
+html.light-theme .cover-request-item {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-left: 3.5px solid #d97706 !important;
+}
+
+[data-theme="light"] .cover-request-item:has(.cover-status-claimed),
+html.light-theme .cover-request-item:has(.cover-status-claimed) {
+  border-left-color: #059669 !important;
+}
+
+[data-theme="light"] .cover-status-open,
+html.light-theme .cover-status-open {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #fcd34d !important;
+}
+
+[data-theme="light"] .cover-status-absence,
+html.light-theme .cover-status-absence {
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+  border-color: #fca5a5 !important;
+}
+
+[data-theme="light"] .cover-status-claimed,
+html.light-theme .cover-status-claimed {
+  background: #dcfce7 !important;
+  color: #15803d !important;
+  border-color: #86efac !important;
+}
+
+[data-theme="light"] .cover-req-time,
+html.light-theme .cover-req-time {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .cover-req-summary,
+html.light-theme .cover-req-summary {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .cover-highlight,
+html.light-theme .cover-highlight {
+  color: #1d4ed8 !important;
+}
+
+[data-theme="light"] .cover-req-reason,
+html.light-theme .cover-req-reason {
+  color: #334155 !important;
+  background: #f8fafc !important;
+  border-left-color: #94a3b8 !important;
+}
+
+[data-theme="light"] .cover-req-claimed-note,
+html.light-theme .cover-req-claimed-note {
+  color: #047857 !important;
+  background: #ecfdf5 !important;
+  border-color: #6ee7b7 !important;
+}
+
+/* 5. Mobile Responsive V4.4 Layout */
+@media (max-width: 768px) {
+  .pwa-update-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .pwa-update-card .pwa-actions-wrap {
+    width: 100%;
+  }
+
+  .pwa-update-card .pwa-actions-wrap .btn {
+    width: 100% !important;
+    height: 38px !important;
+    padding: 6px 12px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
+  .checklist-actor-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .checklist-actor-select {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+  }
+
+  .cover-board-card {
+    padding: 12px 12px;
+  }
+
+  .cover-request-item {
+    padding: 10px 12px;
+  }
+
+  .cover-req-actions {
+    gap: 6px;
+  }
+
+  .cover-claim-select {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 38px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .cover-req-actions .btn {
+    height: 36px !important;
+    padding: 6px 10px !important;
+    font-size: 0.75rem !important;
+    white-space: nowrap !important;
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+  }
 }

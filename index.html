@@ -23,7 +23,7 @@
       } catch (e) { }
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=4.3">
+  <link rel="stylesheet" href="styles.css?v=4.4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -145,6 +145,22 @@
         </button>
         <button class="btn btn-secondary btn-sm" onclick="dismissPWABanner()" title="Dismiss">
           ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= PWA UPDATE AVAILABLE BANNER ================= -->
+    <div id="pwaUpdateBanner" class="pwa-install-card pwa-update-card" style="display: none;">
+      <div class="pwa-install-content">
+        <span class="pwa-update-icon">🆕</span>
+        <div class="pwa-text-wrap">
+          <strong class="pwa-app-title">Portal Update Ready</strong>
+          <span class="pwa-app-sub">A newer version is installed. Refresh to load the latest changes.</span>
+        </div>
+      </div>
+      <div class="pwa-actions-wrap">
+        <button type="button" class="btn btn-primary btn-sm" onclick="applyPwaUpdateNow()">
+          🔄 Tap to Refresh
         </button>
       </div>
     </div>
@@ -316,6 +332,11 @@
         <div id="volunteerPersonalBox" class="volunteer-personal-box" style="display: none;">
           <!-- Dynamically populated via app.js -->
         </div>
+      </div>
+
+      <!-- ================= LIVE OPEN SHIFT COVER REQUESTS BOARD ================= -->
+      <div id="openCoverBoardCard" class="card cover-board-card card-accent-amber" style="display: none;">
+        <!-- Dynamically populated via renderOpenCoverBoard() in app.js -->
       </div>
 
       <!-- 1st Service Table (Public / Team View) -->
@@ -578,6 +599,15 @@
             <!-- Dynamic active week pill rendered by app.js -->
           </div>
 
+          <div class="checklist-actor-wrap">
+            <label for="checklistActorSelect" class="checklist-actor-label">🙋 Checking as:</label>
+            <select id="checklistActorSelect" class="role-select checklist-actor-select"
+              onchange="onVolunteerFilterChange(this.value, false)"
+              title="Select your name so teammates see who completed each task">
+              <option value="">👤 Select Name...</option>
+            </select>
+          </div>
+
           <div class="week-actions-wrap">
             <button class="btn btn-secondary btn-sm" onclick="resetChecklists()"
               title="Reset all checkmarks for this week">
@@ -586,6 +616,10 @@
             <button class="btn btn-secondary btn-sm" onclick="markAllChecklistsDone()"
               title="Mark all tasks done for this week">
               ✅ Mark All Done
+            </button>
+            <button class="btn btn-whatsapp btn-sm" onclick="shareChecklistStatusWhatsApp()"
+              title="Share current Saturday preparation progress to WhatsApp">
+              📤 Share Status
             </button>
           </div>
         </div>
@@ -1572,6 +1606,8 @@
 
       <div class="modal-actions-row" style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="closeSwapRequestModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="postSwapRequestToPortal()"
+          title="Post this cover need directly to the Schedule page board">📌 Post to Board</button>
         <button class="btn btn-whatsapp" onclick="copySwapMessage()">📋 Copy</button>
         <button class="btn btn-whatsapp" style="background: linear-gradient(135deg, #0284c7, #0369a1);"
           onclick="sendSwapToLeaderWhatsApp()" title="Send directly to Leader Lokesh on WhatsApp">👤 Send to
@@ -1722,7 +1758,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=4.3"></script>
+  <script src="app.js?v=4.4"></script>
 </body>
 
 </html>

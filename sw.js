@@ -1,9 +1,9 @@
-const CACHE_NAME = 'flag-media-cache-v4.3';
+const CACHE_NAME = 'flag-media-cache-v4.4';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
-  'styles.css?v=4.3',
-  'app.js?v=4.3',
+  'styles.css?v=4.4',
+  'app.js?v=4.4',
   'data.js',
   'logo.png',
   'manifest.json'

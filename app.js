@@ -49,7 +49,7 @@ function syncOfficialCrewPhoneNumbers(state) {
   OFFICIAL_CREW_DIRECTORY.forEach(official => {
     let existing = state.members.find(m => isAliasMatch(m.name, official.name));
     if (existing) {
-      if (official.phone) existing.phone = official.phone;
+      if (official.phone && !existing.phone) existing.phone = official.phone;
       if (official.name !== existing.name && ["Shyam Davit", "Sam Davit", "Praveen", "Andross"].includes(existing.name)) {
         existing.name = official.name;
       }
@@ -177,20 +177,55 @@ const defaultState = {
       date: "01 Oct 2026",
       status: "Resolved"
     }
-  ]
+  ],
+  weeklyChecks: {},
+  weeklyCheckMeta: {},
+  swapRequests: [],
+  activeWeekDatePinned: false
 };
 
+const ADMIN_PIN_LOCAL_KEY = "FLAG_MEDIA_ADMIN_PIN";
 let appState = null;
 let isAdminLoggedIn = false;
 
+function getLocalAdminPin() {
+  try {
+    const stored = localStorage.getItem(ADMIN_PIN_LOCAL_KEY);
+    if (stored) return stored;
+  } catch (e) {}
+  return (appState && appState.adminPin) ? String(appState.adminPin) : "1234";
+}
+
+function setLocalAdminPin(pin) {
+  try {
+    localStorage.setItem(ADMIN_PIN_LOCAL_KEY, String(pin));
+  } catch (e) {}
+  if (appState && "adminPin" in appState) {
+    delete appState.adminPin;
+  }
+}
+
+function sanitizeCloudState(state) {
+  if (!state || typeof state !== "object") return state;
+  const copy = JSON.parse(JSON.stringify(state));
+  delete copy.adminPin;
+  return copy;
+}
+
 // ================= ADMIN CONSOLE CONTROLS & SECURITY =================
+function openAdminPinModal() {
+  const input = document.getElementById("adminPinInput");
+  const modal = document.getElementById("adminPinModal");
+  if (input) input.value = "";
+  if (modal) modal.classList.add("show");
+  if (input) setTimeout(() => input.focus(), 100);
+}
+
 function handleAdminNavClick(btn) {
   if (isAdminLoggedIn) {
     switchView("adminView", btn);
   } else {
-    document.getElementById("adminPinInput").value = "";
-    document.getElementById("adminPinModal").classList.add("show");
-    setTimeout(() => document.getElementById("adminPinInput").focus(), 100);
+    openAdminPinModal();
   }
 }
 
@@ -200,7 +235,7 @@ function closeAdminPinModal() {
 
 function unlockAdminWithPin() {
   const pinEntered = document.getElementById("adminPinInput").value.trim();
-  const currentPin = appState.adminPin || "1234";
+  const currentPin = getLocalAdminPin();
 
   if (pinEntered === currentPin) {
     isAdminLoggedIn = true;
@@ -209,6 +244,15 @@ function unlockAdminWithPin() {
 
     const adminBtn = document.getElementById("adminNavBtn");
     switchView("adminView", adminBtn);
+
+    if (window.postLoginRedirectTab) {
+      const targetTab = window.postLoginRedirectTab;
+      window.postLoginRedirectTab = null;
+      const tabBtn = document.querySelector(`.admin-pill-btn[onclick*="${targetTab}"]`);
+      switchAdminTab(targetTab, tabBtn);
+    }
+
+    renderOpenCoverBoard();
     showToast("👑 Admin Console Unlocked! Welcome Lokesh.");
   } else {
     alert("Incorrect Admin PIN. Please try again.");
@@ -219,6 +263,7 @@ function unlockAdminWithPin() {
 function lockAdminConsole() {
   isAdminLoggedIn = false;
   updateAdminNavUI();
+  renderOpenCoverBoard();
   const scheduleBtn = document.querySelector(".nav-links .nav-btn:first-child");
   switchView("scheduleView", scheduleBtn);
   showToast("🔒 Admin Console Locked.");
@@ -266,7 +311,7 @@ function closeChangePinModal() {
 function saveNewAdminPin() {
   const oldPin = document.getElementById("oldPinInput").value.trim();
   const newPin = document.getElementById("newPinInput").value.trim();
-  const currentPin = appState.adminPin || "1234";
+  const currentPin = getLocalAdminPin();
 
   if (oldPin !== currentPin) {
     alert("Current PIN does not match. Cannot change PIN.");
@@ -277,10 +322,10 @@ function saveNewAdminPin() {
     return;
   }
 
-  appState.adminPin = newPin;
-  saveState();
+  setLocalAdminPin(newPin);
+  saveState(true);
   closeChangePinModal();
-  showToast("Admin PIN updated successfully!");
+  showToast("Admin PIN updated securely on this device!");
 }
 
 // Helper: Calculate all dates for a given day of the week in a month
@@ -393,23 +438,42 @@ function ensureStateIntegrity(state) {
   if (!state.morningPrayer) {
     state.morningPrayer = { enabled: false, title: "21 Days Early Morning Prayer", days: [] };
   }
+  if (!state.weeklyChecks || typeof state.weeklyChecks !== "object") {
+    state.weeklyChecks = {};
+  }
+  if (!state.weeklyCheckMeta || typeof state.weeklyCheckMeta !== "object") {
+    state.weeklyCheckMeta = {};
+  }
+  if (!state.swapRequests || !Array.isArray(state.swapRequests)) {
+    state.swapRequests = [];
+  }
+  if ("adminPin" in state && state.adminPin) {
+    try {
+      if (!localStorage.getItem(ADMIN_PIN_LOCAL_KEY)) {
+        localStorage.setItem(ADMIN_PIN_LOCAL_KEY, String(state.adminPin));
+      }
+    } catch (e) {}
+    delete state.adminPin;
+  }
   const legacyChecklistIds = new Set(["cam-clean", "sys-clean", "eq-charge", "mic-battery", "live-procedure", "cam-cleaning", "sys-cleaning", "eq-charging", "mic-batteries"]);
   const hasLegacyChecklists = Array.isArray(state.checklists) && state.checklists.some(c => legacyChecklistIds.has(c.id));
   if (!state.checklists || !Array.isArray(state.checklists) || !state.checklistTemplateVersion || state.checklistTemplateVersion < 2 || hasLegacyChecklists) {
     state.checklists = JSON.parse(JSON.stringify(defaultState.checklists || []));
     state.checklistTemplateVersion = 3;
-    if (state.weeklyChecks && typeof state.weeklyChecks === "object") {
-      const validIds = new Set();
-      state.checklists.forEach(cl => (cl.items || []).forEach(item => validIds.add(item.id)));
-      Object.keys(state.weeklyChecks).forEach(wk => {
-        const wkMap = state.weeklyChecks[wk];
-        if (wkMap && typeof wkMap === "object") {
-          Object.keys(wkMap).forEach(itemId => {
-            if (!validIds.has(itemId)) delete wkMap[itemId];
-          });
-        }
-      });
-    }
+    const validIds = new Set();
+    state.checklists.forEach(cl => (cl.items || []).forEach(item => validIds.add(item.id)));
+    [state.weeklyChecks, state.weeklyCheckMeta].forEach(mapRoot => {
+      if (mapRoot && typeof mapRoot === "object") {
+        Object.keys(mapRoot).forEach(wk => {
+          const wkMap = mapRoot[wk];
+          if (wkMap && typeof wkMap === "object") {
+            Object.keys(wkMap).forEach(itemId => {
+              if (!validIds.has(itemId)) delete wkMap[itemId];
+            });
+          }
+        });
+      }
+    });
   } else if (state.checklistTemplateVersion !== 3) {
     state.checklists.forEach(cl => {
       if (cl && typeof cl === "object") {
@@ -567,10 +631,13 @@ function loadState() {
     syncOfficialCrewPhoneNumbers(appState);
   }
 
-  saveState();
+  saveState(true);
 }
 
-function saveState(skipCloud = false) {
+/**
+ * Persists appState locally and syncs either a granular Firebase patch or full sanitized state.
+ */
+function saveState(skipCloud = false, cloudPatch = null) {
   // Sync active schedule back to archive
   const currentKey = `${appState.selectedYear}-${appState.selectedMonth}`;
   if (!appState.schedules) appState.schedules = {};
@@ -587,7 +654,11 @@ function saveState(skipCloud = false) {
   updateBadges();
 
   if (!skipCloud) {
-    saveToCloud(appState);
+    if (cloudPatch && typeof cloudPatch === "object" && Object.keys(cloudPatch).length > 0) {
+      saveToCloud(cloudPatch, true);
+    } else {
+      saveToCloud(appState, false);
+    }
   }
 }
 
@@ -1137,6 +1208,7 @@ function renderAll() {
 
   // Render both public view and admin dropdowns
   renderPublicSchedule();
+  renderOpenCoverBoard();
   render1stService();
   render2ndService();
   render3rdService();
@@ -2297,6 +2369,13 @@ function getServiceWeeks() {
 
 function getActiveWeekDate() {
   const weeks = getServiceWeeks();
+  if (appState.activeWeekDatePinned && appState.activeWeekDate && weeks.some(w => w.date === appState.activeWeekDate)) {
+    return appState.activeWeekDate;
+  }
+  const upcoming = (typeof getNextUpcomingSundayDate === "function") ? getNextUpcomingSundayDate() : "";
+  if (upcoming && weeks.some(w => w.date === upcoming)) {
+    return upcoming;
+  }
   if (appState.activeWeekDate && weeks.some(w => w.date === appState.activeWeekDate)) {
     return appState.activeWeekDate;
   }
@@ -2321,12 +2400,13 @@ function setAdminActiveWeek(date) {
     if (sel) date = sel.value;
   }
   if (!date) return;
-  setActiveWeekDate(date);
+  setActiveWeekDate(date, true);
 }
 
-function setActiveWeekDate(date) {
+function setActiveWeekDate(date, isManual = false) {
   appState.activeWeekDate = date;
   appState.selectedChecklistWeek = date;
+  appState.activeWeekDatePinned = !!isManual;
 
   if (!appState.weeklyChecks) appState.weeklyChecks = {};
   if (!appState.weeklyChecks[date]) {
@@ -2344,7 +2424,11 @@ function setActiveWeekDate(date) {
     });
   }
 
-  saveState();
+  saveState(false, {
+    activeWeekDate: date,
+    selectedChecklistWeek: date,
+    activeWeekDatePinned: appState.activeWeekDatePinned
+  });
   renderChecklists();
   updateBadges();
 
@@ -2370,11 +2454,65 @@ function setChecklistStatusFilter(filter, btnEl) {
   renderChecklists();
 }
 
-function toggleCategoryChecklistDone(clId) {
-  const viewDate = currentViewingWeekDate();
+function getActiveChecklistActor() {
+  let saved = window.currentVolunteerFilter || "";
+  if (!saved) {
+    try { saved = localStorage.getItem("FLAG_SAVED_VOLUNTEER_NAME") || ""; } catch (e) {}
+  }
+  if (saved) return saved;
+  return isAdminLoggedIn ? "Lokesh (Admin)" : "Media Team";
+}
+
+function formatChecklistTimestamp() {
+  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+/**
+ * Updates checklist item statuses and who/when attribution for a service week,
+ * pushing only changed leaf keys to Firebase RTDB.
+ */
+function applyChecklistItemStates(viewDate, itemStatusMap) {
   if (!appState.weeklyChecks) appState.weeklyChecks = {};
   if (!appState.weeklyChecks[viewDate]) appState.weeklyChecks[viewDate] = {};
-  const checks = appState.weeklyChecks[viewDate];
+  if (!appState.weeklyCheckMeta) appState.weeklyCheckMeta = {};
+  if (!appState.weeklyCheckMeta[viewDate]) appState.weeklyCheckMeta[viewDate] = {};
+
+  const actor = getActiveChecklistActor();
+  const timeStr = formatChecklistTimestamp();
+  const isActiveWeek = viewDate === getActiveWeekDate();
+  const cloudPatch = {};
+
+  Object.keys(itemStatusMap).forEach(itemId => {
+    const isDone = !!itemStatusMap[itemId];
+    if (isDone) {
+      const meta = { by: actor, at: timeStr };
+      appState.weeklyChecks[viewDate][itemId] = true;
+      appState.weeklyCheckMeta[viewDate][itemId] = meta;
+      cloudPatch[`weeklyChecks/${viewDate}/${itemId}`] = true;
+      cloudPatch[`weeklyCheckMeta/${viewDate}/${itemId}`] = meta;
+    } else {
+      delete appState.weeklyChecks[viewDate][itemId];
+      delete appState.weeklyCheckMeta[viewDate][itemId];
+      cloudPatch[`weeklyChecks/${viewDate}/${itemId}`] = null;
+      cloudPatch[`weeklyCheckMeta/${viewDate}/${itemId}`] = null;
+    }
+
+    if (isActiveWeek && appState.checklists) {
+      appState.checklists.forEach(cl => {
+        const item = (cl.items || []).find(i => i.id === itemId);
+        if (item) item.done = isDone;
+      });
+    }
+  });
+
+  saveState(false, cloudPatch);
+  renderChecklists();
+  updateBadges();
+}
+
+function toggleCategoryChecklistDone(clId) {
+  const viewDate = currentViewingWeekDate();
+  const checks = (appState.weeklyChecks && appState.weeklyChecks[viewDate]) || {};
 
   const cl = (appState.checklists || []).find(c => c.id === clId);
   if (!cl || !cl.items || cl.items.length === 0) return;
@@ -2382,16 +2520,9 @@ function toggleCategoryChecklistDone(clId) {
   const allCurrentlyDone = cl.items.every(i => !!checks[i.id]);
   const newStatus = !allCurrentlyDone;
 
-  cl.items.forEach(i => {
-    checks[i.id] = newStatus;
-    if (viewDate === getActiveWeekDate()) {
-      i.done = newStatus;
-    }
-  });
-
-  saveState();
-  renderChecklists();
-  updateBadges();
+  const itemStatusMap = {};
+  cl.items.forEach(i => { itemStatusMap[i.id] = newStatus; });
+  applyChecklistItemStates(viewDate, itemStatusMap);
 
   const cleanTitle = cl.title.replace(/^\d+\.\s*/, '');
   if (newStatus) {
@@ -2420,6 +2551,7 @@ function renderChecklists() {
 
   // 1. Calculate stats for the active week
   const checks = (appState.weeklyChecks && appState.weeklyChecks[activeDate]) || {};
+  const checkMeta = (appState.weeklyCheckMeta && appState.weeklyCheckMeta[activeDate]) || {};
   let totalTasks = 0;
   let doneTasks = 0;
   if (appState.checklists) {
@@ -2571,11 +2703,19 @@ function renderChecklists() {
         if (filterMode === "done" && !isDone) return;
         visibleItemCount++;
 
+        const meta = checkMeta[item.id];
+        const metaBadgeHtml = (isDone && meta && meta.by)
+          ? `<span class="task-checked-meta">✓ Checked by <strong>${escapeHtml(meta.by)}</strong>${meta.at ? ` • ${escapeHtml(meta.at)}` : ''}</span>`
+          : '';
+
         taskHtml += `
           <div class="task-row ${isDone ? 'checked' : ''}">
             <div class="task-main" onclick="toggleCheckItem('${cl.id}', '${item.id}')">
               <input type="checkbox" ${isDone ? 'checked' : ''} onclick="event.stopPropagation(); toggleCheckItem('${cl.id}', '${item.id}')">
-              <span class="task-text">${item.text}</span>
+              <div class="task-content-wrap">
+                <span class="task-text">${escapeHtml(item.text)}</span>
+                ${metaBadgeHtml}
+              </div>
             </div>
             ${isAdmin ? `<button class="task-del-btn" onclick="deleteChecklistItem('${cl.id}', '${item.id}')" title="Delete this task">&times;</button>` : ''}
           </div>
@@ -2651,27 +2791,11 @@ function renderChecklists() {
 
 function toggleCheckItem(clId, itemId) {
   const viewDate = currentViewingWeekDate();
-  if (!appState.weeklyChecks) appState.weeklyChecks = {};
-  if (!appState.weeklyChecks[viewDate]) appState.weeklyChecks[viewDate] = {};
+  const checks = (appState.weeklyChecks && appState.weeklyChecks[viewDate]) || {};
+  const nextStatus = !checks[itemId];
 
-  const currentStatus = !!appState.weeklyChecks[viewDate][itemId];
-  appState.weeklyChecks[viewDate][itemId] = !currentStatus;
-
-  // Also sync item.done if viewing active week for backward compatibility
-  if (viewDate === getActiveWeekDate() && appState.checklists) {
-    const cl = appState.checklists.find(c => c.id === clId);
-    if (cl && cl.items) {
-      const item = cl.items.find(i => i.id === itemId);
-      if (item) item.done = appState.weeklyChecks[viewDate][itemId];
-    }
-  }
-
-  saveState();
-  renderChecklists();
-  updateBadges();
-
-  const isDone = appState.weeklyChecks[viewDate][itemId];
-  showToast(isDone ? "✅ Task marked complete & synced live to all crew!" : "⏳ Task marked pending & synced live!");
+  applyChecklistItemStates(viewDate, { [itemId]: nextStatus });
+  showToast(nextStatus ? "✅ Task marked complete & synced live to all crew!" : "⏳ Task marked pending & synced live!");
 }
 
 function resetChecklists() {
@@ -2682,7 +2806,9 @@ function resetChecklists() {
 
   if (confirm(`Reset all checklist items for ${wName}?\n\nAll tasks will be unchecked freshly.`)) {
     if (!appState.weeklyChecks) appState.weeklyChecks = {};
+    if (!appState.weeklyCheckMeta) appState.weeklyCheckMeta = {};
     appState.weeklyChecks[viewDate] = {};
+    appState.weeklyCheckMeta[viewDate] = {};
 
     if (viewDate === getActiveWeekDate() && appState.checklists) {
       appState.checklists.forEach(cl => {
@@ -2692,7 +2818,10 @@ function resetChecklists() {
       });
     }
 
-    saveState();
+    saveState(false, {
+      [`weeklyChecks/${viewDate}`]: null,
+      [`weeklyCheckMeta/${viewDate}`]: null
+    });
     renderChecklists();
     updateBadges();
     showToast(`Checklist reset to fresh for ${wName}.`);
@@ -2705,26 +2834,56 @@ function markAllChecklistsDone() {
   const wObj = weeks.find(w => w.date === viewDate);
   const wName = wObj ? wObj.label : viewDate;
 
-  if (!appState.weeklyChecks) appState.weeklyChecks = {};
-  if (!appState.weeklyChecks[viewDate]) appState.weeklyChecks[viewDate] = {};
+  const itemStatusMap = {};
+  (appState.checklists || []).forEach(cl => {
+    (cl.items || []).forEach(i => { itemStatusMap[i.id] = true; });
+  });
 
-  if (appState.checklists) {
-    appState.checklists.forEach(cl => {
-      if (cl.items) {
-        cl.items.forEach(i => {
-          appState.weeklyChecks[viewDate][i.id] = true;
-          if (viewDate === getActiveWeekDate()) {
-            i.done = true;
-          }
-        });
-      }
-    });
-  }
-
-  saveState();
-  renderChecklists();
-  updateBadges();
+  applyChecklistItemStates(viewDate, itemStatusMap);
   showToast(`All items marked done for ${wName}!`);
+}
+
+/**
+ * Generates a formatted Saturday Preparation progress report and opens WhatsApp share.
+ */
+function shareChecklistStatusWhatsApp() {
+  const activeDate = getActiveWeekDate();
+  const weeks = getServiceWeeks();
+  const wObj = weeks.find(w => w.date === activeDate) || { label: activeDate };
+  const checks = (appState.weeklyChecks && appState.weeklyChecks[activeDate]) || {};
+  const meta = (appState.weeklyCheckMeta && appState.weeklyCheckMeta[activeDate]) || {};
+
+  let total = 0;
+  let done = 0;
+  const sectionsText = (appState.checklists || []).map(cl => {
+    const items = cl.items || [];
+    const catDone = items.filter(i => !!checks[i.id]).length;
+    total += items.length;
+    done += catDone;
+    const icon = (items.length > 0 && catDone === items.length) ? "✅" : "⏳";
+    const pendingList = items.filter(i => !checks[i.id]).map(i => `   • Pending: ${i.text}`);
+    const lastBy = items.map(i => meta[i.id]?.by).filter(Boolean).pop();
+    const headerLine = `${icon} *${cl.title}* (${catDone}/${items.length})${lastBy ? ` — _by ${lastBy}_` : ''}`;
+    return pendingList.length ? `${headerLine}\n${pendingList.join("\n")}` : headerLine;
+  }).join("\n\n");
+
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const statusBanner = done === total && total > 0
+    ? "🎉 *ALL SATURDAY PREP TASKS COMPLETED — READY FOR SUNDAY!*"
+    : `📊 *Progress:* ${done} / ${total} Tasks Completed (${pct}%)`;
+
+  const msg = `*🕊️ FLAG MEDIA TEAM — SATURDAY PREP REPORT*\n` +
+    `📅 *Service Week:* ${wObj.label}\n` +
+    `${statusBanner}\n━━━━━━━━━━━━━━━━━━━━━\n\n` +
+    `${sectionsText}\n\n━━━━━━━━━━━━━━━━━━━━━\n` +
+    `_Updated via FLAG Media Portal_ 🙌`;
+
+  navigator.clipboard.writeText(msg).then(() => {
+    showToast("📋 Checklist report copied! Opening WhatsApp...");
+  }).catch(() => {
+    copyFallback(msg);
+  });
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
 function updateBadges() {
@@ -3096,7 +3255,7 @@ Shalom Media Team! 👋
 • 🎯 Gimble: *${s1.gimble || '-'}*
 • 💻 Live in System: *${s1.live || '-'}*
 • ✂️ Spot Editing: *${s1.spot || '-'}*
-• 🔋 Camera & Battery Charging: *${s1.charging || 'Yashwanth & Sam Davit'}*
+• 🔋 Camera & Battery Charging: *${s1.charging || 'Yashwanth & Sam Joshua'}*
 
 *🎬 2ND SERVICE (08:00 AM Call | Starts 08:30 AM):*
 • 🎥 Cam & Live Operator: *${s2.operator || '-'}*
@@ -3278,6 +3437,7 @@ function getVolunteerDuties(name) {
           date: r.date,
           service: '1st Service (06:00 AM – 08:00 AM)',
           serviceShort: '1st Service',
+          serviceType: 'firstService',
           role: rm.label,
           rawRole: rm.key,
           assignedText: r[rm.key],
@@ -3298,6 +3458,7 @@ function getVolunteerDuties(name) {
         date: r.date,
         service: '2nd Service (08:30 AM – 10:30 AM)',
         serviceShort: '2nd Service',
+        serviceType: 'secondService',
         role: '🎥 Camera & Live System',
         rawRole: 'operator',
         assignedText: r.operator,
@@ -3317,6 +3478,7 @@ function getVolunteerDuties(name) {
         date: r.date,
         service: '3rd Service (11:00 AM – 01:00 PM)',
         serviceShort: '3rd Service',
+        serviceType: 'thirdService',
         role: '🎥 Camera & Live System',
         rawRole: 'operator',
         assignedText: r.operator,
@@ -3336,6 +3498,7 @@ function getVolunteerDuties(name) {
         date: r.date,
         service: 'Friday Fasting Prayer',
         serviceShort: 'Friday Prayer',
+        serviceType: 'fridayPrayer',
         role: '🎥 Camera Operator',
         rawRole: 'cam1',
         assignedText: r.cam1,
@@ -3351,6 +3514,7 @@ function getVolunteerDuties(name) {
         date: r.date,
         service: 'Friday Fasting Prayer',
         serviceShort: 'Friday Prayer',
+        serviceType: 'fridayPrayer',
         role: '💻 Live System',
         rawRole: 'live',
         assignedText: r.live,
@@ -3378,6 +3542,7 @@ function getVolunteerDuties(name) {
           date: r.date,
           service: `🌟 ${r.title || 'Special Meeting'}`,
           serviceShort: r.title || 'Special Meeting',
+          serviceType: 'specialMeetings',
           role: rm.label,
           rawRole: rm.key,
           assignedText: r[rm.key],
@@ -3407,6 +3572,7 @@ function getVolunteerDuties(name) {
             date: r.day,
             service: `🌅 ${appState.morningPrayer.title || 'Morning Prayer'}`,
             serviceShort: 'Morning Prayer',
+            serviceType: 'morningPrayer',
             role: rm.label,
             rawRole: rm.key,
             assignedText: r[rm.key],
@@ -3429,18 +3595,23 @@ window.currentVolunteerFilter = "";
 
 function initVolunteerFilter() {
   const select = document.getElementById("volunteerFilterSelect");
-  if (!select) return;
-  const currentVal = window.currentVolunteerFilter || select.value || "";
+  const actorSelect = document.getElementById("checklistActorSelect");
+  if (!select && !actorSelect) return;
 
-  // Get sorted unique member names
+  const currentVal = window.currentVolunteerFilter || (select ? select.value : "") || (actorSelect ? actorSelect.value : "") || "";
   const memberNames = (appState.members || []).map(m => m.name).sort((a, b) => a.localeCompare(b));
-  
-  let html = `<option value="">👤 Select Your Name...</option>`;
-  memberNames.forEach(m => {
-    const isSel = (m === currentVal) ? "selected" : "";
-    html += `<option value="${escapeHtml(m)}" ${isSel}>${escapeHtml(m)}</option>`;
-  });
-  select.innerHTML = html;
+
+  const buildOptions = (placeholder) => {
+    let html = `<option value="">${placeholder}</option>`;
+    memberNames.forEach(m => {
+      const isSel = (m === currentVal) ? "selected" : "";
+      html += `<option value="${escapeHtml(m)}" ${isSel}>${escapeHtml(m)}</option>`;
+    });
+    return html;
+  };
+
+  if (select) select.innerHTML = buildOptions("👤 Select Your Name...");
+  if (actorSelect) actorSelect.innerHTML = buildOptions("👤 Select Name...");
 }
 
 function onVolunteerFilterChange(name, shouldScroll = true) {
@@ -3454,10 +3625,12 @@ function onVolunteerFilterChange(name, shouldScroll = true) {
   } catch (e) {}
 
   const clearBtn = document.getElementById("clearVolunteerFilterBtn");
-  const select = document.getElementById("volunteerFilterSelect");
-  if (select && select.value !== window.currentVolunteerFilter) {
-    select.value = window.currentVolunteerFilter;
-  }
+  ["volunteerFilterSelect", "checklistActorSelect"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.value !== window.currentVolunteerFilter) {
+      el.value = window.currentVolunteerFilter;
+    }
+  });
 
   const box = document.getElementById("volunteerPersonalBox");
 
@@ -3468,6 +3641,7 @@ function onVolunteerFilterChange(name, shouldScroll = true) {
       box.innerHTML = "";
     }
     renderPublicSchedule();
+    renderOpenCoverBoard();
     return;
   }
 
@@ -3475,6 +3649,7 @@ function onVolunteerFilterChange(name, shouldScroll = true) {
   const duties = getVolunteerDuties(window.currentVolunteerFilter);
   renderVolunteerPersonalBox(window.currentVolunteerFilter, duties);
   renderPublicSchedule();
+  renderOpenCoverBoard();
 
   if (shouldScroll && box) {
     box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -4000,6 +4175,266 @@ function sendSwapToLeaderWhatsApp() {
   window.open(`https://wa.me/917010368793?text=${encoded}`, '_blank');
 }
 
+/**
+ * Posts the active Swap / Cover request to the portal's live Open Cover Board
+ * and syncs only `swapRequests` to Firebase RTDB.
+ */
+function postSwapRequestToPortal() {
+  const volunteer = (currentSwapVolunteer || "").trim();
+  if (!volunteer) {
+    alert("Please select your volunteer name first.");
+    return;
+  }
+
+  const duties = getVolunteerDuties(volunteer);
+  const select = document.getElementById("swapDutySelect");
+  const selectedIdx = select ? parseInt(select.value, 10) : 0;
+  const duty = (!isNaN(selectedIdx) && duties[selectedIdx]) ? duties[selectedIdx] : null;
+
+  const typeSelect = document.getElementById("swapTypeSelect");
+  const reqType = typeSelect ? typeSelect.value : "swap";
+  const isAbsence = reqType === "absence";
+
+  const reasonInput = document.getElementById("swapReasonInput");
+  const reason = (reasonInput && reasonInput.value.trim())
+    ? reasonInput.value.trim()
+    : (isAbsence ? "Emergency / unable to attend" : "Schedule clash / need shift cover");
+
+  const repInput = document.getElementById("swapReplacementInput");
+  const replacement = repInput ? repInput.value.trim() : "";
+
+  const newReq = {
+    id: "sw-" + Date.now(),
+    volunteer,
+    type: reqType,
+    date: duty ? duty.date : (appState.month || "Upcoming"),
+    service: duty ? duty.service : "Media Team Duty",
+    serviceShort: duty ? duty.serviceShort : "General Duty",
+    serviceType: duty ? (duty.serviceType || "") : "",
+    rawRole: duty ? (duty.rawRole || "") : "",
+    roleLabel: duty ? duty.role : "Any Media Role",
+    callTime: duty ? (duty.callTime || "") : "",
+    reason,
+    status: replacement ? "claimed" : "open",
+    coveredBy: replacement,
+    createdAt: formatChecklistTimestamp(),
+    claimedAt: replacement ? formatChecklistTimestamp() : ""
+  };
+
+  if (!Array.isArray(appState.swapRequests)) appState.swapRequests = [];
+  appState.swapRequests.unshift(newReq);
+  if (appState.swapRequests.length > 25) {
+    appState.swapRequests = appState.swapRequests.slice(0, 25);
+  }
+
+  saveState(false, { swapRequests: appState.swapRequests });
+  renderOpenCoverBoard();
+  closeSwapRequestModal();
+  showToast(replacement
+    ? `📌 Posted cover notice (${replacement} covering) & synced live!`
+    : `📌 Posted to Open Cover Board! Team can claim it live.`);
+}
+
+function replaceVolunteerInSlot(slotValue, oldName, newName) {
+  if (!slotValue) return newName;
+  const parts = String(slotValue).split(/\s*&\s*/).map(p => p.trim()).filter(Boolean);
+  let replaced = false;
+  const updated = parts.map(p => {
+    if (!replaced && isAliasMatch(p, oldName)) {
+      replaced = true;
+      return newName;
+    }
+    return p;
+  });
+  return replaced ? updated.join(" & ") : newName;
+}
+
+function claimCoverRequest(reqId) {
+  const req = (appState.swapRequests || []).find(r => r.id === reqId);
+  if (!req) return;
+
+  const sel = document.getElementById(`claimSelect_${reqId}`);
+  let claimer = (sel && sel.value) ? sel.value.trim() : (window.currentVolunteerFilter || "").trim();
+  if (!claimer) {
+    showToast("👤 Please pick your name in the Cover dropdown first.");
+    if (sel) sel.focus();
+    return;
+  }
+  if (isAliasMatch(claimer, req.volunteer)) {
+    showToast("⚠️ Please choose a teammate to cover this shift.");
+    return;
+  }
+
+  req.status = "claimed";
+  req.coveredBy = claimer;
+  req.claimedAt = formatChecklistTimestamp();
+
+  saveState(false, { swapRequests: appState.swapRequests });
+  renderOpenCoverBoard();
+  showToast(`🤝 Thank you ${claimer}! Marked as covering ${req.volunteer}'s shift.`);
+}
+
+function notifyLeaderClaimWhatsApp(reqId) {
+  const req = (appState.swapRequests || []).find(r => r.id === reqId);
+  if (!req) return;
+
+  const msg = `*✅ FLAG MEDIA — COVER CONFIRMED*\n━━━━━━━━━━━━━━━━━━━━━\n` +
+    `📅 *Date:* ${req.date}\n` +
+    `⛪ *Service:* ${req.service}\n` +
+    `🎬 *Role:* ${req.roleLabel}\n` +
+    `👤 *Original Volunteer:* ${req.volunteer}\n` +
+    `🤝 *Covered By:* *${req.coveredBy || 'Volunteer'}*\n\n` +
+    `Please confirm and apply this cover to the active schedule roster. 🙌`;
+
+  window.open(`https://wa.me/917010368793?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+function applyCoverRequestToRoster(reqId) {
+  if (!isAdminLoggedIn) {
+    openAdminPinModal();
+    return;
+  }
+  const req = (appState.swapRequests || []).find(r => r.id === reqId);
+  if (!req || !req.coveredBy || !req.serviceType || !req.rawRole) {
+    showToast("⚠️ This general request cannot be auto-applied. Update manually in Admin.");
+    return;
+  }
+
+  let updated = false;
+  if (req.serviceType === "morningPrayer" && appState.morningPrayer && Array.isArray(appState.morningPrayer.days)) {
+    const dayRow = appState.morningPrayer.days.find(d => d.day === req.date);
+    if (dayRow && req.rawRole in dayRow) {
+      dayRow[req.rawRole] = replaceVolunteerInSlot(dayRow[req.rawRole], req.volunteer, req.coveredBy);
+      updated = true;
+    }
+  } else if (Array.isArray(appState[req.serviceType])) {
+    const row = appState[req.serviceType].find(r => r.date === req.date);
+    if (row && req.rawRole in row) {
+      row[req.rawRole] = replaceVolunteerInSlot(row[req.rawRole], req.volunteer, req.coveredBy);
+      updated = true;
+    }
+  }
+
+  if (!updated) {
+    showToast("⚠️ Shift row not found in active month. Please update manually in Admin.");
+    return;
+  }
+
+  appState.swapRequests = (appState.swapRequests || []).filter(r => r.id !== reqId);
+  saveState();
+  renderAll();
+  showToast(`✅ Applied cover: ${req.coveredBy} replaced ${req.volunteer} (${req.serviceShort} on ${req.date})!`);
+}
+
+function dismissCoverRequest(reqId) {
+  appState.swapRequests = (appState.swapRequests || []).filter(r => r.id !== reqId);
+  saveState(false, { swapRequests: appState.swapRequests });
+  renderOpenCoverBoard();
+  showToast("🗑️ Cover request removed from board.");
+}
+
+/**
+ * Renders the live Open Shift Cover Board above the schedule when open/claimed requests exist.
+ */
+function renderOpenCoverBoard() {
+  const card = document.getElementById("openCoverBoardCard");
+  if (!card) return;
+
+  const activeReqs = (appState.swapRequests || []).filter(r => r && (r.status === "open" || r.status === "claimed"));
+  if (activeReqs.length === 0) {
+    card.style.display = "none";
+    card.innerHTML = "";
+    return;
+  }
+
+  const openCount = activeReqs.filter(r => r.status === "open").length;
+  const memberNames = (appState.members || []).map(m => m.name).sort((a, b) => a.localeCompare(b));
+
+  const itemsHtml = activeReqs.map(req => {
+    const isClaimed = req.status === "claimed";
+    const isAbsence = req.type === "absence";
+    const badgeClass = isClaimed ? "cover-status-claimed" : (isAbsence ? "cover-status-absence" : "cover-status-open");
+    const badgeLabel = isClaimed
+      ? `🟢 COVERED BY ${escapeHtml(req.coveredBy)}`
+      : (isAbsence ? "🔴 ABSENCE REPORTED" : "🟠 NEEDS COVER");
+
+    const canManage = isAdminLoggedIn || isAliasMatch(req.volunteer, window.currentVolunteerFilter);
+
+    let actionArea = "";
+    if (!isClaimed) {
+      const optionsHtml = [`<option value="">Pick your name...</option>`]
+        .concat(
+          memberNames
+            .filter(m => !isAliasMatch(m, req.volunteer))
+            .map(m => {
+              const sel = (window.currentVolunteerFilter && isAliasMatch(m, window.currentVolunteerFilter)) ? "selected" : "";
+              return `<option value="${escapeHtml(m)}" ${sel}>${escapeHtml(m)}</option>`;
+            })
+        ).join("");
+
+      actionArea = `
+        <div class="cover-req-actions">
+          <select id="claimSelect_${escapeHtml(req.id)}" class="role-select cover-claim-select" title="Select your name to cover this shift">
+            ${optionsHtml}
+          </select>
+          <button type="button" class="btn btn-primary btn-sm" onclick="claimCoverRequest('${escapeQuotes(req.id)}')">
+            🙋 I Can Cover
+          </button>
+          ${canManage ? `<button type="button" class="btn btn-secondary btn-sm" onclick="dismissCoverRequest('${escapeQuotes(req.id)}')" title="Cancel this request">✕ Cancel</button>` : ''}
+        </div>
+      `;
+    } else {
+      const canAutoApply = isAdminLoggedIn && req.serviceType && req.rawRole;
+      actionArea = `
+        <div class="cover-req-actions">
+          <button type="button" class="btn btn-whatsapp btn-sm" onclick="notifyLeaderClaimWhatsApp('${escapeQuotes(req.id)}')" title="Send confirmation to Leader Lokesh">
+            💬 Notify Leader
+          </button>
+          ${canAutoApply ? `<button type="button" class="btn btn-primary btn-sm" onclick="applyCoverRequestToRoster('${escapeQuotes(req.id)}')" title="Replace ${escapeQuotes(req.volunteer)} with ${escapeQuotes(req.coveredBy)} in the active roster">✅ Apply to Roster</button>` : ''}
+          ${canManage ? `<button type="button" class="btn btn-secondary btn-sm" onclick="dismissCoverRequest('${escapeQuotes(req.id)}')" title="Remove resolved notice">🗑️ Dismiss</button>` : ''}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="cover-request-item ${isClaimed ? 'is-claimed' : ''}">
+        <div class="cover-req-top">
+          <span class="cover-status-pill ${badgeClass}">${badgeLabel}</span>
+          <span class="cover-req-time">Posted ${escapeHtml(req.createdAt || 'Recently')}</span>
+        </div>
+        <div class="cover-req-summary">
+          <strong>${escapeHtml(req.volunteer)}</strong> needs cover for
+          <span class="cover-highlight">${escapeHtml(req.date)} • ${escapeHtml(req.serviceShort)} (${escapeHtml(req.roleLabel)})</span>
+        </div>
+        <div class="cover-req-reason">📝 ${escapeHtml(req.reason || 'Schedule cover requested')}</div>
+        ${isClaimed ? `<div class="cover-req-claimed-note">🤝 <strong>${escapeHtml(req.coveredBy)}</strong> volunteered to cover${req.claimedAt ? ` • ${escapeHtml(req.claimedAt)}` : ''}.</div>` : ''}
+        ${actionArea}
+      </div>
+    `;
+  }).join("");
+
+  card.innerHTML = `
+    <div class="cover-board-header">
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <span class="cover-board-icon">🔁</span>
+        <div>
+          <h3 class="cover-board-title">Live Shift Cover Requests (${activeReqs.length})</h3>
+          <p class="cover-board-sub">
+            ${openCount > 0 ? `${openCount} shift${openCount > 1 ? 's' : ''} currently need volunteer cover.` : 'All posted cover requests have a volunteer! Waiting leader confirmation.'}
+          </p>
+        </div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="openSwapRequestModal()">
+        + Request Cover
+      </button>
+    </div>
+    <div class="cover-board-list">
+      ${itemsHtml}
+    </div>
+  `;
+  card.style.display = "block";
+}
+
 // ================= FEATURE 3: 📲 INDIVIDUAL WHATSAPP DIRECT REMINDER =================
 let currentReminderVolunteer = "";
 
@@ -4114,13 +4549,40 @@ function sendDirectReminderWhatsApp() {
 }
 
 // ================= FEATURE 4: 📱 MOBILE APP EXPERIENCE (PWA) =================
-// Register Service Worker for Offline Access
+function showPwaUpdateBanner() {
+  const banner = document.getElementById("pwaUpdateBanner");
+  if (banner) banner.style.display = "flex";
+}
+
+function applyPwaUpdateNow() {
+  window.location.reload();
+}
+
+// Register Service Worker for Offline Access + Live Update Prompt
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then(
-      reg => console.log('FLAG Service Worker registered:', reg.scope),
-      err => console.log('FLAG Service Worker registration failed:', err)
-    );
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (hadController) {
+        showPwaUpdateBanner();
+      }
+    });
+
+    navigator.serviceWorker.register('./sw.js').then(reg => {
+      console.log('FLAG Service Worker registered:', reg.scope);
+      if (reg.waiting && navigator.serviceWorker.controller) {
+        showPwaUpdateBanner();
+      }
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            showPwaUpdateBanner();
+          }
+        });
+      });
+    }, err => console.log('FLAG Service Worker registration failed:', err));
   });
 }
 
@@ -4730,7 +5192,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
       const cloudState = snapshot.val();
       if (cloudState && !isSyncingFromCloud) {
         console.log("☁️ Real-time cloud sync received:", cloudState);
-        const needsChecklistMigration = cloudState.checklistTemplateVersion !== 3;
+        const needsCloudCleanup = cloudState.checklistTemplateVersion !== 3 || ("adminPin" in cloudState);
         isSyncingFromCloud = true;
         // Merge received cloud state into appState
         ensureStateIntegrity(cloudState);
@@ -4741,14 +5203,14 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
         renderAll();
         updateCloudSyncUI(true);
         isSyncingFromCloud = false;
-        if (needsChecklistMigration) {
-          saveToCloud(appState);
+        if (needsCloudCleanup) {
+          saveToCloud(appState, false);
         }
         showToast("☁️ Real-time schedule updated from Cloud!");
       } else if (!cloudState) {
         // First time cloud initialization - push current local state to cloud!
         ensureStateIntegrity(appState);
-        ref.set(appState).catch(err => console.warn("Init cloud error:", err));
+        ref.set(sanitizeCloudState(appState)).catch(err => console.warn("Init cloud error:", err));
       }
     }, err => {
       console.error("Firebase sync error:", err);
@@ -4807,11 +5269,18 @@ function disconnectFirebase() {
   }
 }
 
-function saveToCloud(state) {
+/**
+ * Writes either a granular key/path update (`isPatch = true`) or the sanitized full state (`isPatch = false`) to Firebase.
+ */
+function saveToCloud(stateOrPatch, isPatch = false) {
   if (!firebaseDb || !cloudSyncConnected || isSyncingFromCloud) return;
   try {
-    firebaseDb.ref(FIREBASE_DB_NODE).set(state).then(() => {
-      console.log("☁️ Successfully saved to Firebase Cloud!");
+    const ref = firebaseDb.ref(FIREBASE_DB_NODE);
+    const writePromise = isPatch
+      ? ref.update(stateOrPatch)
+      : ref.set(sanitizeCloudState(stateOrPatch));
+    writePromise.then(() => {
+      console.log(isPatch ? "☁️ Granular update saved to Firebase Cloud!" : "☁️ Successfully saved to Firebase Cloud!");
     }).catch(err => {
       console.warn("☁️ Failed to push to Firebase Cloud:", err);
     });
@@ -4887,7 +5356,7 @@ function parseSyncHash(hash) {
 }
 
 function getRosterSyncUrl() {
-  const hash = generateSyncHash(appState);
+  const hash = generateSyncHash(sanitizeCloudState(appState));
   const base = window.location.origin + window.location.pathname;
   return `${base}#sync=${hash}`;
 }
@@ -4913,6 +5382,7 @@ function checkUrlForRosterSync() {
   if (window.location.hash && window.location.hash.startsWith("#sync=")) {
     const syncedState = parseSyncHash(window.location.hash);
     if (syncedState && syncedState.firstService) {
+      ensureStateIntegrity(syncedState);
       appState = syncedState;
       localStorage.setItem("FLAG_MEDIA_PORTAL_STATE", JSON.stringify(appState));
       // Clean up hash from URL bar cleanly
@@ -5189,7 +5659,7 @@ function submitGearIssue() {
   if (!appState.gearIssues) appState.gearIssues = [];
   appState.gearIssues.unshift(newIssue);
 
-  saveState();
+  saveState(false, { gearIssues: appState.gearIssues });
   renderGearIssues();
 
   if (descInput) descInput.value = "";
@@ -5221,7 +5691,7 @@ function toggleGearIssueStatus(id) {
     issue.status = "Open";
   }
 
-  saveState();
+  saveState(false, { gearIssues: appState.gearIssues });
   renderGearIssues();
   showToast(`Gear status updated to: ${issue.status}`);
 }
@@ -5229,7 +5699,7 @@ function toggleGearIssueStatus(id) {
 function deleteGearIssue(id) {
   if (!confirm("Are you sure you want to delete this equipment issue log?")) return;
   appState.gearIssues = appState.gearIssues.filter(i => i.id !== id);
-  saveState();
+  saveState(false, { gearIssues: appState.gearIssues });
   renderGearIssues();
   showToast("Equipment issue log deleted.");
 }
@@ -5243,7 +5713,7 @@ function sendGearIssueWhatsApp(id) {
   const urgencyIcon = issue.urgency === "Critical" ? "🚨 CRITICAL FAULT" : (issue.urgency === "Medium" ? "⚠️ MEDIUM ATTENTION" : "ℹ️ ROUTINE MAINTENANCE");
 
   const msg = `🛠️ *FLAG CHURCH MEDIA — GEAR MAINTENANCE ALERT*\n\n` +
-    `To: *Yashwanth & Sam Davit* (Equipment Incharge)\n` +
+    `To: *Yashwanth & Sam Joshua* (Equipment Incharge)\n` +
     `Status Alert: *${urgencyIcon}*\n\n` +
     `📦 *Equipment:* ${issue.item}\n` +
     `📅 *Logged Date:* ${issue.date}\n` +
