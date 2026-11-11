@@ -88,89 +88,58 @@ const initialData = {
   },
   checklists: [
     {
-      id: "cam-cleaning",
-      title: "1. Camera Cleaning",
-      incharge: "1st Cam & 2nd Cam Operators",
-      timing: "Saturday Evening & Sunday T-75 min",
+      id: "cam-maint",
+      title: "1. Camera Maintenance",
+      incharge: "Camera Operators",
+      timing: "Every Saturday Preparation",
       items: [
-        { id: "cc1", text: "Outer body & tripod wipe-down with dry microfiber cloth", done: false },
-        { id: "cc2", text: "Air-blower used on front lens elements to remove loose grit/dust", done: false },
-        { id: "cc3", text: "Lens glass cleaned with optical fluid and gentle circular wipe", done: false },
-        { id: "cc4", text: "Camera LCD viewfinders degreased and fingerprint-free", done: false },
-        { id: "cc5", text: "Tripod pan/tilt locks and quick-release plates verified tight", done: false },
-        { id: "cc6", text: "Lens caps reattached after pack-down", done: false }
+        { id: "cm1", text: "Clean all cameras (Camera 1 and Camera 2).", done: false },
+        { id: "cm2", text: "Ensure cameras are functioning properly.", done: false }
       ]
     },
     {
-      id: "sys-cleaning",
-      title: "2. System Cleaning & PC Maintenance",
-      incharge: "Live in System Operators (Anand / Yashwant)",
-      timing: "Friday Evening & Sunday T-60 min",
+      id: "sys-equip",
+      title: "2. System & Equipment Cleaning",
+      incharge: "Live System & Equipment Team",
+      timing: "Every Saturday Preparation",
       items: [
-        { id: "sc1", text: "Recording drive free space checked (> 50 GB available)", done: false },
-        { id: "sc2", text: "Previous week recordings archived to church backup drive/NAS", done: false },
-        { id: "sc3", text: "OBS / vMix temporary cache and replay buffers cleared", done: false },
-        { id: "sc4", text: "PC vents and cooling fans dusted / checked for airflow", done: false },
-        { id: "sc5", text: "Fresh PC restart completed at T-60 min before service", done: false },
-        { id: "sc6", text: "Windows Updates paused / verified not pending mid-service", done: false }
+        { id: "se1", text: "Clean the streaming system / PC.", done: false },
+        { id: "se2", text: "Clean all tripods.", done: false },
+        { id: "se3", text: "Clean the Setup area.", done: false }
       ]
     },
     {
-      id: "eq-charging",
-      title: "3. Equipment Charging",
-      incharge: "Yashwant & Sam Davit",
-      timing: "Saturday by 7:00 PM & Sunday T-75 min",
+      id: "charge-batt",
+      title: "3. Charging & Battery Preparation",
+      incharge: "Yashwanth & Charging Incharge",
+      timing: "Every Saturday Preparation",
       items: [
-        { id: "ec1", text: "All primary camera batteries charged to 100% full indicator", done: false },
-        { id: "ec2", text: "At least 3-4 spare camera batteries charged and packed in bag", done: false },
-        { id: "ec3", text: "Gimbal 3-axis battery handle charged to 100%", done: false },
-        { id: "ec4", text: "Director field monitors & wireless video transmitters charged", done: false },
-        { id: "ec5", text: "Friday prayer drained batteries docked and recharged", done: false },
-        { id: "ec6", text: "Media desk UPS power strip firmly connected and functional", done: false }
+        { id: "cb1", text: "Charge the Gimbal.", done: false },
+        { id: "cb2", text: "Charge all camera batteries.", done: false },
+        { id: "cb3", text: "Recharge all Mic batteries.", done: false }
       ]
     },
     {
-      id: "mic-batteries",
-      title: "4. Recharge Mic Batteries",
-      incharge: "Charging Incharge & Sound/Live Tech",
-      timing: "Saturday Evening & Sunday T-60 min",
+      id: "live-proc",
+      title: "4. Sunday Service Live Procedure",
+      incharge: "Team Leader & Live System Operators",
+      timing: "Every Saturday Preparation",
       items: [
-        { id: "mb1", text: "Preacher wireless lapel/headset transmitter loaded with fresh cells", done: false },
-        { id: "mb2", text: "Worship leader & pulpit stage handheld mics battery levels checked", done: false },
-        { id: "mb3", text: "Emergency 8-pack fresh AA battery caddy present at media desk", done: false },
-        { id: "mb4", text: "Wireless receiver rack displays solid green RF and full battery icon", done: false },
-        { id: "mb5", text: "Preacher audio test completed on headphones with zero hiss/crackle", done: false }
+        { id: "lp1", text: "Prepare and update the Sunday Service Live Procedure.", done: false },
+        { id: "lp2", text: "Verify the streaming workflow.", done: false },
+        { id: "lp3", text: "Check audio and video settings.", done: false }
       ]
     },
     {
       id: "outside-tv",
-      title: "5. Set Up Outside TV & Live Stream Verification",
+      title: "5. Outside TV & Live Stream Testing",
       incharge: "Assigned Floater / Support Tech",
-      timing: "Sunday T-45 min to T-20 min",
+      timing: "Every Saturday Preparation",
       items: [
-        { id: "ot1", text: "Outside TV display powered on; HDMI/wireless receiver connected", done: false },
-        { id: "ot2", text: "Outdoor HDMI cables taped down securely to prevent tripping hazard", done: false },
-        { id: "ot3", text: "Live feed displayed on outside screen at 1080p with no stutter", done: false },
-        { id: "ot4", text: "Outdoor audio walk test done during worship soundcheck", done: false },
-        { id: "ot5", text: "Volume calibrated loud & clear over street/lobby ambient noise", done: false },
-        { id: "ot6", text: "Mid-service verification done during sermon (15 mins in)", done: false }
-      ]
-    },
-    {
-      id: "live-procedure",
-      title: "6. Sunday Service Live Procedure",
-      incharge: "Media Director & Entire Indoor Crew",
-      timing: "Sunday T-90 min to T+30 min",
-      items: [
-        { id: "lp1", text: "T-90 min: Team arrival, devotional scripture, and pre-service prayer", done: false },
-        { id: "lp2", text: "T-75 min: Power on switcher, PCs, cameras, and Outside TV", done: false },
-        { id: "lp3", text: "T-60 min: Camera white balance matched (4500K-5600K) & focus locked", done: false },
-        { id: "lp4", text: "T-45 min: Broadcast audio check on headphones (levels at -18 to -12 dBFS)", done: false },
-        { id: "lp5", text: "T-30 min: Sermon slides loaded & lyric lower-thirds tested", done: false },
-        { id: "lp6", text: "T-15 min: Pre-service countdown stream started with music loop", done: false },
-        { id: "lp7", text: "T-00 min: SERVICE BEGINS - Cam 1 taken as worship team opens", done: false },
-        { id: "lp8", text: "Post-Service: Stop Stream ➔ Stop Local Recording ➔ Verify SSD file", done: false },
-        { id: "lp9", text: "Post-Service: Hand master video to Joshua (Spot Editor) & pack down gear", done: false }
+        { id: "ot1", text: "Set up the outside TV.", done: false },
+        { id: "ot2", text: "Connect and test the TV display.", done: false },
+        { id: "ot3", text: "Check whether the live stream is working properly.", done: false },
+        { id: "ot4", text: "Verify audio and video output on the outside TV.", done: false }
       ]
     }
   ],

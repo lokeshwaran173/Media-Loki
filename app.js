@@ -110,81 +110,56 @@ const defaultState = {
       { id: 6, day: "Saturday", cam1: "Yashwanth", cam2: "Andrew", gimbal: "Shyam Davit", liveEditor: "Praveen", socialMedia: "Joshua" }
     ]
   },
+  checklistTemplateVersion: 2,
   checklists: [
     {
-      id: "cam-clean",
-      title: "1. Camera Cleaning",
+      id: "cam-maint",
+      title: "1. Camera Maintenance",
       assignedTo: "Camera Operators",
       items: [
-        { id: "c1", text: "Clean lens glass with air blower first (remove dust grit)", done: false },
-        { id: "c2", text: "Wipe lens with optical fluid & microfiber in circular motion", done: false },
-        { id: "c3", text: "Clean LCD viewfinders & flip monitors", done: false },
-        { id: "c4", text: "Wipe tripod legs, check fluid head pan/tilt locks", done: false },
-        { id: "c5", text: "Reattach lens caps after service pack-down", done: false }
+        { id: "cm1", text: "Clean all cameras (Camera 1 and Camera 2).", done: false },
+        { id: "cm2", text: "Ensure cameras are functioning properly.", done: false }
       ]
     },
     {
-      id: "sys-clean",
-      title: "2. System Cleaning",
-      assignedTo: "Live System Operators",
+      id: "sys-equip",
+      title: "2. System & Equipment Cleaning",
+      assignedTo: "Live System & Equipment Team",
       items: [
-        { id: "s1", text: "Verify recording hard drive space has > 50 GB free", done: false },
-        { id: "s2", text: "Clear OBS / vMix temporary cache and replay buffers", done: false },
-        { id: "s3", text: "Restart streaming computer 60 mins before service", done: false },
-        { id: "s4", text: "Verify Windows auto-updates are paused", done: false },
-        { id: "s5", text: "Dust PC tower fans and inspect rear USB/HDMI cables", done: false }
+        { id: "se1", text: "Clean the streaming system / PC.", done: false },
+        { id: "se2", text: "Clean all tripods.", done: false },
+        { id: "se3", text: "Clean the Setup area.", done: false }
       ]
     },
     {
-      id: "eq-charge",
-      title: "3. Equipment Charging",
-      assignedTo: "Yashwanth & Sam Davit",
+      id: "charge-batt",
+      title: "3. Charging & Battery Preparation",
+      assignedTo: "Yashwanth & Charging Incharge",
       items: [
-        { id: "e1", text: "Charge all camera main batteries to 100% (Saturday evening)", done: false },
-        { id: "e2", text: "Pack at least 3-4 fully charged spare camera batteries", done: false },
-        { id: "e3", text: "Charge 3-axis motorized Gimbal handle to 100%", done: false },
-        { id: "e4", text: "Charge director field monitors & wireless video transmitters", done: false },
-        { id: "e5", text: "Verify media desk UPS power strip is switched on", done: false }
+        { id: "cb1", text: "Charge the Gimbal.", done: false },
+        { id: "cb2", text: "Charge all camera batteries.", done: false },
+        { id: "cb3", text: "Recharge all Mic batteries.", done: false }
       ]
     },
     {
-      id: "mic-battery",
-      title: "4. Recharge the Mic Batteries",
-      assignedTo: "Charging Incharge & Audio Tech",
+      id: "live-proc",
+      title: "4. Sunday Service Live Procedure",
+      assignedTo: "Team Leader & Live System Operators",
       items: [
-        { id: "m1", text: "Insert fresh 100% batteries into pastor's lapel/headset transmitter", done: false },
-        { id: "m2", text: "Check battery indicators on all stage wireless handheld mics", done: false },
-        { id: "m3", text: "Verify emergency 8-pack fresh AA batteries is at media desk", done: false },
-        { id: "m4", text: "Confirm receiver displays solid green RF and full battery bars", done: false },
-        { id: "m5", text: "Test audio signal on headphones for zero hiss or dropouts", done: false }
+        { id: "lp1", text: "Prepare and update the Sunday Service Live Procedure.", done: false },
+        { id: "lp2", text: "Verify the streaming workflow.", done: false },
+        { id: "lp3", text: "Check audio and video settings.", done: false }
       ]
     },
     {
       id: "outside-tv",
-      title: "5. Set up Outside TV & Check Live Stream Working Properly",
-      assignedTo: "Assigned Floater / Tech",
+      title: "5. Outside TV & Live Stream Testing",
+      assignedTo: "Assigned Floater / Support Tech",
       items: [
-        { id: "t1", text: "Power on outside TV in porch / lobby", done: false },
-        { id: "t2", text: "Connect HDMI / wireless stream receiver securely", done: false },
-        { id: "t3", text: "Tape down outdoor cables firmly to prevent tripping hazard", done: false },
-        { id: "t4", text: "Verify video feed is sharp 1080p without buffering stutter", done: false },
-        { id: "t5", text: "Calibrate outdoor speaker volume during worship soundcheck", done: false },
-        { id: "t6", text: "Mid-service check: verify TV is active 15 mins into sermon", done: false }
-      ]
-    },
-    {
-      id: "live-procedure",
-      title: "6. Sunday Service Live Procedure",
-      assignedTo: "Team Leader & All Crew",
-      items: [
-        { id: "p1", text: "05:30 AM: Team arrival & 5-minute pre-service prayer", done: false },
-        { id: "p2", text: "05:35 AM: Power on switchers, streaming PCs, cameras, and Outside TV", done: false },
-        { id: "p3", text: "05:45 AM: Match camera white balance (4500K-5600K) & lock tripod focus", done: false },
-        { id: "p4", text: "05:50 AM: Soundcheck broadcast audio levels (-18 to -12 dBFS)", done: false },
-        { id: "p5", text: "05:55 AM: Start YouTube countdown stream & lyric overlays (1st Service: 06:00 AM)", done: false },
-        { id: "p6", text: "08:00 AM: 2nd Service Crew Handover & Live System Setup (2nd Service: 08:30 AM)", done: false },
-        { id: "p7", text: "10:30 AM: 3rd Service Crew Handover & Live System Setup (3rd Service: 11:00 AM)", done: false },
-        { id: "p8", text: "Post-Service: Stop stream ➔ Stop local recording ➔ Verify SSD file & pack down", done: false }
+        { id: "ot1", text: "Set up the outside TV.", done: false },
+        { id: "ot2", text: "Connect and test the TV display.", done: false },
+        { id: "ot3", text: "Check whether the live stream is working properly.", done: false },
+        { id: "ot4", text: "Verify audio and video output on the outside TV.", done: false }
       ]
     }
   ],
@@ -423,8 +398,23 @@ function ensureStateIntegrity(state) {
   if (!state.morningPrayer) {
     state.morningPrayer = { enabled: false, title: "21 Days Early Morning Prayer", days: [] };
   }
-  if (!state.checklists || !Array.isArray(state.checklists)) {
+  const legacyChecklistIds = new Set(["cam-clean", "sys-clean", "eq-charge", "mic-battery", "live-procedure", "cam-cleaning", "sys-cleaning", "eq-charging", "mic-batteries"]);
+  const hasLegacyChecklists = Array.isArray(state.checklists) && state.checklists.some(c => legacyChecklistIds.has(c.id));
+  if (!state.checklists || !Array.isArray(state.checklists) || state.checklistTemplateVersion !== 2 || hasLegacyChecklists) {
     state.checklists = JSON.parse(JSON.stringify(defaultState.checklists || []));
+    state.checklistTemplateVersion = 2;
+    if (state.weeklyChecks && typeof state.weeklyChecks === "object") {
+      const validIds = new Set();
+      state.checklists.forEach(cl => (cl.items || []).forEach(item => validIds.add(item.id)));
+      Object.keys(state.weeklyChecks).forEach(wk => {
+        const wkMap = state.weeklyChecks[wk];
+        if (wkMap && typeof wkMap === "object") {
+          Object.keys(wkMap).forEach(itemId => {
+            if (!validIds.has(itemId)) delete wkMap[itemId];
+          });
+        }
+      });
+    }
   }
   return state;
 }
@@ -497,29 +487,6 @@ function loadState() {
 
   if (appState.morningPrayer.enabled === undefined) {
     appState.morningPrayer.enabled = false;
-  }
-
-  // Auto-sync checklist items for Sunday Service Live Procedure with accurate 06:00 AM, 08:30 AM, 11:00 AM timings
-  if (appState.checklists) {
-    const procedureUpdates = {
-      p1: "05:30 AM: Team arrival & 5-minute pre-service prayer",
-      p2: "05:35 AM: Power on switchers, streaming PCs, cameras, and Outside TV",
-      p3: "05:45 AM: Match camera white balance (4500K-5600K) & lock tripod focus",
-      p4: "05:50 AM: Soundcheck broadcast audio levels (-18 to -12 dBFS)",
-      p5: "05:55 AM: Start YouTube countdown stream & lyric overlays (1st Service: 06:00 AM)",
-      p6: "08:00 AM: 2nd Service Crew Handover & Live System Setup (2nd Service: 08:30 AM)",
-      p7: "10:30 AM: 3rd Service Crew Handover & Live System Setup (3rd Service: 11:00 AM)",
-      p8: "Post-Service: Stop stream ➔ Stop local recording ➔ Verify SSD file & pack down"
-    };
-    appState.checklists.forEach(cl => {
-      if (cl.id === "live-procedure" && cl.items) {
-        cl.items.forEach(i => {
-          if (procedureUpdates[i.id]) {
-            i.text = procedureUpdates[i.id];
-          }
-        });
-      }
-    });
   }
 
   // Cleanse any old Day 1, Day 2 rows into the clean Monday - Saturday roster
@@ -1475,29 +1442,6 @@ function renderMorningPrayer() {
   }
   if (appState.morningPrayer.enabled === undefined) {
     appState.morningPrayer.enabled = false;
-  }
-
-  // Auto-sync checklist items for Sunday Service Live Procedure with accurate 06:00 AM, 08:30 AM, 11:00 AM timings
-  if (appState.checklists) {
-    const procedureUpdates = {
-      p1: "05:30 AM: Team arrival & 5-minute pre-service prayer",
-      p2: "05:35 AM: Power on switchers, streaming PCs, cameras, and Outside TV",
-      p3: "05:45 AM: Match camera white balance (4500K-5600K) & lock tripod focus",
-      p4: "05:50 AM: Soundcheck broadcast audio levels (-18 to -12 dBFS)",
-      p5: "05:55 AM: Start YouTube countdown stream & lyric overlays (1st Service: 06:00 AM)",
-      p6: "08:00 AM: 2nd Service Crew Handover & Live System Setup (2nd Service: 08:30 AM)",
-      p7: "10:30 AM: 3rd Service Crew Handover & Live System Setup (3rd Service: 11:00 AM)",
-      p8: "Post-Service: Stop stream ➔ Stop local recording ➔ Verify SSD file & pack down"
-    };
-    appState.checklists.forEach(cl => {
-      if (cl.id === "live-procedure" && cl.items) {
-        cl.items.forEach(i => {
-          if (procedureUpdates[i.id]) {
-            i.text = procedureUpdates[i.id];
-          }
-        });
-      }
-    });
   }
 
   // Update Status Badge & Toggle Button in Admin Console
@@ -2501,17 +2445,17 @@ function renderChecklists() {
   // 2. Update Public Weekly Banner DOM elements
   const bannerTitle = document.getElementById("activeWeekBannerTitle");
   if (bannerTitle) {
-    bannerTitle.textContent = `📅 Sunday Checklist: ${activeWeekObj.label}`;
+    bannerTitle.textContent = `📋 Saturday Preparation Checklist – Sunday Service (${activeWeekObj.label})`;
   }
 
   const liveBadgeText = document.getElementById("weekLiveBadgeText");
   if (liveBadgeText) {
-    liveBadgeText.textContent = "SERVICE IN PROGRESS";
+    liveBadgeText.textContent = "SATURDAY PREPARATION • SUNDAY SERVICE";
   }
 
   const bannerSub = document.getElementById("activeWeekBannerSub");
   if (bannerSub) {
-    bannerSub.textContent = `Sunday operational checklists for ${activeWeekObj.label}. Volunteers can check off completed tasks during service. Week is configured in Admin Console.`;
+    bannerSub.textContent = `FLAG Media Team – Saturday Preparation Checklist for Sunday Service (${activeWeekObj.label}). Update each task once completed. 🙌`;
   }
 
   const weekProgText = document.getElementById("weekProgressText");
@@ -2538,12 +2482,11 @@ function renderChecklists() {
   const catGrid = document.getElementById("categoryReadinessGrid");
   if (catGrid && appState.checklists) {
     const catIcons = {
-      "cam-clean": "📷",
-      "sys-clean": "💻",
-      "eq-charge": "🔋",
-      "mic-battery": "🎙️",
-      "outside-tv": "📺",
-      "live-procedure": "🎬"
+      "cam-maint": "📷",
+      "sys-equip": "💻",
+      "charge-batt": "🔋",
+      "live-proc": "🎬",
+      "outside-tv": "📺"
     };
 
     catGrid.innerHTML = appState.checklists.map(cl => {
@@ -4788,6 +4731,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
       const cloudState = snapshot.val();
       if (cloudState && !isSyncingFromCloud) {
         console.log("☁️ Real-time cloud sync received:", cloudState);
+        const needsChecklistMigration = cloudState.checklistTemplateVersion !== 2;
         isSyncingFromCloud = true;
         // Merge received cloud state into appState
         ensureStateIntegrity(cloudState);
@@ -4798,6 +4742,9 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
         renderAll();
         updateCloudSyncUI(true);
         isSyncingFromCloud = false;
+        if (needsChecklistMigration) {
+          saveToCloud(appState);
+        }
         showToast("☁️ Real-time schedule updated from Cloud!");
       } else if (!cloudState) {
         // First time cloud initialization - push current local state to cloud!

@@ -23,7 +23,7 @@
       } catch (e) { }
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=4.1">
+  <link rel="stylesheet" href="styles.css?v=4.2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -64,7 +64,7 @@
           </svg>
           <span class="nav-label-long">Service Checklists</span>
           <span class="nav-label-short">Checks</span>
-          <span class="nav-badge-pill" id="checklistProgressBadge">0/34</span>
+          <span class="nav-badge-pill" id="checklistProgressBadge">0/15</span>
         </button>
         <button class="nav-btn" onclick="switchView('teamView', this)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -214,9 +214,9 @@
             <div class="stat-content">
               <div class="stat-icon-wrapper emerald-glow">✅</div>
               <div class="stat-info">
-                <span class="stat-label">Sunday Readiness Checklist</span>
-                <strong class="stat-value" id="heroChecklistProgress">0/34 Tasks Done</strong>
-                <span class="stat-sub">Audio, Video, Mic &amp; Battery Ready</span>
+                <span class="stat-label">Saturday Prep Checklist</span>
+                <strong class="stat-value" id="heroChecklistProgress">0/15 Done (0%)</strong>
+                <span class="stat-sub">Cameras, System, Charging, Live &amp; TV</span>
               </div>
             </div>
             <div class="stat-status-pill emerald-pill">
@@ -547,20 +547,19 @@
           <div class="week-banner-info">
             <div class="week-live-indicator">
               <span class="beacon-dot emerald-beacon"></span>
-              <span id="weekLiveBadgeText" class="week-live-text">SERVICE IN PROGRESS</span>
+              <span id="weekLiveBadgeText" class="week-live-text">SATURDAY PREPARATION &bull; SUNDAY SERVICE</span>
             </div>
             <h2 class="week-banner-title" id="activeWeekBannerTitle">
-              📅 Sunday Checklist: Week 1 (04 Oct 2026)
+              📋 Saturday Preparation Checklist &ndash; Sunday Service
             </h2>
             <p class="week-banner-sub" id="activeWeekBannerSub">
-              Sunday operational checklists. Volunteers can check off completed tasks during service. Week is configured
-              in Admin Console.
+              FLAG Media Team &ndash; Complete every Saturday before Sunday service and update each task once completed. 🙌
             </p>
           </div>
 
           <div class="week-banner-stats">
             <div class="week-stat-box">
-              <span class="week-stat-num" id="weekProgressText">0 / 34</span>
+              <span class="week-stat-num" id="weekProgressText">0 / 15</span>
               <span class="week-stat-label">Tasks Done</span>
             </div>
             <div class="week-progress-circle-wrap">
@@ -603,7 +602,7 @@
               <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: #fff;" class="cat-readiness-title">1-Tap
                 Category Readiness Status</h3>
               <p style="font-size: 0.82rem; color: var(--text-muted); margin: 3px 0 0 0;" class="cat-readiness-sub">
-                Quick 1-tap completion for all 6 service areas. Mark sections complete or filter pending tasks.
+                Quick 1-tap completion for all 5 Saturday prep areas. Mark sections complete or filter pending tasks.
               </p>
             </div>
           </div>
@@ -611,11 +610,11 @@
           <div class="checklist-status-filters" id="checklistStatusFilters">
             <button class="status-filter-pill active" onclick="setChecklistStatusFilter('all', this)"
               id="filterAllTasksBtn">
-              📋 All Tasks (<span id="countAllTasks">34</span>)
+              📋 All Tasks (<span id="countAllTasks">15</span>)
             </button>
             <button class="status-filter-pill pill-pending" onclick="setChecklistStatusFilter('pending', this)"
               id="filterPendingTasksBtn">
-              ⏳ Pending Only (<span id="countPendingTasks">34</span>)
+              ⏳ Pending Only (<span id="countPendingTasks">15</span>)
             </button>
             <button class="status-filter-pill pill-done" onclick="setChecklistStatusFilter('done', this)"
               id="filterDoneTasksBtn">
@@ -624,15 +623,22 @@
           </div>
         </div>
 
-        <!-- 6 Quick Category Readiness Cards Grid -->
+        <!-- 5 Quick Category Readiness Cards Grid -->
         <div class="category-readiness-grid" id="categoryReadinessGrid">
           <!-- Dynamically populated via app.js -->
         </div>
       </div>
 
-      <!-- 6 Checklists Container -->
+      <!-- 5 Checklists Container -->
       <div class="checklists-container" id="checklistsContainer">
         <!-- Rendered dynamically via app.js -->
+      </div>
+
+      <!-- Team Instruction Banner -->
+      <div class="card card-accent-emerald checklist-team-instruction">
+        <p class="checklist-instruction-text">
+          🙌 <strong>Team instruction:</strong> Please complete all the above tasks every Saturday and update the checklist once each task is completed.
+        </p>
       </div>
     </section>
 
@@ -1718,7 +1724,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=4.1"></script>
+  <script src="app.js?v=4.2"></script>
 </body>
 
 </html>

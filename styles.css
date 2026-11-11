@@ -6926,3 +6926,39 @@ html.light-theme .btn-remember-switch {
     padding: 12px !important;
   }
 }
+
+/* ================= TEAM INSTRUCTION CALLOUT (v4.2) ================= */
+.checklist-team-instruction {
+  margin-top: 20px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(13, 22, 36, 0.92) 100%);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+
+.checklist-instruction-text {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #a7f3d0;
+  line-height: 1.55;
+}
+
+.checklist-instruction-text strong {
+  color: #34d399;
+}
+
+[data-theme="light"] .checklist-team-instruction,
+html.light-theme .checklist-team-instruction {
+  background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%) !important;
+  border-color: rgba(16, 185, 129, 0.45) !important;
+}
+
+[data-theme="light"] .checklist-instruction-text,
+html.light-theme .checklist-instruction-text {
+  color: #065f46 !important;
+}
+
+[data-theme="light"] .checklist-instruction-text strong,
+html.light-theme .checklist-instruction-text strong {
+  color: #047857 !important;
+}
