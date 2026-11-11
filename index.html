@@ -23,7 +23,7 @@
       } catch (e) { }
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=4.5">
+  <link rel="stylesheet" href="styles.css?v=4.6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -89,8 +89,8 @@
 
       <div class="nav-actions">
         <button id="navInstallPwaBtn" class="theme-toggle-btn nav-install-btn"
-          style="display: none; background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); color: #34d399;"
-          onclick="triggerPWAInstall()" title="Install Church App to Phone Home Screen">
+          style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); color: #34d399;"
+          onclick="triggerPWAInstall()" title="Install or Share FLAG Media App">
           <span style="font-size: 0.95rem;">📲</span>
           <span>App</span>
         </button>
@@ -1768,6 +1768,26 @@
     </div>
   </div>
 
+  <!-- ================= UNIVERSAL APP INSTALL & SHARE MODAL ================= -->
+  <div id="pwaDownloadModal" class="modal-overlay" onclick="if(event.target === this) closePwaDownloadModal()">
+    <div class="modal-card" style="max-width: 460px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">📲</span>
+          <h3>Install FLAG Media App</h3>
+        </div>
+        <button class="modal-close" onclick="closePwaDownloadModal()">&times;</button>
+      </div>
+      <div id="pwaDownloadStatusNote" class="pwa-guide-notice"></div>
+      <div id="pwaDownloadSteps" class="ios-install-steps"></div>
+      <div class="modal-actions-row" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="closePwaDownloadModal()">Close</button>
+        <button class="btn btn-primary" onclick="copyPortalAppLink()">📋 Copy Link</button>
+        <button class="btn btn-whatsapp" onclick="sharePortalAppWhatsApp()">💬 Share to Team</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= TOAST NOTIFICATION ================= -->
   <div id="toast" class="toast-box">
     <span id="toastIcon">✔️</span>
@@ -1778,7 +1798,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=4.5"></script>
+  <script src="app.js?v=4.6"></script>
 </body>
 
 </html>

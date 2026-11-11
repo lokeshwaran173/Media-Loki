@@ -7549,3 +7549,44 @@ html.light-theme .actor-pick-btn:hover {
   border-color: #0284c7 !important;
   color: #0369a1 !important;
 }
+
+.nav-install-btn {
+  display: inline-flex !important;
+  align-items: center;
+  flex-shrink: 0 !important;
+}
+
+.pwa-guide-notice {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  font-size: 0.84rem;
+  color: #d1fae5;
+  line-height: 1.45;
+}
+
+.pwa-guide-notice strong {
+  color: #34d399;
+}
+
+[data-theme="light"] .pwa-guide-notice,
+html.light-theme .pwa-guide-notice {
+  background: #ecfdf5 !important;
+  border-color: #6ee7b7 !important;
+  color: #065f46 !important;
+}
+
+[data-theme="light"] .pwa-guide-notice strong,
+html.light-theme .pwa-guide-notice strong {
+  color: #047857 !important;
+}
+
+@media (max-width: 355px) {
+  .brand-text p {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
