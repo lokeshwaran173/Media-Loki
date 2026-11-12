@@ -1039,7 +1039,7 @@ function updateScheduleLayoutVisibility() {
 
   tableWraps.forEach(el => el.style.display = isCard ? "none" : "block");
   cardGrids.forEach(el => el.style.display = isCard ? "grid" : "none");
-  tableHints.forEach(el => el.style.display = isCard ? "none" : "block");
+  tableHints.forEach(el => el.style.display = isCard ? "none" : "");
 
   const tableBtn = document.getElementById("schedViewTableBtn");
   const cardBtn = document.getElementById("schedViewCardBtn");

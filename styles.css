@@ -8670,6 +8670,104 @@ html.light-theme .roster-pair {
   }
 }
 
+/* ==========================================================================
+   V5.4 EXECUTIVE POLISH: DESKTOP TOOLBARS, TEAM CARDS & CHECKLIST GRID
+   ========================================================================== */
+
+@media (min-width: 769px) {
+  .mobile-table-hint {
+    display: none !important;
+  }
+}
+
+/* Keep WhatsApp Announcement bar compact & horizontal on desktop */
+.whatsapp-compact-controls .wa-mini-select {
+  width: auto !important;
+  min-width: 128px;
+  max-width: 185px;
+  flex: 0 1 auto;
+}
+
+.whatsapp-compact-bar {
+  align-items: center;
+  gap: 12px;
+}
+
+@media (min-width: 1024px) {
+  .whatsapp-compact-bar {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Prevent Team Card action buttons from clipping on desktop/tablet grids */
+.team-directory-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 18px;
+}
+
+.team-card {
+  border-radius: 16px;
+}
+
+.team-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.team-card-actions .btn {
+  padding: 6px 11px;
+  font-size: 0.78rem;
+  min-height: 34px;
+}
+
+/* Align Checklist Sync Banner & fit all 5 readiness cards cleanly in 1 row on wide desktop */
+.checklist-sync-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sync-banner-tag {
+  flex-shrink: 0;
+}
+
+@media (min-width: 1120px) {
+  .category-readiness-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 12px;
+  }
+}
+
+/* Cleaner executive accent borders & schedule pairing readability */
+.card-accent-blue,
+.card-accent-emerald,
+.card-accent-amber,
+.card-accent-special,
+.card-accent-morning,
+.card-accent-whatsapp {
+  border-top-width: 2px !important;
+}
+
+.roster-pair {
+  color: #f8fafc;
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  padding: 2px 9px;
+  border-radius: 9999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+[data-theme="light"] .roster-pair,
+html.light-theme .roster-pair {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+}
+
 @media (max-width: 640px) {
   .hero-banner {
     padding: 20px 16px 18px;
