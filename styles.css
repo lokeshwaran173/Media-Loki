@@ -9370,3 +9370,479 @@ html.light-theme .senior-pastor-pill strong {
     box-sizing: border-box !important;
   }
 }
+
+/* ================= V5.8 EXECUTIVE LEADERSHIP CARDS & COMPLETE LIGHT-THEME CONTRAST ================= */
+.hero-leadership-strip {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.leader-showcase-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 9px 15px 9px 11px;
+  border-radius: 13px;
+  background: rgba(15, 23, 42, 0.62);
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  max-width: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leader-showcase-card:hover {
+  transform: translateY(-1px);
+}
+
+.leader-showcase-card.tier-pastor {
+  border-color: rgba(192, 132, 252, 0.42);
+  border-left: 3px solid #a855f7;
+  background: linear-gradient(135deg, rgba(88, 28, 135, 0.34), rgba(15, 23, 42, 0.78));
+}
+
+.leader-showcase-card.tier-incharge {
+  border-color: rgba(56, 189, 248, 0.42);
+  border-left: 3px solid #0ea5e9;
+  background: linear-gradient(135deg, rgba(12, 74, 110, 0.36), rgba(15, 23, 42, 0.78));
+}
+
+.leader-showcase-card.tier-team {
+  border-color: rgba(251, 191, 36, 0.45);
+  border-left: 3px solid #f59e0b;
+  background: linear-gradient(135deg, rgba(120, 53, 15, 0.32), rgba(15, 23, 42, 0.78));
+}
+
+.leader-medallion {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.tier-pastor .leader-medallion {
+  background: rgba(168, 85, 247, 0.22);
+  border-color: rgba(192, 132, 252, 0.38);
+}
+
+.tier-incharge .leader-medallion {
+  background: rgba(14, 165, 233, 0.22);
+  border-color: rgba(56, 189, 248, 0.38);
+}
+
+.tier-team .leader-medallion {
+  background: rgba(245, 158, 11, 0.22);
+  border-color: rgba(251, 191, 36, 0.42);
+}
+
+.leader-showcase-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+}
+
+.leader-role-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: #cbd5e1;
+}
+
+.tier-pastor .leader-role-eyebrow {
+  color: #d8b4fe;
+}
+
+.tier-incharge .leader-role-eyebrow {
+  color: #7dd3fc;
+}
+
+.tier-team .leader-role-eyebrow {
+  color: #fcd34d;
+}
+
+.leader-person-name {
+  font-size: 0.94rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: #f8fafc;
+}
+
+/* Light Theme Executive Leadership Cards */
+[data-theme="light"] .leader-showcase-card,
+html.light-theme .leader-showcase-card {
+  background: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="light"] .leader-showcase-card.tier-pastor,
+html.light-theme .leader-showcase-card.tier-pastor {
+  background: linear-gradient(135deg, #faf5ff 0%, #ffffff 75%) !important;
+  border-color: #d8b4fe !important;
+  border-left: 4px solid #7c3aed !important;
+}
+
+[data-theme="light"] .leader-showcase-card.tier-incharge,
+html.light-theme .leader-showcase-card.tier-incharge {
+  background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 75%) !important;
+  border-color: #7dd3fc !important;
+  border-left: 4px solid #0284c7 !important;
+}
+
+[data-theme="light"] .leader-showcase-card.tier-team,
+html.light-theme .leader-showcase-card.tier-team {
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 75%) !important;
+  border-color: #fcd34d !important;
+  border-left: 4px solid #d97706 !important;
+}
+
+[data-theme="light"] .tier-pastor .leader-medallion,
+html.light-theme .tier-pastor .leader-medallion {
+  background: #f3e8ff !important;
+  border-color: #d8b4fe !important;
+}
+
+[data-theme="light"] .tier-incharge .leader-medallion,
+html.light-theme .tier-incharge .leader-medallion {
+  background: #e0f2fe !important;
+  border-color: #bae6fd !important;
+}
+
+[data-theme="light"] .tier-team .leader-medallion,
+html.light-theme .tier-team .leader-medallion {
+  background: #fef3c7 !important;
+  border-color: #fde68a !important;
+}
+
+[data-theme="light"] .tier-pastor .leader-role-eyebrow,
+html.light-theme .tier-pastor .leader-role-eyebrow {
+  color: #6b21a8 !important;
+}
+
+[data-theme="light"] .tier-incharge .leader-role-eyebrow,
+html.light-theme .tier-incharge .leader-role-eyebrow {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .tier-team .leader-role-eyebrow,
+html.light-theme .tier-team .leader-role-eyebrow {
+  color: #b45309 !important;
+}
+
+[data-theme="light"] .leader-person-name,
+html.light-theme .leader-person-name {
+  color: #0f172a !important;
+}
+
+/* Executive Sub-header Pills (Media Team & Admin Console) */
+.senior-pastor-pill,
+.dept-incharge-pill {
+  padding: 6px 13px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+}
+
+[data-theme="light"] .senior-pastor-pill,
+html.light-theme .senior-pastor-pill {
+  background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%) !important;
+  border: 1px solid #c084fc !important;
+  color: #3b0764 !important;
+}
+
+[data-theme="light"] .senior-pastor-pill strong,
+html.light-theme .senior-pastor-pill strong {
+  color: #581c87 !important;
+}
+
+[data-theme="light"] .dept-incharge-pill,
+html.light-theme .dept-incharge-pill {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  border: 1px solid #38bdf8 !important;
+  color: #0c4a6e !important;
+}
+
+[data-theme="light"] .dept-incharge-pill strong,
+html.light-theme .dept-incharge-pill strong {
+  color: #075985 !important;
+}
+
+[data-theme="light"] .team-leader-pill,
+html.light-theme .team-leader-pill {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+  border: 1px solid #f59e0b !important;
+  color: #78350f !important;
+}
+
+/* Semantic Status, Phone & Shift Pills (Dark + High-Contrast Light) */
+.member-phone-pill {
+  font-size: 0.72rem;
+  color: #4ade80;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  background: rgba(34, 197, 94, 0.12);
+  padding: 2px 7px;
+  border-radius: 5px;
+  border: 1px solid rgba(34, 197, 94, 0.28);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.team-shift-pill.shift-active { color: #10b981; }
+.team-shift-pill.shift-heavy { color: #f59e0b; }
+.team-shift-pill.shift-resting { color: #94a3b8; }
+
+.wb-role-sub { font-size: 0.72rem; color: #94a3b8; }
+.wb-status-tag.wb-heavy { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+.wb-status-tag.wb-optimal { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+.wb-status-tag.wb-light { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+.wb-status-tag.wb-resting { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.4); }
+
+.gear-urgency-chip.chip-medium { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+.gear-urgency-chip.chip-critical { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+.gear-urgency-chip.chip-low { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
+.gear-reporter-name { color: #38bdf8; }
+
+/* Light Mode Comprehensive High-Contrast Fixes */
+[data-theme="light"] .member-phone-pill,
+html.light-theme .member-phone-pill {
+  color: #166534 !important;
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}
+
+[data-theme="light"] .team-shift-pill.shift-active,
+html.light-theme .team-shift-pill.shift-active {
+  color: #065f46 !important;
+  background: #d1fae5 !important;
+  border: 1px solid #6ee7b7 !important;
+}
+
+[data-theme="light"] .team-shift-pill.shift-heavy,
+html.light-theme .team-shift-pill.shift-heavy {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border: 1px solid #fcd34d !important;
+}
+
+[data-theme="light"] .team-shift-pill.shift-resting,
+html.light-theme .team-shift-pill.shift-resting {
+  color: #334155 !important;
+  background: #e2e8f0 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .cat-status-badge.badge-pending,
+html.light-theme .cat-status-badge.badge-pending {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border: 1px solid #f59e0b !important;
+}
+
+[data-theme="light"] .cat-status-badge.badge-complete,
+html.light-theme .cat-status-badge.badge-complete {
+  color: #065f46 !important;
+  background: #d1fae5 !important;
+  border: 1px solid #10b981 !important;
+}
+
+[data-theme="light"] .wb-role-sub,
+html.light-theme .wb-role-sub {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .wb-status-tag.wb-heavy,
+html.light-theme .wb-status-tag.wb-heavy {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="light"] .wb-status-tag.wb-optimal,
+html.light-theme .wb-status-tag.wb-optimal {
+  color: #065f46 !important;
+  background: #d1fae5 !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="light"] .wb-status-tag.wb-light,
+html.light-theme .wb-status-tag.wb-light {
+  color: #075985 !important;
+  background: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+}
+
+[data-theme="light"] .wb-status-tag.wb-resting,
+html.light-theme .wb-status-tag.wb-resting {
+  color: #334155 !important;
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .gear-urgency-chip.chip-medium,
+html.light-theme .gear-urgency-chip.chip-medium {
+  color: #92400e !important;
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+}
+
+[data-theme="light"] .gear-urgency-chip.chip-critical,
+html.light-theme .gear-urgency-chip.chip-critical {
+  color: #991b1b !important;
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+}
+
+[data-theme="light"] .gear-urgency-chip.chip-low,
+html.light-theme .gear-urgency-chip.chip-low {
+  color: #065f46 !important;
+  background: #d1fae5 !important;
+  border-color: #10b981 !important;
+}
+
+[data-theme="light"] .gear-reporter-name,
+html.light-theme .gear-reporter-name {
+  color: #0369a1 !important;
+}
+
+/* Override any remaining hardcoded inline pale colors when Light Theme is active */
+[data-theme="light"] [style*="color: #94a3b8"],
+[data-theme="light"] [style*="color:#94a3b8"],
+html.light-theme [style*="color: #94a3b8"],
+html.light-theme [style*="color:#94a3b8"] {
+  color: #475569 !important;
+}
+
+[data-theme="light"] [style*="color: #38bdf8"],
+[data-theme="light"] [style*="color:#38bdf8"],
+html.light-theme [style*="color: #38bdf8"],
+html.light-theme [style*="color:#38bdf8"] {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] [style*="color: #93c5fd"],
+[data-theme="light"] [style*="color:#93c5fd"],
+html.light-theme [style*="color: #93c5fd"],
+html.light-theme [style*="color:#93c5fd"] {
+  color: #1e40af !important;
+}
+
+[data-theme="light"] [style*="color: #f59e0b"],
+[data-theme="light"] [style*="color:#f59e0b"],
+html.light-theme [style*="color: #f59e0b"],
+html.light-theme [style*="color:#f59e0b"] {
+  color: #b45309 !important;
+}
+
+[data-theme="light"] [style*="color: #4ade80"],
+[data-theme="light"] [style*="color:#4ade80"],
+html.light-theme [style*="color: #4ade80"],
+html.light-theme [style*="color:#4ade80"] {
+  color: #166534 !important;
+}
+
+/* Light Mode Workload, Role Demand, Active Nav & Action Pill High-Contrast Fixes */
+[data-theme="light"] .wb-count,
+html.light-theme .wb-count {
+  color: #0369a1 !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .role-demand-pill,
+html.light-theme .role-demand-pill {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="light"] .role-demand-pill strong,
+html.light-theme .role-demand-pill strong {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .nav-btn.active,
+html.light-theme .nav-btn.active {
+  background: #0369a1 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .nav-btn.active .nav-badge-pill,
+html.light-theme .nav-btn.active .nav-badge-pill {
+  background: rgba(15, 23, 42, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-whatsapp,
+html.light-theme .btn-whatsapp,
+[data-theme="light"] .week-pct-badge,
+html.light-theme .week-pct-badge {
+  background: #15803d !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-admin-nav.unlocked,
+html.light-theme .btn-admin-nav.unlocked,
+[data-theme="light"] .btn-amber,
+html.light-theme .btn-amber {
+  background: #b45309 !important;
+  border-color: #92400e !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] #saveStatusIndicator,
+html.light-theme #saveStatusIndicator {
+  color: #064e3b !important;
+}
+
+@media (max-width: 640px) {
+  .hero-leadership-strip {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .leader-showcase-card {
+    width: 100% !important;
+    padding: 8px 12px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .leader-medallion {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 0.9rem !important;
+  }
+
+  .leader-role-eyebrow {
+    font-size: clamp(0.56rem, 2.3vw, 0.64rem) !important;
+    white-space: nowrap !important;
+  }
+
+  .leader-person-name {
+    font-size: 0.88rem !important;
+    white-space: nowrap !important;
+  }
+}

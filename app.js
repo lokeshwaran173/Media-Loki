@@ -400,7 +400,7 @@ function renderLeaderBadges() {
     } else {
       heroBadge.style.display = "";
       heroBadge.removeAttribute("aria-hidden");
-      heroBadge.innerHTML = `<span class="dept-text-inner">👑 Team Leader: <strong>${escapeHtml(leader)}</strong></span>`;
+      heroBadge.innerHTML = `<span class="leader-medallion" aria-hidden="true">👑</span><div class="leader-showcase-text"><span class="leader-role-eyebrow">Team Leader</span><strong class="leader-person-name">${escapeHtml(leader)}</strong></div>`;
     }
   }
   if (teamBadge) teamBadge.textContent = `👑 Team Leader: ${leader}`;
@@ -3048,7 +3048,7 @@ function renderMembers() {
           <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)}</div>
           <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 5px;">
             ${m.phone ? `
-              <span style="font-size: 0.72rem; color: #4ade80; font-family: var(--font-mono); font-weight: 700; background: rgba(34, 197, 94, 0.12); padding: 2px 7px; border-radius: 5px; border: 1px solid rgba(34, 197, 94, 0.28); display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
+              <span class="member-phone-pill">
                 📱 ${escapeHtml(m.phone)}
               </span>
             ` : ''}
@@ -3196,13 +3196,13 @@ function renderPublicTeamDirectory() {
     const cardAccent = accentStrips[gradIndex];
     const isLeader = isAliasMatch(rawName, activeLeaderName);
 
-    let shiftTagColor = "#10b981";
+    let shiftTagClass = "shift-active";
     let shiftTagText = `${shiftCount} ${shiftCount === 1 ? 'shift' : 'shifts'} in ${mName}`;
     if (shiftCount === 0) {
-      shiftTagColor = "#94a3b8";
+      shiftTagClass = "shift-resting";
       shiftTagText = `Resting in ${mName}`;
     } else if (shiftCount >= 4) {
-      shiftTagColor = "#f59e0b";
+      shiftTagClass = "shift-heavy";
     }
 
     const hasPhone = m.phone && m.phone.trim();
@@ -3247,7 +3247,7 @@ function renderPublicTeamDirectory() {
         <div class="team-card-details">
           <div class="team-detail-row">
             <span class="team-detail-label">Serving Shifts</span>
-            <span class="team-shift-pill" style="color: ${shiftTagColor};">
+            <span class="team-shift-pill ${shiftTagClass}">
               ${shiftTagText}
             </span>
           </div>
@@ -7174,17 +7174,17 @@ function renderWorkloadAnalytics() {
     let statusTag = "";
     let barColor = "#10b981"; // green
     if (count >= 4) {
-      statusTag = `<span class="wb-status-tag" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4);">Heavy (${count})</span>`;
+      statusTag = `<span class="wb-status-tag wb-heavy">Heavy (${count})</span>`;
       barColor = "linear-gradient(90deg, #f59e0b, #d97706)";
     } else if (count >= 2) {
-      statusTag = `<span class="wb-status-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);">Optimal (${count})</span>`;
+      statusTag = `<span class="wb-status-tag wb-optimal">Optimal (${count})</span>`;
       barColor = "linear-gradient(90deg, #10b981, #059669)";
     } else if (count === 1) {
-      statusTag = `<span class="wb-status-tag" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4);">Light (1)</span>`;
+      statusTag = `<span class="wb-status-tag wb-light">Light (1)</span>`;
       barColor = "linear-gradient(90deg, #38bdf8, #0284c7)";
     } else {
-      statusTag = `<span class="wb-status-tag" style="background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.4);">Resting (0)</span>`;
-      barColor = "#475569";
+      statusTag = `<span class="wb-status-tag wb-resting">Resting (0)</span>`;
+      barColor = "#64748b";
     }
 
     return `
@@ -7192,7 +7192,7 @@ function renderWorkloadAnalytics() {
         <div class="wb-header">
           <div class="wb-name-wrap">
             <span class="wb-name">${m.name}</span>
-            <span style="font-size: 0.72rem; color: #94a3b8;">(${m.role || 'Member'})</span>
+            <span class="wb-role-sub">(${m.role || 'Member'})</span>
           </div>
           <div style="display: flex; align-items: center; gap: 8px;">
             ${statusTag}
@@ -7381,13 +7381,13 @@ function renderGearIssues() {
 
   container.innerHTML = filtered.map(issue => {
     let urgencyClass = "urgency-medium";
-    let urgencyChipStyle = "background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4);";
+    let urgencyChipClass = "chip-medium";
     if (issue.urgency === "Critical") {
       urgencyClass = "urgency-critical";
-      urgencyChipStyle = "background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);";
+      urgencyChipClass = "chip-critical";
     } else if (issue.urgency === "Low") {
       urgencyClass = "urgency-low";
-      urgencyChipStyle = "background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4);";
+      urgencyChipClass = "chip-low";
     }
 
     let statusChipStyle = "background: #2563eb; color: #fff;";
@@ -7403,12 +7403,12 @@ function renderGearIssues() {
       <div class="gear-issue-card ${urgencyClass} ${isResolved ? 'status-resolved' : ''}">
         <div class="gear-card-top">
           <div class="gear-card-title-wrap">
-            <span class="gear-urgency-chip" style="${urgencyChipStyle}">${issue.urgency}</span>
+            <span class="gear-urgency-chip ${urgencyChipClass}">${issue.urgency}</span>
             <span class="gear-card-item-title">${issue.item}</span>
             <span class="gear-status-chip" style="${statusChipStyle}">${issue.status}</span>
           </div>
           <div class="gear-card-meta">
-            📅 ${issue.date} &bull; Reported by <strong style="color: #38bdf8;">${issue.reporter}</strong>
+            📅 ${issue.date} &bull; Reported by <strong class="gear-reporter-name">${issue.reporter}</strong>
           </div>
         </div>
 
