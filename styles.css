@@ -9859,3 +9859,171 @@ html.light-theme #saveStatusIndicator {
     white-space: nowrap !important;
   }
 }
+
+/* ================= V6.0 MEDIA TEAM HERO ALIGNMENT & COLOSSIANS 3:23 VERSE BOX ================= */
+.team-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 370px);
+  gap: 22px;
+  align-items: center;
+  width: 100%;
+}
+
+.team-hero-main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.team-hero-headline {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 0;
+}
+
+.team-hero-headline .team-hero-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.team-hero-copy {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.team-church-tag {
+  display: inline-flex;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.team-hero-copy .section-title {
+  margin: 0 0 6px 0;
+}
+
+.team-hero-copy .section-desc {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.team-hero-leaders {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.team-strength-card {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px !important;
+  border-radius: 14px !important;
+}
+
+.team-strength-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.22);
+}
+
+.crew-badge-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #cbd5e1;
+}
+
+.crew-count-value {
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #38bdf8;
+}
+
+.crew-scripture-quote {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.crew-scripture-text {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.48;
+  font-style: italic;
+  color: #e2e8f0;
+}
+
+.crew-scripture-ref {
+  font-style: normal;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #fbbf24;
+  letter-spacing: 0.03em;
+}
+
+[data-theme="light"] .team-strength-top,
+html.light-theme .team-strength-top {
+  border-bottom-color: #bae6fd !important;
+}
+
+[data-theme="light"] .crew-badge-label,
+html.light-theme .crew-badge-label {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .crew-count-value,
+html.light-theme .crew-count-value {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .crew-scripture-text,
+html.light-theme .crew-scripture-text {
+  color: #1e293b !important;
+}
+
+[data-theme="light"] .crew-scripture-ref,
+html.light-theme .crew-scripture-ref {
+  color: #b45309 !important;
+}
+
+@media (max-width: 920px) {
+  .team-hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .team-hero-headline {
+    gap: 12px;
+  }
+
+  .team-hero-leaders {
+    gap: 6px;
+  }
+
+  .team-hero-leaders .call-time-badge {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .team-hero-leaders .dept-incharge-pill {
+    white-space: nowrap;
+  }
+
+  .team-strength-card {
+    padding: 12px 14px !important;
+  }
+}
