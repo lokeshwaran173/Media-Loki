@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=5.1">
+  <link rel="stylesheet" href="styles.css?v=5.2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -1858,6 +1858,26 @@
     </div>
   </div>
 
+  <!-- ================= MOBILE CALENDAR APP REMINDER MODAL ================= -->
+  <div id="mobileCalendarModal" class="modal-overlay" onclick="if(event.target === this) closeMobileCalendarModal()">
+    <div class="modal-card" style="max-width: 480px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.3rem;">📅</span>
+          <h3>Add Duties to Phone Calendar</h3>
+        </div>
+        <button class="modal-close" onclick="closeMobileCalendarModal()">&times;</button>
+      </div>
+      <div id="mobileCalendarNote" class="pwa-guide-notice"></div>
+      <div id="mobileCalendarDutiesList" class="mobile-cal-list"></div>
+      <div class="modal-actions-row" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+        <button id="mobileCalShareBtn" class="btn btn-primary" style="display: none;" onclick="shareCurrentVolunteerIcs()">📤 Open in Calendar App</button>
+        <button id="mobileCalDownloadBtn" class="btn btn-secondary" onclick="downloadCurrentVolunteerIcsFile()">💾 Save .ics File</button>
+        <button class="btn btn-secondary" onclick="closeMobileCalendarModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= VOLUNTEER AVAILABILITY / AWAY DATES MODAL ================= -->
   <div id="availabilityModal" class="modal-overlay" onclick="if(event.target === this) closeAvailabilityModal()">
     <div class="modal-card" style="max-width: 520px;">
@@ -1911,7 +1931,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=5.1"></script>
+  <script src="app.js?v=5.2"></script>
 </body>
 
 </html>

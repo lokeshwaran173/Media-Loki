@@ -4878,11 +4878,11 @@ function renderVolunteerPersonalBox(name, duties) {
             <div class="duty-role">${escapeHtml(d.role)}</div>
             ${d.assignedText && d.assignedText.includes('&') ? `<div style="font-size: 0.76rem; opacity: 0.85; margin-top: 2px;">👥 Paired with: <strong>${escapeHtml(d.assignedText)}</strong></div>` : ''}
             <div class="duty-actions-strip">
-              <button type="button" class="btn-duty-action" onclick="addSingleDutyToGoogleCalendar('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Add this shift directly to Google Calendar">
+              <button type="button" class="btn-duty-action" onclick="addSingleDutyToGoogleCalendar('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Open this shift directly in Google Calendar">
                 📅 Google Cal
               </button>
-              <button type="button" class="btn-duty-action" onclick="downloadSingleDutyIcs('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Download .ics event with Saturday 12h, 60m & 15m alarms">
-                📱 iCal
+              <button type="button" class="btn-duty-action" onclick="downloadSingleDutyIcs('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Add shift to Phone Calendar & reminders">
+                📱 Phone Cal
               </button>
               <button type="button" class="btn-duty-action btn-duty-swap" onclick="openSwapForSpecificDuty('${escapeQuotes(memberObj.name)}', ${dIdx})" title="Request a swap or report absence for this specific shift">
                 🔄 Swap / Absent
@@ -4923,7 +4923,7 @@ function renderVolunteerPersonalBox(name, duties) {
           📅 Add to Google Cal
         </button>
         <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.84rem;" onclick="downloadVolunteerCalendar('${escapeQuotes(memberObj.name)}')">
-          📱 Phone Calendar (.ics)
+          📱 Phone Calendar
         </button>
         <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.84rem; border-color: rgba(239, 68, 68, 0.4);" onclick="openAvailabilityModal('${escapeQuotes(memberObj.name)}')">
           🚫 My Away Dates
@@ -5033,17 +5033,27 @@ function parseDutyUtc(dateStr, timeStr, serviceEndStr = "", serviceHint = "") {
   };
 }
 
-// 1-Click Google Calendar Direct URL Generator
-function addSingleDutyToGoogleCalendar(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
+function buildGoogleCalendarUrl(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
   const utc = parseDutyUtc(date, callTime, serviceEnd, service);
   const title = `FLAG Media: ${role} (${service})`;
   const location = "Full Life Centre AG Church, Indoor Media Desk";
-  const details = `Full Life Centre AG Church - Indoor Media Ministry\n\n👤 Volunteer: ${volunteerName || 'Media Team'}\n⛪ Service: ${service}\n🎬 Scheduled Role: ${role}\n⏰ Call Time: ${callTime}${serviceEnd && serviceEnd !== 'TBD' ? `\n🏁 Service Ends: ${serviceEnd}` : ''}\n🙏 Team Prayer: ${prayerTime || '15 mins before call'}\n📍 Location: Indoor Media Desk\n\n"Whatever you do, work at it with all your heart as for the Lord." - Colossians 3:23 🙏✨`;
+  const details = `Full Life Centre AG Church - Indoor Media Ministry\n\n👤 Volunteer: ${volunteerName || 'Media Team'}\n⛪ Service: ${service}\n🎬 Scheduled Role: ${role}\n⏰ Call Time: ${callTime}${serviceEnd && serviceEnd !== 'TBD' ? `\n🏁 Service Ends: ${serviceEnd}` : ''}\n🙏 Team Prayer: ${prayerTime || '15 mins before call'}\n🔔 Reminder Tip: Set a 12-hour (Saturday eve) or 1-hour reminder in Calendar!\n📍 Location: Indoor Media Desk\n\n"Whatever you do, work at it with all your heart as for the Lord." - Colossians 3:23 🙏✨`;
 
-  const gCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${utc.startUtc}/${utc.endUtc}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
-  
-  window.open(gCalUrl, '_blank');
-  showToast(`📅 Opening Google Calendar for ${service} on ${date}...`);
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${utc.startUtc}/${utc.endUtc}&details=${encodeURIComponent(details)}&location=${encodeURIComponent(location)}`;
+}
+
+function openCalendarUrl(url) {
+  const win = window.open(url, '_blank', 'noopener');
+  if (!win || win.closed) {
+    window.location.href = url;
+  }
+}
+
+// 1-Click Google Calendar Direct URL Generator
+function addSingleDutyToGoogleCalendar(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
+  const gCalUrl = buildGoogleCalendarUrl(date, service, role, callTime, prayerTime, volunteerName, serviceEnd);
+  openCalendarUrl(gCalUrl);
+  showToast(`📅 Opening Calendar for ${service} on ${date}...`);
 }
 
 function addVolunteerNextDutyToGoogleCalendar(name) {
@@ -5068,29 +5078,24 @@ function addVolunteerNextDutyToGoogleCalendar(name) {
     nextDuty.serviceEnd || ""
   );
   if (duties.length > 1) {
-    showToast(`📅 Adding duty 1 of ${duties.length} to Google Calendar. Use individual shift buttons below for other dates!`);
+    showToast(`📅 Opening duty 1 of ${duties.length} in Calendar. Tap "Phone Calendar" for all shifts!`);
   }
 }
 
-// Single-Duty .ics Generator with Saturday 12h, 60-min & 15-min Alarms
-function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
+function formatIcsStampNow() {
   const now = new Date();
   const pad = n => String(n).padStart(2, '0');
-  const nowStamp = `${pad(now.getUTCFullYear())}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+  return `${pad(now.getUTCFullYear())}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+}
 
-  const utc = parseDutyUtc(date, callTime, serviceEnd, service);
-  const uid = `flag-media-${Date.now()}-${Math.random().toString(36).substring(2, 8)}@fulllifecentre.church`;
-  const summary = `FLAG Media: ${role} (${service})`;
-  const description = `Full Life Centre AG Church - Indoor Media Duty\\nService: ${service}\\nRole: ${role}\\nCall Time: ${callTime}\\nTeam Prayer: ${prayerTime || '15 mins before call'}\\nAssigned: ${volunteerName}\\n\\nPlease arrive promptly. God bless your ministry!`;
+function buildDutyVeventBlock(duty, nowStamp, idx = 0) {
+  const utc = parseDutyUtc(duty.date, duty.callTime, duty.serviceEnd || "", duty.service || "");
+  const uid = `flag-media-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 8)}@fulllifecentre.church`;
+  const serviceLabel = duty.serviceShort || duty.service;
+  const summary = `FLAG Media: ${duty.role} (${serviceLabel})`;
+  const description = `Full Life Centre AG Church - Indoor Media Duty\\nService: ${duty.service}\\nRole: ${duty.role}\\nCall Time: ${duty.callTime}\\nTeam Prayer: ${duty.prayerTime || '15 mins before call'}\\nAssigned: ${duty.assignedText || duty.volunteerName || 'Media Team'}\\n\\nPlease arrive promptly. God bless your ministry!`;
 
-  const icsBody = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Full Life Centre AG Church//Indoor Media Portal//EN',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'X-WR-CALNAME:FLAG Media - ' + (volunteerName || 'Duty'),
-    'X-WR-TIMEZONE:Asia/Kolkata',
+  return [
     'BEGIN:VEVENT',
     `UID:${uid}`,
     `DTSTAMP:${nowStamp}`,
@@ -5115,25 +5120,182 @@ function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunt
     'DESCRIPTION:FLAG Media Call Time in 15 Mins',
     'TRIGGER:-PT15M',
     'END:VALARM',
-    'END:VEVENT',
+    'END:VEVENT'
+  ].join('\r\n');
+}
+
+function buildIcsCalendarString(calName, dutiesList) {
+  const nowStamp = formatIcsStampNow();
+  const vevents = (dutiesList || []).map((d, idx) => buildDutyVeventBlock(d, nowStamp, idx));
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Full Life Centre AG Church//Indoor Media Portal//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    `X-WR-CALNAME:${calName}`,
+    'X-WR-TIMEZONE:Asia/Kolkata',
+    ...vevents,
     'END:VCALENDAR'
   ].join('\r\n');
+}
 
+function triggerIcsFileDownload(icsBody, filename) {
   const blob = new Blob([icsBody], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const safeDate = (date || 'Duty').replace(/[^a-zA-Z0-9]/g, '_');
   a.href = url;
-  a.download = `FLAG_Media_${safeDate}.ics`;
+  a.download = filename;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
+function isIosSafariDirectCalendarSupported() {
+  return isIosDevice() && !isIosNonSafariBrowser() && !isInAppBrowser();
+}
+
+function openIcsDataUriForIos(icsBody) {
+  window.location.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(icsBody)}`;
+}
+
+function canShareIcsFiles(filename) {
+  try {
+    if (!navigator.share || !navigator.canShare || typeof File === 'undefined') return false;
+    const probe = new File(['BEGIN:VCALENDAR\r\nEND:VCALENDAR'], filename || 'duty.ics', { type: 'text/calendar' });
+    return navigator.canShare({ files: [probe] });
+  } catch (e) {
+    return false;
+  }
+}
+
+async function shareIcsViaNativeSheet(icsBody, filename, titleText) {
+  try {
+    const file = new File([icsBody], filename, { type: 'text/calendar' });
+    await navigator.share({
+      files: [file],
+      title: titleText || 'FLAG Media Duty Reminder',
+      text: 'Open with your phone Calendar app to save duty reminders.'
+    });
+    return true;
+  } catch (err) {
+    if (err && err.name === 'AbortError') return true; // user cancelled share sheet cleanly
+    return false;
+  }
+}
+
+window.__activeMobileCalendarContext = null;
+
+function openMobileCalendarModal(volunteerName, duties) {
+  const modal = document.getElementById('mobileCalendarModal');
+  const noteEl = document.getElementById('mobileCalendarNote');
+  const listEl = document.getElementById('mobileCalendarDutiesList');
+  const shareBtn = document.getElementById('mobileCalShareBtn');
+  if (!modal || !listEl) return;
+
+  const safeName = (volunteerName || 'Duty').replace(/[^a-zA-Z0-9]/g, '_');
+  const safeMonth = (appState.month || 'Schedule').replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = duties.length === 1
+    ? `FLAG_Media_${(duties[0].date || 'Duty').replace(/[^a-zA-Z0-9]/g, '_')}.ics`
+    : `FLAG_Media_${safeName}_${safeMonth}.ics`;
+
+  const normalizedDuties = duties.map(d => ({
+    ...d,
+    volunteerName: volunteerName || d.volunteerName || d.assignedText || 'Media Team'
+  }));
+  const icsBody = buildIcsCalendarString(`FLAG Media - ${volunteerName || 'Duty'}`, normalizedDuties);
+  window.__activeMobileCalendarContext = { volunteerName, duties: normalizedDuties, icsBody, filename };
+
+  if (noteEl) {
+    if (isIosDevice() && !isIosSafariDirectCalendarSupported()) {
+      noteEl.innerHTML = '🍎 <strong>iPhone Tip:</strong> Tap <strong>Open in Calendar</strong> on each shift below, or open this portal in <strong>Safari</strong> to add all shifts into Apple Calendar at once.';
+    } else {
+      noteEl.innerHTML = '📱 <strong>Tap any shift below</strong> to open it straight inside your phone’s Calendar app & set your reminder — no messy `.ics` download needed!';
+    }
+  }
+
+  if (shareBtn) {
+    shareBtn.style.display = canShareIcsFiles(filename) ? 'inline-flex' : 'none';
+  }
+
+  listEl.innerHTML = normalizedDuties.map((d, idx) => `
+    <div class="mobile-cal-item">
+      <div class="mobile-cal-meta">
+        <div class="mobile-cal-date">📅 ${escapeHtml(d.date)} • ${escapeHtml(d.serviceShort || d.service)}</div>
+        <div class="mobile-cal-title">${escapeHtml(d.role)}</div>
+        <div class="mobile-cal-time">⏰ Call: ${escapeHtml(d.callTime)}${d.serviceEnd && d.serviceEnd !== 'TBD' ? ` (Ends ${escapeHtml(d.serviceEnd)})` : ''}</div>
+      </div>
+      <button type="button" class="btn btn-primary btn-sm" onclick="openMobileCalendarDutyAtIndex(${idx})">
+        📅 Open in Calendar
+      </button>
+    </div>
+  `).join('');
+
+  modal.style.display = 'flex';
+}
+
+function openMobileCalendarDutyAtIndex(idx) {
+  const ctx = window.__activeMobileCalendarContext;
+  if (!ctx || !ctx.duties || !ctx.duties[idx]) return;
+  const d = ctx.duties[idx];
+  addSingleDutyToGoogleCalendar(d.date, d.service, d.role, d.callTime, d.prayerTime || '', ctx.volunteerName || d.volunteerName, d.serviceEnd || '');
+}
+
+async function shareCurrentVolunteerIcs() {
+  const ctx = window.__activeMobileCalendarContext;
+  if (!ctx) return;
+  const shared = await shareIcsViaNativeSheet(ctx.icsBody, ctx.filename, `FLAG Media Schedule - ${ctx.volunteerName || 'Duty'}`);
+  if (!shared) {
+    triggerIcsFileDownload(ctx.icsBody, ctx.filename);
+    showToast('📅 Calendar file saved! Tap it to import into Calendar.');
+  }
+}
+
+function downloadCurrentVolunteerIcsFile() {
+  const ctx = window.__activeMobileCalendarContext;
+  if (!ctx) return;
+  triggerIcsFileDownload(ctx.icsBody, ctx.filename);
+  showToast('📅 .ics file saved! Open the file from Downloads if your phone supports importing .ics.');
+}
+
+function closeMobileCalendarModal() {
+  const modal = document.getElementById('mobileCalendarModal');
+  if (modal) modal.style.display = 'none';
+}
+
+// Single-Duty Calendar Handler: opens Calendar app cleanly on mobile, downloads .ics on desktop
+function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
+  const dutyObj = {
+    date,
+    service,
+    serviceShort: service,
+    role,
+    callTime,
+    prayerTime,
+    volunteerName,
+    assignedText: volunteerName,
+    serviceEnd
+  };
+  const icsBody = buildIcsCalendarString(`FLAG Media - ${volunteerName || 'Duty'}`, [dutyObj]);
+  const safeDate = (date || 'Duty').replace(/[^a-zA-Z0-9]/g, '_');
+
+  if (isIosSafariDirectCalendarSupported()) {
+    openIcsDataUriForIos(icsBody);
+    showToast(`📅 Opening Apple Calendar for ${date}...`);
+    return;
+  }
+
+  if (isMobileInstallEligible()) {
+    openMobileCalendarModal(volunteerName, [dutyObj]);
+    return;
+  }
+
+  triggerIcsFileDownload(icsBody, `FLAG_Media_${safeDate}.ics`);
   showToast(`📅 Calendar event downloaded for ${date}!`);
 }
 
-// Calendar Generator (.ics) with Saturday 12-Hour, 60-min & 15-min Pre-Call Alarms
+// Volunteer Month Calendar Handler: opens mobile Calendar chooser/iOS Calendar on phones, downloads .ics on desktop
 function downloadVolunteerCalendar(name) {
   const volunteer = name || window.currentVolunteerFilter;
   if (!volunteer) {
@@ -5146,74 +5308,22 @@ function downloadVolunteerCalendar(name) {
     return;
   }
 
-  const now = new Date();
-  const pad = n => String(n).padStart(2, '0');
-  const nowStamp = `${pad(now.getUTCFullYear())}${pad(now.getUTCMonth() + 1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+  const icsBody = buildIcsCalendarString(`FLAG Media Schedule - ${volunteer}`, duties);
+  const safeName = volunteer.replace(/[^a-zA-Z0-9]/g, '_');
+  const safeMonth = (appState.month || 'Schedule').replace(/[^a-zA-Z0-9]/g, '_');
 
-  let icsEvents = [];
-  duties.forEach((d, idx) => {
-    const utc = parseDutyUtc(d.date, d.callTime, d.serviceEnd || "", d.service || "");
-
-    const uid = `flag-media-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 8)}@fulllifecentre.church`;
-    const summary = `FLAG Media: ${d.role} (${d.serviceShort})`;
-    const description = `Full Life Centre AG Church - Indoor Media Duty\\nService: ${d.service}\\nRole: ${d.role}\\nCall Time: ${d.callTime}\\nTeam Prayer: ${d.prayerTime || '15 mins before call'}\\nAssigned: ${d.assignedText || volunteer}\\n\\nPlease arrive promptly. God bless your ministry!`;
-
-    icsEvents.push(`BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${nowStamp}
-DTSTART:${utc.startUtc}
-DTEND:${utc.endUtc}
-SUMMARY:${summary}
-DESCRIPTION:${description}
-LOCATION:Full Life Centre AG Church, Indoor Media Desk
-STATUS:CONFIRMED
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:FLAG Media Saturday 12hr Reminder: Duty Tomorrow Morning
-TRIGGER:-PT12H
-END:VALARM
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:FLAG Media Call Time in 60 Mins
-TRIGGER:-PT60M
-END:VALARM
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:FLAG Media Call Time in 15 Mins
-TRIGGER:-PT15M
-END:VALARM
-END:VEVENT`);
-  });
-
-  if (icsEvents.length === 0) {
-    showToast(`Could not format calendar dates for ${volunteer}.`);
+  if (isIosSafariDirectCalendarSupported()) {
+    openIcsDataUriForIos(icsBody);
+    showToast(`📅 Opening Apple Calendar with all ${duties.length} duties...`);
     return;
   }
 
-  const icsBody = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Full Life Centre AG Church//Indoor Media Portal//EN',
-    'CALSCALE:GREGORIAN',
-    'METHOD:PUBLISH',
-    'X-WR-CALNAME:FLAG Media Schedule - ' + volunteer,
-    'X-WR-TIMEZONE:Asia/Kolkata',
-    ...icsEvents,
-    'END:VCALENDAR'
-  ].join('\r\n');
+  if (isMobileInstallEligible()) {
+    openMobileCalendarModal(volunteer, duties);
+    return;
+  }
 
-  const blob = new Blob([icsBody], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const safeName = volunteer.replace(/[^a-zA-Z0-9]/g, '_');
-  const safeMonth = (appState.month || 'Schedule').replace(/[^a-zA-Z0-9]/g, '_');
-  a.href = url;
-  a.download = `FLAG_Media_${safeName}_${safeMonth}.ics`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
+  triggerIcsFileDownload(icsBody, `FLAG_Media_${safeName}_${safeMonth}.ics`);
   showToast(`📅 Calendar exported for ${volunteer}! Open file to import into phone calendar.`);
 }
 
