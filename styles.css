@@ -10027,3 +10027,193 @@ html.light-theme .crew-scripture-ref {
     padding: 12px 14px !important;
   }
 }
+
+/* ================= V6.1 LIGHT THEME COMPREHENSIVE COLOR & WCAG AA DETAILS ================= */
+[data-theme="light"] .hero-title .gradient-text,
+html.light-theme .hero-title .gradient-text {
+  background: none !important;
+  -webkit-text-fill-color: #0369a1 !important;
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .btn-admin-nav,
+html.light-theme .btn-admin-nav {
+  color: #92400e !important;
+  border-color: rgba(180, 83, 9, 0.48) !important;
+  background: rgba(245, 158, 11, 0.10) !important;
+}
+
+[data-theme="light"] .stat-status-pill,
+html.light-theme .stat-status-pill,
+[data-theme="light"] .stat-status-pill strong,
+html.light-theme .stat-status-pill strong {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .stat-status-pill.blue-pill,
+html.light-theme .stat-status-pill.blue-pill {
+  background: #0369a1 !important;
+}
+
+[data-theme="light"] .stat-status-pill.amber-pill,
+html.light-theme .stat-status-pill.amber-pill {
+  background: #b45309 !important;
+}
+
+[data-theme="light"] .stat-status-pill.emerald-pill,
+html.light-theme .stat-status-pill.emerald-pill {
+  background: #15803d !important;
+}
+
+[data-theme="light"] .stat-status-pill.purple-pill,
+html.light-theme .stat-status-pill.purple-pill {
+  background: #6d28d9 !important;
+}
+
+[data-theme="light"] .active-month-label,
+html.light-theme .active-month-label {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .sched-view-btn.active,
+html.light-theme .sched-view-btn.active {
+  background: #0369a1 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-primary,
+html.light-theme .btn-primary {
+  background: #0369a1 !important;
+  border-color: #075985 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-warning,
+html.light-theme .btn-warning {
+  background: #b45309 !important;
+  border-color: #92400e !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-save-schedule,
+html.light-theme .btn-save-schedule,
+[data-theme="light"] .btn-cat-action.btn-mark-done,
+html.light-theme .btn-cat-action.btn-mark-done {
+  background: #047857 !important;
+  border-color: #065f46 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .btn-danger,
+html.light-theme .btn-danger {
+  background: #dc2626 !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+
+/* Fix Dark Personal Filter Box in Light Mode */
+[data-theme="light"] .volunteer-personal-box,
+html.light-theme .volunteer-personal-box {
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 55%, #f0f9ff 100%) !important;
+  border: 1.5px solid #fcd34d !important;
+  box-shadow: 0 6px 20px rgba(217, 119, 6, 0.08) !important;
+}
+
+[data-theme="light"] .volunteer-summary-header,
+html.light-theme .volunteer-summary-header {
+  border-bottom-color: #fde68a !important;
+}
+
+[data-theme="light"] .greeting-sub strong,
+html.light-theme .greeting-sub strong {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .device-remember-pill,
+html.light-theme .device-remember-pill {
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+  color: #78350f !important;
+}
+
+[data-theme="light"] .btn-remember-switch,
+html.light-theme .btn-remember-switch {
+  color: #0369a1 !important;
+  font-weight: 800 !important;
+}
+
+/* Fix Checklists Active Week Strong Tag & Filter Pills */
+[data-theme="light"] .week-pill-btn.active,
+html.light-theme .week-pill-btn.active {
+  background: #0369a1 !important;
+  border-color: #075985 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .week-pill-btn.active span,
+[data-theme="light"] .week-pill-btn.active strong,
+html.light-theme .week-pill-btn.active span,
+html.light-theme .week-pill-btn.active strong,
+[data-theme="light"] .btn-primary strong,
+html.light-theme .btn-primary strong,
+[data-theme="light"] .btn-whatsapp strong,
+html.light-theme .btn-whatsapp strong,
+[data-theme="light"] .nav-btn.active strong,
+html.light-theme .nav-btn.active strong,
+[data-theme="light"] .status-filter-pill.active,
+[data-theme="light"] .status-filter-pill.active span,
+html.light-theme .status-filter-pill.active,
+html.light-theme .status-filter-pill.active span {
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .status-filter-pill.active,
+html.light-theme .status-filter-pill.active {
+  background: #0369a1 !important;
+  border-color: #075985 !important;
+}
+
+[data-theme="light"] .week-stat-num,
+html.light-theme .week-stat-num {
+  color: #0369a1 !important;
+}
+
+/* Fix Admin Sub-Navigation Bar Track & Buttons in Light Mode */
+[data-theme="light"] .admin-subnav-bar,
+html.light-theme .admin-subnav-bar {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="light"] .admin-pill-btn,
+html.light-theme .admin-pill-btn {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="light"] .admin-pill-btn:hover,
+html.light-theme .admin-pill-btn:hover {
+  background: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .admin-pill-btn.active,
+html.light-theme .admin-pill-btn.active {
+  background: #0369a1 !important;
+  border-color: #075985 !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(3, 105, 161, 0.25) !important;
+}
+
+/* Darker Placeholders for Light Mode Forms */
+[data-theme="light"] .input-text::placeholder,
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder,
+html.light-theme .input-text::placeholder,
+html.light-theme input::placeholder,
+html.light-theme textarea::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
