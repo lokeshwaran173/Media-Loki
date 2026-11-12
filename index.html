@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=5.5">
+  <link rel="stylesheet" href="styles.css?v=5.6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -195,8 +195,8 @@
                 <span class="gradient-text">Indoor Media Team</span>
               </h1>
               <div class="hero-leadership-strip">
-                <span class="hero-dept-pill">✝️ Overall Media Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span>
-                <span class="hero-leader-pill" id="heroLeaderBadge">👑 Team Leader: <strong>Lokesh</strong></span>
+                <span class="hero-dept-pill"><span class="dept-text-inner">✝️ Overall Media Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
+                <span class="hero-leader-pill" id="heroLeaderBadge"><span class="dept-text-inner">👑 Team Leader: <strong>Lokesh</strong></span></span>
               </div>
             </div>
           </div>
@@ -702,7 +702,7 @@
             <div>
               <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                 <span class="header-tag tag-blue" style="font-weight: 800;">FULL LIFE CENTRE AG CHURCH</span>
-                <span class="call-time-badge dept-incharge-pill">✝️ Overall Dept. Incharge: Pastor. Jerry Jemson</span>
+                <span class="call-time-badge dept-incharge-pill"><span class="dept-text-inner">✝️ Overall Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
                 <span class="call-time-badge team-leader-pill" id="teamLeaderBadge">👑 Team Leader: Lokesh</span>
               </div>
               <h2 class="section-title" style="margin-top: 8px;">Indoor Media Crew Directory</h2>
@@ -752,7 +752,7 @@
           <div>
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <span class="header-tag tag-amber" style="font-weight: 800;">👑 ADMIN CONSOLE ACTIVE</span>
-              <span class="call-time-badge dept-incharge-pill">✝️ Dept. Incharge: Pastor. Jerry Jemson</span>
+              <span class="call-time-badge dept-incharge-pill"><span class="dept-text-inner">✝️ Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
               <span class="call-time-badge team-leader-pill" id="adminLeaderBadge">👑 Team Leader: Lokesh</span>
               <button type="button" class="btn-leader-edit" onclick="openChangeLeaderModal()"
                 title="Change Team Leader name shown across portal & WhatsApp alerts">
@@ -1081,21 +1081,28 @@
       <!-- SUB-TAB 2: TEAM MEMBERS MANAGER -->
       <div id="adminMembersTab" class="admin-tab-content">
         <div class="card card-accent-amber admin-leadership-card" style="margin-bottom: 20px;">
-          <div class="card-row">
-            <div>
-              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                <span class="header-tag tag-blue">✝️ Overall Media Dept. Incharge: Pastor. Jerry Jemson</span>
+          <div class="admin-leadership-row">
+            <div class="admin-leadership-info">
+              <div class="admin-leadership-badges">
+                <span class="header-tag tag-blue dept-incharge-pill"><span class="dept-text-inner">✝️ Overall Media Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
                 <span class="call-time-badge team-leader-pill" id="adminTabLeaderBadge">👑 Team Leader: Lokesh</span>
               </div>
-              <p class="section-desc" style="margin-top: 6px;">Select any team member below (or tap <strong>👑 Set Leader</strong> on their card) to assign the active <strong>Team Leader</strong> badge across the entire portal.</p>
+              <p class="section-desc" style="margin-top: 8px;">Select a member and click <strong>Save</strong> to update <strong>👑 Team Leader</strong>, or click <strong>Blank on Main Page</strong> to hide it on the main page.</p>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <select id="adminTeamLeaderSelect" class="role-select" style="min-width: 200px; font-weight: 700;"
-                onchange="setTeamLeaderByName(this.value)" title="Select Team Leader">
+            <div class="admin-leadership-actions">
+              <select id="adminTeamLeaderSelect" class="role-select admin-leader-select" title="Choose Team Leader">
               </select>
-              <button type="button" class="btn btn-secondary btn-sm" onclick="openChangeLeaderModal()">
-                ✏️ Custom Name
-              </button>
+              <div class="admin-leadership-btn-group">
+                <button type="button" class="btn btn-save-schedule btn-sm" onclick="saveAdminSelectedLeader()">
+                  💾 Save Leader
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openChangeLeaderModal()">
+                  ✏️ Custom
+                </button>
+                <button type="button" id="btnToggleLeaderBlankMain" class="btn btn-blank-leader btn-sm" onclick="toggleLeaderMainPageBlank()">
+                  🚫 Blank on Main Page
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1543,9 +1550,10 @@
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; gap: 10px;">
-        <button class="btn btn-secondary" onclick="closeChangeLeaderModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="saveNewLeaderName()">Save Leader</button>
+      <div class="modal-actions-row" style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
+        <button type="button" class="btn btn-blank-leader btn-sm" id="btnModalBlankLeader" onclick="setLeaderBlankFromModal()" style="margin-right: auto;">🚫 Blank on Main Page</button>
+        <button type="button" class="btn btn-secondary" onclick="closeChangeLeaderModal()">Cancel</button>
+        <button type="button" class="btn btn-save-schedule" onclick="saveNewLeaderName()">💾 Save Leader</button>
       </div>
     </div>
   </div>
@@ -1963,7 +1971,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=5.5"></script>
+  <script src="app.js?v=5.6"></script>
 </body>
 
 </html>

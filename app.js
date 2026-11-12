@@ -84,6 +84,7 @@ function syncOfficialCrewPhoneNumbers(state) {
 const defaultState = {
   month: "October 2026",
   leaderName: DEFAULT_LEADER_NAME,
+  hideLeaderOnMainPage: false,
   members: JSON.parse(JSON.stringify(OFFICIAL_CREW_DIRECTORY)),
   firstService: [
     { id: 1, date: "04 Oct 2026", cam1: "Balaji", cam2: "Lokesh", gimble: "Shyam Davit", live: "Anand", spot: "Joshua", charging: "Yashwanth & Sam Davit" },
@@ -378,22 +379,55 @@ function openWhatsAppToLeader(messageText) {
 
 function renderLeaderBadges() {
   const leader = getLeaderName();
+  const isBlankOnMain = Boolean(appState && appState.hideLeaderOnMainPage);
   const heroBadge = document.getElementById("heroLeaderBadge");
   const teamBadge = document.getElementById("teamLeaderBadge");
   const adminBadge = document.getElementById("adminLeaderBadge");
   const adminTabBadge = document.getElementById("adminTabLeaderBadge");
   const adminLeaderSelect = document.getElementById("adminTeamLeaderSelect");
+  const blankBtn = document.getElementById("btnToggleLeaderBlankMain");
+  const modalBlankBtn = document.getElementById("btnModalBlankLeader");
   const printLine = document.getElementById("printLeadershipLine");
   const swapPrompt = document.getElementById("swapLeaderPromptName");
   const swapBtn = document.getElementById("btnSendSwapToLeader");
   const satBtn = document.getElementById("btnSendSatAlertToLeader");
 
-  if (heroBadge) heroBadge.innerHTML = `👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
+  if (heroBadge) {
+    if (isBlankOnMain || !leader) {
+      heroBadge.style.display = "none";
+      heroBadge.setAttribute("aria-hidden", "true");
+    } else {
+      heroBadge.style.display = "";
+      heroBadge.removeAttribute("aria-hidden");
+      heroBadge.innerHTML = `<span class="dept-text-inner">👑 Team Leader: <strong>${escapeHtml(leader)}</strong></span>`;
+    }
+  }
   if (teamBadge) teamBadge.textContent = `👑 Team Leader: ${leader}`;
-  if (adminBadge) adminBadge.textContent = `👑 Team Leader: ${leader}`;
-  if (adminTabBadge) adminTabBadge.textContent = `👑 Team Leader: ${leader}`;
+  if (adminBadge) {
+    adminBadge.textContent = isBlankOnMain
+      ? `👑 Team Leader: ${leader} (Blank on Main Page)`
+      : `👑 Team Leader: ${leader}`;
+  }
+  if (adminTabBadge) {
+    adminTabBadge.textContent = isBlankOnMain
+      ? `👑 Team Leader: ${leader} (Blank on Main Page)`
+      : `👑 Team Leader: ${leader}`;
+  }
+  if (blankBtn) {
+    blankBtn.classList.toggle("active", isBlankOnMain);
+    blankBtn.textContent = isBlankOnMain ? "👁️ Show on Main Page" : "🚫 Blank on Main Page";
+    blankBtn.title = isBlankOnMain
+      ? "Currently blank on the main page — click to show Team Leader again"
+      : "Hide Team Leader badge on the main page";
+  }
+  if (modalBlankBtn) {
+    modalBlankBtn.classList.toggle("active", isBlankOnMain);
+    modalBlankBtn.textContent = isBlankOnMain ? "👁️ Show on Main Page" : "🚫 Blank on Main Page";
+  }
   if (printLine) {
-    printLine.innerHTML = `✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong> &bull; 👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
+    printLine.innerHTML = isBlankOnMain || !leader
+      ? `✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong>`
+      : `✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong> &bull; 👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
   }
   if (adminLeaderSelect) {
     const members = (appState && Array.isArray(appState.members)) ? appState.members : [];
@@ -419,9 +453,43 @@ function setTeamLeaderByName(name) {
   const newLeader = String(name || "").trim();
   if (!newLeader) return;
   appState.leaderName = newLeader;
-  saveState(false, { leaderName: appState.leaderName });
+  appState.hideLeaderOnMainPage = false;
+  saveState(false, { leaderName: appState.leaderName, hideLeaderOnMainPage: false });
   renderAll();
-  showToast(`👑 Team Leader updated to ${newLeader}!`);
+  showToast(`👑 Team Leader saved as ${newLeader}!`);
+}
+
+function saveAdminSelectedLeader() {
+  const sel = document.getElementById("adminTeamLeaderSelect");
+  const picked = sel ? sel.value.trim() : "";
+  if (!picked) {
+    showToast("⚠️ Please choose a Team Leader from the list first.");
+    return;
+  }
+  setTeamLeaderByName(picked);
+}
+
+function toggleLeaderMainPageBlank() {
+  appState.hideLeaderOnMainPage = !Boolean(appState.hideLeaderOnMainPage);
+  saveState(false, { hideLeaderOnMainPage: appState.hideLeaderOnMainPage });
+  renderAll();
+  showToast(
+    appState.hideLeaderOnMainPage
+      ? "🙈 Team Leader is now blank on the Main Page!"
+      : `👁️ Team Leader (${getLeaderName()}) is now shown on the Main Page!`
+  );
+}
+
+function setLeaderBlankFromModal() {
+  appState.hideLeaderOnMainPage = !Boolean(appState.hideLeaderOnMainPage);
+  saveState(false, { hideLeaderOnMainPage: appState.hideLeaderOnMainPage });
+  closeChangeLeaderModal();
+  renderAll();
+  showToast(
+    appState.hideLeaderOnMainPage
+      ? "🙈 Team Leader is now blank on the Main Page!"
+      : `👁️ Team Leader (${getLeaderName()}) is now shown on the Main Page!`
+  );
 }
 
 function openChangeLeaderModal() {
@@ -561,6 +629,9 @@ function ensureStateIntegrity(state) {
   }
   if (!state.leaderName || typeof state.leaderName !== "string" || !state.leaderName.trim()) {
     state.leaderName = DEFAULT_LEADER_NAME;
+  }
+  if (typeof state.hideLeaderOnMainPage !== "boolean") {
+    state.hideLeaderOnMainPage = false;
   }
   if (!state.crewDirectoryVersion || state.crewDirectoryVersion < CURRENT_CREW_DIRECTORY_VERSION) {
     state.members = state.members.filter(m => !isAliasMatch(m.name, "Andrew"));
@@ -2966,29 +3037,29 @@ function renderMembers() {
     if (shiftCount >= 4) shiftBadgeClass = "tag-purple";
 
     card.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+      <div class="member-card-main">
         <div class="member-avatar" style="background: ${avatarBg};">${initials}</div>
-        <div class="member-info" style="min-width: 0;">
-          <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(m.name)}</h4>
-          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 2px;">
-            <span style="font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)}</span>
+        <div class="member-info" style="min-width: 0; flex: 1;">
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+            <h4 style="margin: 0;">${escapeHtml(m.name)}</h4>
             ${isLeader ? `<span class="team-leader-tag-pill">👑 Team Leader</span>` : ""}
           </div>
-          ${m.phone ? `
-            <div style="margin-top: 3px;">
-              <span style="font-size: 0.72rem; color: #4ade80; font-family: var(--font-mono); font-weight: 700; background: rgba(34, 197, 94, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(34, 197, 94, 0.28); display: inline-flex; align-items: center; gap: 4px;">
+          <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)}</div>
+          <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 5px;">
+            ${m.phone ? `
+              <span style="font-size: 0.72rem; color: #4ade80; font-family: var(--font-mono); font-weight: 700; background: rgba(34, 197, 94, 0.12); padding: 2px 7px; border-radius: 5px; border: 1px solid rgba(34, 197, 94, 0.28); display: inline-flex; align-items: center; gap: 4px; white-space: nowrap;">
                 📱 ${escapeHtml(m.phone)}
               </span>
-            </div>
-          ` : ''}
-          <span class="header-tag ${shiftBadgeClass}" style="font-size: 0.7rem; padding: 2px 8px; margin-top: 4px; display: inline-block;">
-            ${shiftCount} ${shiftCount === 1 ? 'Shift' : 'Shifts'} this month
-          </span>
+            ` : ''}
+            <span class="header-tag ${shiftBadgeClass}" style="font-size: 0.7rem; padding: 2px 8px; display: inline-block; white-space: nowrap;">
+              ${shiftCount} ${shiftCount === 1 ? 'Shift' : 'Shifts'} this month
+            </span>
+          </div>
         </div>
       </div>
-      <div style="display: flex; gap: 4px; align-items: center; flex-shrink: 0;">
+      <div class="member-card-actions">
         <button class="btn-icon-leader${isLeader ? ' active' : ''}" onclick="setTeamLeaderByName('${escapeQuotes(m.name)}')" title="${isLeader ? 'Active Team Leader' : 'Set ' + escapeQuotes(m.name) + ' as Team Leader'}">
-          👑
+          <span>👑</span><span>${isLeader ? 'Team Leader' : 'Set Leader'}</span>
         </button>
         <button class="btn-icon-wa" onclick="openDirectReminderModal('${escapeQuotes(m.name)}')" title="Send WhatsApp Duty Reminder">
           💬
@@ -3286,6 +3357,7 @@ function saveMemberEdit() {
   appState.members[editingMemberIdx].phone = newPhone;
   if (leaderChk && leaderChk.checked) {
     appState.leaderName = newName;
+    appState.hideLeaderOnMainPage = false;
   } else if (wasLeader && newName !== oldName) {
     appState.leaderName = newName;
   }
