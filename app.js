@@ -3,9 +3,10 @@
 // Official Full Life Centre AG Church Indoor Media Crew Directory & Contacts
 const DEFAULT_MEMBER_ROLE = "Media Crew Member";
 const CURRENT_MEMBER_ROLES_VERSION = 1;
-const CURRENT_CREW_DIRECTORY_VERSION = 1;
+const CURRENT_CREW_DIRECTORY_VERSION = 2;
 const DEFAULT_LEADER_NAME = "Lokesh";
 const DEFAULT_LEADER_PHONE = "916380795436";
+const OVERALL_DEPT_INCHARGE = "Pastor. Jerry Jemson";
 
 const OFFICIAL_CREW_DIRECTORY = [
   { name: "Lokesh", role: DEFAULT_MEMBER_ROLE, phone: "+91 63807 95436" },
@@ -63,7 +64,7 @@ function syncOfficialCrewPhoneNumbers(state) {
     let existing = state.members.find(m => isAliasMatch(m.name, official.name));
     if (existing) {
       if (official.phone && !existing.phone) existing.phone = official.phone;
-      if (official.name !== existing.name && ["Shyam Davit", "Sam Davit", "Praveen", "Andross"].includes(existing.name)) {
+      if (official.name !== existing.name && (["Shyam Davit", "Sam Davit", "Praveen", "Andross"].includes(existing.name) || /^andross$/i.test(existing.name))) {
         existing.name = official.name;
       }
       if (official.role && (!existing.role || existing.role === "Media Volunteer" || existing.role === "Media Crew")) {
@@ -377,17 +378,50 @@ function openWhatsAppToLeader(messageText) {
 
 function renderLeaderBadges() {
   const leader = getLeaderName();
+  const heroBadge = document.getElementById("heroLeaderBadge");
   const teamBadge = document.getElementById("teamLeaderBadge");
   const adminBadge = document.getElementById("adminLeaderBadge");
+  const adminTabBadge = document.getElementById("adminTabLeaderBadge");
+  const adminLeaderSelect = document.getElementById("adminTeamLeaderSelect");
+  const printLine = document.getElementById("printLeadershipLine");
   const swapPrompt = document.getElementById("swapLeaderPromptName");
   const swapBtn = document.getElementById("btnSendSwapToLeader");
   const satBtn = document.getElementById("btnSendSatAlertToLeader");
 
-  if (teamBadge) teamBadge.textContent = `👑 Leader: ${leader}`;
-  if (adminBadge) adminBadge.textContent = `Leader: ${leader}`;
+  if (heroBadge) heroBadge.innerHTML = `👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
+  if (teamBadge) teamBadge.textContent = `👑 Team Leader: ${leader}`;
+  if (adminBadge) adminBadge.textContent = `👑 Team Leader: ${leader}`;
+  if (adminTabBadge) adminTabBadge.textContent = `👑 Team Leader: ${leader}`;
+  if (printLine) {
+    printLine.innerHTML = `✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong> &bull; 👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
+  }
+  if (adminLeaderSelect) {
+    const members = (appState && Array.isArray(appState.members)) ? appState.members : [];
+    const opts = [`<option value="">-- Choose Team Leader --</option>`];
+    let hasSelectedMember = false;
+    members.forEach(m => {
+      if (!m || !m.name) return;
+      const isMatch = isAliasMatch(m.name, leader);
+      if (isMatch) hasSelectedMember = true;
+      opts.push(`<option value="${escapeHtml(m.name)}" ${isMatch ? "selected" : ""}>👑 ${escapeHtml(m.name)}</option>`);
+    });
+    if (!hasSelectedMember && leader) {
+      opts.push(`<option value="${escapeHtml(leader)}" selected>👑 ${escapeHtml(leader)}</option>`);
+    }
+    adminLeaderSelect.innerHTML = opts.join("");
+  }
   if (swapPrompt) swapPrompt.textContent = `Leader ${leader}`;
   if (swapBtn) swapBtn.title = `Send directly to Leader ${leader} on WhatsApp`;
   if (satBtn) satBtn.title = `Send preview to Leader ${leader} on WhatsApp`;
+}
+
+function setTeamLeaderByName(name) {
+  const newLeader = String(name || "").trim();
+  if (!newLeader) return;
+  appState.leaderName = newLeader;
+  saveState(false, { leaderName: appState.leaderName });
+  renderAll();
+  showToast(`👑 Team Leader updated to ${newLeader}!`);
 }
 
 function openChangeLeaderModal() {
@@ -434,11 +468,8 @@ function saveNewLeaderName() {
     alert("Please enter or select a Leader name.");
     return;
   }
-  appState.leaderName = newLeader;
-  saveState(false, { leaderName: appState.leaderName });
   closeChangeLeaderModal();
-  renderAll();
-  showToast(`👑 Team Leader updated to ${newLeader} & synced!`);
+  setTeamLeaderByName(newLeader);
 }
 
 // Helper: Calculate all dates for a given day of the week in a month
@@ -540,6 +571,15 @@ function ensureStateIntegrity(state) {
         lokesh.phone = "+91 63807 95436";
       }
     }
+    state.members.forEach(m => {
+      if (m && m.name && /^andross$/i.test(m.name.trim()) && m.name.trim() !== "Aandross") {
+        m.name = "Aandross";
+      }
+    });
+    if (/^andross$/i.test(String(state.leaderName || "").trim())) {
+      state.leaderName = "Aandross";
+    }
+    renameMemberAcrossSchedules("Andross", "Aandross", state);
     state.crewDirectoryVersion = CURRENT_CREW_DIRECTORY_VERSION;
   }
   if (!state.memberRolesVersion || state.memberRolesVersion < CURRENT_MEMBER_ROLES_VERSION) {
@@ -2911,9 +2951,11 @@ function renderMembers() {
     "linear-gradient(135deg, #06b6d4, #0e7490)"
   ];
 
+  const activeLeaderName = getLeaderName();
   appState.members.forEach((m, idx) => {
+    const isLeader = isAliasMatch(m.name, activeLeaderName);
     const card = document.createElement("div");
-    card.className = "member-card";
+    card.className = "member-card" + (isLeader ? " is-leader-card" : "");
     const initials = m.name.split(" ").map(n => n[0]).join("").toUpperCase();
     const shiftCount = calculateMemberShifts(m.name);
     const gradIndex = Math.abs(m.name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)) % avatarGradients.length;
@@ -2927,12 +2969,15 @@ function renderMembers() {
       <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
         <div class="member-avatar" style="background: ${avatarBg};">${initials}</div>
         <div class="member-info" style="min-width: 0;">
-          <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.name}</h4>
-          <p style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.role || DEFAULT_MEMBER_ROLE}</p>
+          <h4 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(m.name)}</h4>
+          <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 2px;">
+            <span style="font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)}</span>
+            ${isLeader ? `<span class="team-leader-tag-pill">👑 Team Leader</span>` : ""}
+          </div>
           ${m.phone ? `
             <div style="margin-top: 3px;">
               <span style="font-size: 0.72rem; color: #4ade80; font-family: var(--font-mono); font-weight: 700; background: rgba(34, 197, 94, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(34, 197, 94, 0.28); display: inline-flex; align-items: center; gap: 4px;">
-                📱 ${m.phone}
+                📱 ${escapeHtml(m.phone)}
               </span>
             </div>
           ` : ''}
@@ -2942,6 +2987,9 @@ function renderMembers() {
         </div>
       </div>
       <div style="display: flex; gap: 4px; align-items: center; flex-shrink: 0;">
+        <button class="btn-icon-leader${isLeader ? ' active' : ''}" onclick="setTeamLeaderByName('${escapeQuotes(m.name)}')" title="${isLeader ? 'Active Team Leader' : 'Set ' + escapeQuotes(m.name) + ' as Team Leader'}">
+          👑
+        </button>
         <button class="btn-icon-wa" onclick="openDirectReminderModal('${escapeQuotes(m.name)}')" title="Send WhatsApp Duty Reminder">
           💬
         </button>
@@ -3185,10 +3233,12 @@ function openEditMemberModal(idx) {
   const nameInput = document.getElementById("editMemberName");
   const roleInput = document.getElementById("editMemberRole");
   const phoneInput = document.getElementById("editMemberPhone");
+  const leaderChk = document.getElementById("editMemberIsLeader");
 
   if (nameInput) nameInput.value = m.name || "";
   if (roleInput) roleInput.value = m.role || "";
   if (phoneInput) phoneInput.value = m.phone || "";
+  if (leaderChk) leaderChk.checked = isAliasMatch(m.name, getLeaderName());
 
   document.getElementById("editMemberModal").classList.add("show");
   setTimeout(() => {
@@ -3207,10 +3257,12 @@ function saveMemberEdit() {
   const nameInput = document.getElementById("editMemberName");
   const roleInput = document.getElementById("editMemberRole");
   const phoneInput = document.getElementById("editMemberPhone");
+  const leaderChk = document.getElementById("editMemberIsLeader");
   const newName = nameInput.value.trim();
   const newRole = roleInput.value.trim() || DEFAULT_MEMBER_ROLE;
   const newPhone = phoneInput ? phoneInput.value.trim() : "";
   const oldName = appState.members[editingMemberIdx].name;
+  const wasLeader = isAliasMatch(oldName, getLeaderName());
 
   if (!newName) {
     alert("Please enter a valid member name.");
@@ -3232,6 +3284,11 @@ function saveMemberEdit() {
 
   appState.members[editingMemberIdx].role = newRole;
   appState.members[editingMemberIdx].phone = newPhone;
+  if (leaderChk && leaderChk.checked) {
+    appState.leaderName = newName;
+  } else if (wasLeader && newName !== oldName) {
+    appState.leaderName = newName;
+  }
   saveState();
   closeEditMemberModal();
   renderAll();
@@ -3239,51 +3296,53 @@ function saveMemberEdit() {
 }
 
 // Cascade Rename Helper: updates member name across all active and archived schedules
-function renameMemberAcrossSchedules(oldName, newName) {
+function renameMemberAcrossSchedules(oldName, newName, targetState = appState) {
+  if (!targetState || !oldName || !newName) return;
+  const oldLower = oldName.trim().toLowerCase();
   function replaceInSlot(val) {
     if (!val || typeof val !== "string") return val;
-    if (val === oldName) return newName;
+    if (val.trim().toLowerCase() === oldLower) return newName;
     if (val.includes(" & ")) {
       const parts = val.split(" & ");
-      const updated = parts.map(p => p.trim() === oldName ? newName : p);
+      const updated = parts.map(p => p.trim().toLowerCase() === oldLower ? newName : p);
       return updated.join(" & ");
     }
     return val;
   }
 
   // 1st Service
-  (appState.firstService || []).forEach(r => {
+  (targetState.firstService || []).forEach(r => {
     ['cam1', 'cam2', 'gimble', 'live', 'spot', 'charging'].forEach(f => {
       r[f] = replaceInSlot(r[f]);
     });
   });
 
   // 2nd Service
-  (appState.secondService || []).forEach(r => {
+  (targetState.secondService || []).forEach(r => {
     r.operator = replaceInSlot(r.operator);
   });
 
   // 3rd Service
-  (appState.thirdService || []).forEach(r => {
+  (targetState.thirdService || []).forEach(r => {
     r.operator = replaceInSlot(r.operator);
   });
 
   // Friday Fasting
-  (appState.fridayPrayer || []).forEach(r => {
+  (targetState.fridayPrayer || []).forEach(r => {
     r.cam1 = replaceInSlot(r.cam1);
     r.live = replaceInSlot(r.live);
   });
 
   // Special Meetings
-  (appState.specialMeetings || []).forEach(r => {
+  (targetState.specialMeetings || []).forEach(r => {
     ['cam1', 'cam2', 'gimble', 'live', 'spot'].forEach(f => {
       r[f] = replaceInSlot(r[f]);
     });
   });
 
   // Early Morning Prayer
-  if (appState.morningPrayer && appState.morningPrayer.days) {
-    appState.morningPrayer.days.forEach(r => {
+  if (targetState.morningPrayer && targetState.morningPrayer.days) {
+    targetState.morningPrayer.days.forEach(r => {
       ['cam1', 'cam2', 'gimbal', 'liveEditor', 'socialMedia'].forEach(f => {
         r[f] = replaceInSlot(r[f]);
       });
@@ -3291,9 +3350,9 @@ function renameMemberAcrossSchedules(oldName, newName) {
   }
 
   // Multi-month archives
-  if (appState.schedules) {
-    Object.keys(appState.schedules).forEach(key => {
-      const sch = appState.schedules[key];
+  if (targetState.schedules) {
+    Object.keys(targetState.schedules).forEach(key => {
+      const sch = targetState.schedules[key];
       if (sch.firstService) {
         sch.firstService.forEach(r => {
           ['cam1', 'cam2', 'gimble', 'live', 'spot', 'charging'].forEach(f => {

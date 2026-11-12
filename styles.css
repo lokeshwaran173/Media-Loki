@@ -8789,3 +8789,295 @@ html.light-theme .roster-pair {
     padding: 16px;
   }
 }
+
+/* ================= V5.5 LEADERSHIP, DEPT INCHARGE & ADMIN TEAM LEADER CONTROLS ================= */
+.hero-leadership-strip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.hero-dept-pill,
+.hero-leader-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  backdrop-filter: blur(8px);
+}
+
+.hero-dept-pill {
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+  color: #e0f2fe;
+}
+
+.hero-dept-pill strong {
+  color: #7dd3fc;
+  font-weight: 700;
+}
+
+.hero-leader-pill {
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.18), rgba(245, 158, 11, 0.12));
+  border: 1px solid rgba(251, 191, 36, 0.38);
+  color: #fef3c7;
+}
+
+.hero-leader-pill strong {
+  color: #fde68a;
+  font-weight: 700;
+}
+
+.dept-incharge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(14, 165, 233, 0.1));
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  color: #bae6fd;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.admin-leadership-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px 20px;
+  padding: 16px 20px;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 23, 42, 0.85) 60%, rgba(56, 189, 248, 0.08) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  border-top: 1px solid rgba(253, 230, 138, 0.32);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-leadership-card label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #fde68a;
+}
+
+.admin-leadership-card select {
+  min-width: 220px;
+  max-width: 100%;
+  padding: 9px 12px;
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  color: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.admin-leadership-card select:focus {
+  outline: none;
+  border-color: #fbbf24;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+}
+
+.member-card.is-leader-card {
+  border-color: rgba(251, 191, 36, 0.48);
+  border-top-color: rgba(253, 230, 138, 0.52);
+  background: linear-gradient(180deg, rgba(45, 36, 16, 0.55) 0%, rgba(15, 23, 38, 0.94) 100%);
+  box-shadow: var(--shadow-sm), 0 0 18px rgba(251, 191, 36, 0.12);
+}
+
+.member-card.is-leader-card:hover {
+  border-color: rgba(251, 191, 36, 0.72);
+  box-shadow: var(--shadow-md), 0 0 22px rgba(251, 191, 36, 0.2);
+}
+
+.team-leader-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fef3c7;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.28), rgba(217, 119, 6, 0.24));
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.15);
+}
+
+.btn-icon-leader {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.btn-icon-leader:hover {
+  background: rgba(251, 191, 36, 0.24);
+  color: #fde68a;
+  border-color: rgba(251, 191, 36, 0.6);
+  transform: scale(1.08);
+}
+
+.btn-icon-leader.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border-color: rgba(253, 230, 138, 0.75);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+}
+
+.edit-leader-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: #fef3c7;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-leader-checkbox-row input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: #f59e0b;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Light theme overrides for V5.5 leadership elements */
+[data-theme="light"] .hero-dept-pill,
+html.light-theme .hero-dept-pill {
+  background: #e0f2fe !important;
+  border-color: #7dd3fc !important;
+  color: #0c4a6e !important;
+}
+
+[data-theme="light"] .hero-dept-pill strong,
+html.light-theme .hero-dept-pill strong {
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .hero-leader-pill,
+html.light-theme .hero-leader-pill {
+  background: #fef3c7 !important;
+  border-color: #fcd34d !important;
+  color: #78350f !important;
+}
+
+[data-theme="light"] .hero-leader-pill strong,
+html.light-theme .hero-leader-pill strong {
+  color: #92400e !important;
+}
+
+[data-theme="light"] .dept-incharge-pill,
+html.light-theme .dept-incharge-pill {
+  background: #e0f2fe !important;
+  border-color: #7dd3fc !important;
+  color: #0c4a6e !important;
+}
+
+[data-theme="light"] .admin-leadership-card,
+html.light-theme .admin-leadership-card {
+  background: linear-gradient(135deg, #fffbeb 0%, #ffffff 70%, #f0f9ff 100%) !important;
+  border-color: #fcd34d !important;
+}
+
+[data-theme="light"] .admin-leadership-card label,
+html.light-theme .admin-leadership-card label {
+  color: #92400e !important;
+}
+
+[data-theme="light"] .admin-leadership-card select,
+html.light-theme .admin-leadership-card select {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .member-card.is-leader-card,
+html.light-theme .member-card.is-leader-card {
+  background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.14) !important;
+}
+
+[data-theme="light"] .team-leader-tag-pill,
+html.light-theme .team-leader-tag-pill {
+  background: #fef3c7 !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+[data-theme="light"] .btn-icon-leader,
+html.light-theme .btn-icon-leader {
+  background: #fffbeb !important;
+  border-color: #fcd34d !important;
+  color: #b45309 !important;
+}
+
+[data-theme="light"] .btn-icon-leader.active,
+html.light-theme .btn-icon-leader.active {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border-color: #b45309 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .edit-leader-checkbox-row,
+html.light-theme .edit-leader-checkbox-row {
+  background: #fffbeb !important;
+  border-color: #fcd34d !important;
+  color: #78350f !important;
+}
+
+@media (max-width: 640px) {
+  .hero-leadership-strip {
+    gap: 8px;
+  }
+
+  .hero-dept-pill,
+  .hero-leader-pill,
+  .dept-incharge-pill {
+    font-size: 0.76rem;
+    padding: 5px 11px;
+    max-width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .admin-leadership-card {
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .admin-leadership-card select {
+    width: 100%;
+    min-width: 0;
+  }
+}
