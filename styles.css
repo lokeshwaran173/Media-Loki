@@ -8325,3 +8325,369 @@ html.light-theme .mobile-cal-time {
     justify-content: center;
   }
 }
+
+/* ==========================================================================
+   V5.3 MODERN STUDIO VISUAL POLISH (DARK & LIGHT HARMONIZED)
+   ========================================================================== */
+
+body {
+  background-image:
+    radial-gradient(ellipse 80% 45% at 50% -12%, rgba(37, 99, 235, 0.2), transparent 68%),
+    radial-gradient(circle at 12% 20%, rgba(56, 189, 248, 0.09) 0%, transparent 42%),
+    radial-gradient(circle at 88% 30%, rgba(16, 185, 129, 0.07) 0%, transparent 42%),
+    radial-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+  background-size: auto, auto, auto, 26px 26px;
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+/* Crisp Navbar & Segmented Nav Pills */
+.navbar {
+  background: rgba(9, 15, 29, 0.82);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: 0 8px 30px rgba(2, 6, 23, 0.45);
+}
+
+.nav-links {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.nav-btn.active {
+  background: linear-gradient(135deg, #2563eb 0%, #0284c7 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Sleek Broadcast Hero Command Center */
+.hero-banner {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.94) 0%, rgba(11, 19, 36, 0.98) 55%, rgba(15, 31, 56, 0.94) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-top: 1px solid rgba(125, 211, 252, 0.35);
+  border-radius: 22px;
+  padding: 28px 28px 26px;
+  box-shadow:
+    0 24px 56px -18px rgba(2, 6, 23, 0.78),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.hero-ambient-orb {
+  opacity: 0.42;
+}
+
+.hero-brand-logo {
+  border-radius: 18px;
+  border: 1px solid rgba(125, 211, 252, 0.3);
+  box-shadow: 0 10px 26px rgba(2, 132, 199, 0.28);
+}
+
+.hero-welcome-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(125, 211, 252, 0.26);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  background-image: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: #bae6fd;
+  color: #bae6fd;
+  text-shadow: none;
+  margin-bottom: 10px;
+}
+
+.hero-title {
+  font-size: 2.2rem;
+  letter-spacing: -0.035em;
+}
+
+.hero-title .gradient-text {
+  background: linear-gradient(120deg, #ffffff 0%, #e0f2fe 45%, #38bdf8 100%);
+  background-size: 180% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-stat-card {
+  background: linear-gradient(180deg, rgba(22, 33, 58, 0.76) 0%, rgba(13, 21, 38, 0.92) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 16px;
+  padding: 17px 18px;
+  box-shadow: 0 10px 26px rgba(2, 6, 23, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.hero-stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.stat-top-bar {
+  height: 2.5px;
+  box-shadow: none !important;
+}
+
+.stat-sub {
+  color: #94a3b8;
+}
+
+/* Unified Glass Cards & Switchers */
+.card {
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 14px 36px rgba(2, 6, 23, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.header-card {
+  background: linear-gradient(135deg, rgba(24, 38, 68, 0.9) 0%, rgba(13, 21, 38, 0.96) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.28);
+}
+
+.badge-icon-chip {
+  border-radius: 13px;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18);
+}
+
+.schedule-view-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 11px;
+  background: rgba(8, 14, 28, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.sched-view-btn {
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sched-view-btn.active {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(2, 132, 199, 0.35);
+}
+
+/* Razor-Sharp Roster Table & Mobile Service Cards */
+.table-wrap {
+  border-radius: 15px;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-top: 2px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 12px 32px rgba(2, 6, 23, 0.45);
+}
+
+.schedule-table th {
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+}
+
+.roster-name {
+  color: #f8fafc;
+  font-weight: 700;
+  font-size: 0.98rem;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+.schedule-table tbody tr:hover .roster-name {
+  color: #7dd3fc;
+  transform: none;
+  text-shadow: none;
+}
+
+.roster-pair {
+  color: #fde68a;
+  font-weight: 700;
+  font-size: 0.98rem;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+
+.schedule-table tbody tr:hover .roster-pair {
+  color: #fef08a;
+  transform: none;
+  text-shadow: none;
+}
+
+.schedule-service-card {
+  border-radius: 15px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  padding: 15px 17px;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.sched-role-row {
+  padding: 5px 0;
+  border-bottom: 1px dashed rgba(148, 163, 184, 0.12);
+}
+
+.sched-role-row:last-child {
+  border-bottom: none;
+}
+
+/* Modal & Checklist Polish */
+.modal-card {
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-top: 1px solid rgba(125, 211, 252, 0.45);
+  box-shadow: 0 24px 64px rgba(2, 6, 23, 0.75);
+}
+
+.modal-close {
+  border-radius: 10px;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.modal-close:hover {
+  transform: scale(1.06);
+}
+
+/* Light Mode V5.3 Studio Overrides */
+[data-theme="light"] body,
+html.light-theme body {
+  background-image:
+    radial-gradient(ellipse 80% 45% at 50% -10%, rgba(14, 165, 233, 0.11), transparent 68%),
+    radial-gradient(circle at 88% 22%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
+    radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px) !important;
+  background-size: auto, auto, 24px 24px !important;
+}
+
+[data-theme="light"] .hero-banner,
+html.light-theme .hero-banner {
+  background: linear-gradient(145deg, #ffffff 0%, #f0f9ff 55%, #ecfdf5 100%) !important;
+  border: 1px solid #cbd5e1 !important;
+  border-top: 2px solid #0284c7 !important;
+  box-shadow: 0 18px 40px -14px rgba(15, 23, 42, 0.1) !important;
+}
+
+[data-theme="light"] .hero-welcome-text,
+html.light-theme .hero-welcome-text {
+  background: #e0f2fe !important;
+  border: 1px solid #bae6fd !important;
+  -webkit-text-fill-color: #0369a1 !important;
+  color: #0369a1 !important;
+}
+
+[data-theme="light"] .hero-stat-card,
+html.light-theme .hero-stat-card {
+  border-radius: 16px !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="light"] .card,
+html.light-theme .card {
+  border-radius: 18px !important;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06) !important;
+}
+
+[data-theme="light"] .schedule-view-switcher,
+html.light-theme .schedule-view-switcher {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .sched-view-btn,
+html.light-theme .sched-view-btn {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .sched-view-btn.active,
+html.light-theme .sched-view-btn.active {
+  background: linear-gradient(135deg, #0284c7, #2563eb) !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .sched-role-row,
+html.light-theme .sched-role-row {
+  border-bottom-color: #e2e8f0 !important;
+}
+
+[data-theme="light"] .roster-name,
+html.light-theme .roster-name,
+[data-theme="light"] .roster-pair,
+html.light-theme .roster-pair {
+  text-shadow: none !important;
+}
+
+@media (min-width: 1025px) and (max-width: 1380px) {
+  .nav-container {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+
+  .brand {
+    gap: 10px;
+  }
+
+  .brand-logo-img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .brand-text h1 {
+    font-size: 0.96rem;
+  }
+
+  .brand-text p {
+    font-size: 0.68rem;
+  }
+
+  .nav-btn {
+    padding: 7px 10px;
+    font-size: 0.78rem;
+    gap: 5px;
+  }
+
+  .nav-actions {
+    gap: 6px;
+  }
+
+  .theme-toggle-btn,
+  .cloud-sync-badge-pill,
+  .nav-print-btn {
+    padding: 6px 10px;
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-banner {
+    padding: 20px 16px 18px;
+    border-radius: 18px;
+  }
+
+  .hero-welcome-text {
+    font-size: 0.76rem;
+    padding: 4px 10px;
+    line-height: 1.35;
+  }
+
+  .hero-title {
+    font-size: 1.55rem;
+  }
+
+  .card {
+    border-radius: 15px;
+    padding: 16px;
+  }
+}
