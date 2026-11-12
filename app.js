@@ -4220,6 +4220,11 @@ function updateBadges() {
 }
 
 // ================= VIEW SWITCHER =================
+function goHome() {
+  switchView("scheduleView");
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}
+
 function switchView(viewId, btn) {
   document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));

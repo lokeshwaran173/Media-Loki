@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=5.8">
+  <link rel="stylesheet" href="styles.css?v=5.9">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -42,7 +42,7 @@
   <!-- ================= TOP NAVIGATION BAR ================= -->
   <header class="navbar">
     <div class="nav-container">
-      <div class="brand">
+      <div class="brand" role="button" tabindex="0" onclick="goHome()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goHome();}" title="Go to Main Page (Service Schedule)" aria-label="Go to Main Page (Service Schedule)">
         <img src="logo.png" alt="Full Life Centre AG Church Logo" class="brand-logo-img">
         <div class="brand-text">
           <div class="brand-title-row">
@@ -1993,7 +1993,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=5.8"></script>
+  <script src="app.js?v=5.9"></script>
 </body>
 
 </html>

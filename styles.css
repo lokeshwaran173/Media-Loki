@@ -128,6 +128,19 @@ body {
   gap: 12px;
   text-decoration: none;
   flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.brand:hover .brand-logo-img {
+  transform: scale(1.08) rotate(3deg);
+  box-shadow: 0 0 28px rgba(59, 130, 246, 0.6);
+}
+
+.brand:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 4px;
 }
 
 .brand-logo-img {
