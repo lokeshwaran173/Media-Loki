@@ -3,9 +3,12 @@
 // Official Full Life Centre AG Church Indoor Media Crew Directory & Contacts
 const DEFAULT_MEMBER_ROLE = "Media Crew Member";
 const CURRENT_MEMBER_ROLES_VERSION = 1;
+const CURRENT_CREW_DIRECTORY_VERSION = 1;
+const DEFAULT_LEADER_NAME = "Lokesh";
+const DEFAULT_LEADER_PHONE = "916380795436";
 
 const OFFICIAL_CREW_DIRECTORY = [
-  { name: "Lokesh", role: DEFAULT_MEMBER_ROLE, phone: "+91 70103 68793" },
+  { name: "Lokesh", role: DEFAULT_MEMBER_ROLE, phone: "+91 63807 95436" },
   { name: "Balaji", role: DEFAULT_MEMBER_ROLE, phone: "+91 80560 44254" },
   { name: "Shyam David", role: DEFAULT_MEMBER_ROLE, phone: "+91 86818 54526" },
   { name: "Sam Joshua", role: DEFAULT_MEMBER_ROLE, phone: "+91 81110 63598" },
@@ -20,7 +23,6 @@ const OFFICIAL_CREW_DIRECTORY = [
   { name: "Anand", role: DEFAULT_MEMBER_ROLE, phone: "+91 63791 69115" },
   { name: "Aaron", role: DEFAULT_MEMBER_ROLE, phone: "+91 88078 04614" },
   { name: "Yashwanth", role: DEFAULT_MEMBER_ROLE, phone: "+91 70103 68793" },
-  { name: "Andrew", role: DEFAULT_MEMBER_ROLE, phone: "" },
   { name: "Franklin", role: DEFAULT_MEMBER_ROLE, phone: "" }
 ];
 
@@ -80,12 +82,13 @@ function syncOfficialCrewPhoneNumbers(state) {
 // Initial Default State
 const defaultState = {
   month: "October 2026",
+  leaderName: DEFAULT_LEADER_NAME,
   members: JSON.parse(JSON.stringify(OFFICIAL_CREW_DIRECTORY)),
   firstService: [
     { id: 1, date: "04 Oct 2026", cam1: "Balaji", cam2: "Lokesh", gimble: "Shyam Davit", live: "Anand", spot: "Joshua", charging: "Yashwanth & Sam Davit" },
-    { id: 2, date: "11 Oct 2026", cam1: "Andrew & Franklin", cam2: "Shyam Davit", gimble: "Lokesh", live: "Yashwanth", spot: "Joshua", charging: "Yashwanth & Sam Davit" },
+    { id: 2, date: "11 Oct 2026", cam1: "Franklin & Sanjay", cam2: "Shyam Davit", gimble: "Lokesh", live: "Yashwanth", spot: "Joshua", charging: "Yashwanth & Sam Davit" },
     { id: 3, date: "18 Oct 2026", cam1: "Yashwanth", cam2: "Balaji", gimble: "Lokesh", live: "Shyam Davit", spot: "Joshua", charging: "Yashwanth & Sam Davit" },
-    { id: 4, date: "25 Oct 2026", cam1: "Balaji & Andrew", cam2: "Anand", gimble: "Lokesh", live: "Yashwanth", spot: "Joshua", charging: "Yashwanth & Sam Davit" }
+    { id: 4, date: "25 Oct 2026", cam1: "Balaji & Mathew", cam2: "Anand", gimble: "Lokesh", live: "Yashwanth", spot: "Joshua", charging: "Yashwanth & Sam Davit" }
   ],
   secondService: [
     { id: 1, date: "04 Oct 2026", operator: "Praveen" },
@@ -94,8 +97,8 @@ const defaultState = {
     { id: 4, date: "25 Oct 2026", operator: "Praveen" }
   ],
   thirdService: [
-    { id: 1, date: "04 Oct 2026", operator: "Andrew" },
-    { id: 2, date: "11 Oct 2026", operator: "Andrew" },
+    { id: 1, date: "04 Oct 2026", operator: "Sanjay" },
+    { id: 2, date: "11 Oct 2026", operator: "Sanjay" },
     { id: 3, date: "18 Oct 2026", operator: "Franklin" },
     { id: 4, date: "25 Oct 2026", operator: "Franklin" }
   ],
@@ -103,7 +106,7 @@ const defaultState = {
     { id: 1, date: "02 Oct 2026", cam1: "Balaji", live: "Anand" },
     { id: 2, date: "09 Oct 2026", cam1: "Shyam Davit", live: "Yashwanth" },
     { id: 3, date: "16 Oct 2026", cam1: "Franklin", live: "Sam Davit" },
-    { id: 4, date: "23 Oct 2026", cam1: "Andrew", live: "Lokesh" },
+    { id: 4, date: "23 Oct 2026", cam1: "Sanjay", live: "Lokesh" },
     { id: 5, date: "30 Oct 2026", cam1: "Balaji", live: "Shyam Davit" }
   ],
   specialMeetings: [
@@ -114,13 +117,14 @@ const defaultState = {
     title: "21 Days Early Morning Prayer",
     days: [
       { id: 1, day: "Monday", cam1: "Balaji", cam2: "Franklin", gimbal: "Lokesh", liveEditor: "Anand", socialMedia: "Joshua" },
-      { id: 2, day: "Tuesday", cam1: "Andrew", cam2: "Sam Davit", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
+      { id: 2, day: "Tuesday", cam1: "Sanjay", cam2: "Sam Davit", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
       { id: 3, day: "Wednesday", cam1: "Franklin", cam2: "Balaji", gimbal: "Lokesh", liveEditor: "Anand", socialMedia: "Joshua" },
-      { id: 4, day: "Thursday", cam1: "Andrew", cam2: "Franklin", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
+      { id: 4, day: "Thursday", cam1: "Mathew", cam2: "Franklin", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
       { id: 5, day: "Friday", cam1: "Balaji", cam2: "Sam Davit", gimbal: "Lokesh", liveEditor: "Anand", socialMedia: "Joshua" },
-      { id: 6, day: "Saturday", cam1: "Yashwanth", cam2: "Andrew", gimbal: "Shyam Davit", liveEditor: "Praveen", socialMedia: "Joshua" }
+      { id: 6, day: "Saturday", cam1: "Yashwanth", cam2: "Sanjay", gimbal: "Shyam Davit", liveEditor: "Praveen", socialMedia: "Joshua" }
     ]
   },
+  crewDirectoryVersion: CURRENT_CREW_DIRECTORY_VERSION,
   memberRolesVersion: CURRENT_MEMBER_ROLES_VERSION,
   checklistTemplateVersion: 3,
   checklists: [
@@ -266,7 +270,7 @@ function unlockAdminWithPin() {
     }
 
     renderOpenCoverBoard();
-    showToast("👑 Admin Console Unlocked! Welcome Lokesh.");
+    showToast(`👑 Admin Console Unlocked! Welcome ${getLeaderName()}.`);
   } else {
     alert("Incorrect Admin PIN. Please try again.");
     document.getElementById("adminPinInput").select();
@@ -339,6 +343,102 @@ function saveNewAdminPin() {
   saveState(true);
   closeChangePinModal();
   showToast("Admin PIN updated securely on this device!");
+}
+
+// Dynamic Media Team Leader helpers & Admin Console changer
+function getLeaderName() {
+  const raw = appState && typeof appState.leaderName === "string" ? appState.leaderName.trim() : "";
+  return raw || DEFAULT_LEADER_NAME;
+}
+
+function getLeaderPhoneDigits() {
+  const leaderName = getLeaderName();
+  const members = (appState && Array.isArray(appState.members)) ? appState.members : [];
+  const match = members.find(m => m && m.name && isAliasMatch(m.name, leaderName));
+  if (match && match.phone) {
+    const clean = String(match.phone).replace(/[^0-9]/g, "");
+    if (clean.length === 10) return `91${clean}`;
+    if (clean.length >= 11) return clean;
+  }
+  return isAliasMatch(leaderName, DEFAULT_LEADER_NAME) ? DEFAULT_LEADER_PHONE : "";
+}
+
+function openWhatsAppToLeader(messageText) {
+  const encoded = encodeURIComponent(messageText || "");
+  const digits = getLeaderPhoneDigits();
+  const leader = getLeaderName();
+  if (digits) {
+    window.open(`https://wa.me/${digits}?text=${encoded}`, "_blank");
+  } else {
+    window.open(`https://wa.me/?text=${encoded}`, "_blank");
+    showToast(`ℹ️ No mobile number saved for Leader ${leader} — choose contact in WhatsApp.`);
+  }
+}
+
+function renderLeaderBadges() {
+  const leader = getLeaderName();
+  const teamBadge = document.getElementById("teamLeaderBadge");
+  const adminBadge = document.getElementById("adminLeaderBadge");
+  const swapPrompt = document.getElementById("swapLeaderPromptName");
+  const swapBtn = document.getElementById("btnSendSwapToLeader");
+  const satBtn = document.getElementById("btnSendSatAlertToLeader");
+
+  if (teamBadge) teamBadge.textContent = `👑 Leader: ${leader}`;
+  if (adminBadge) adminBadge.textContent = `Leader: ${leader}`;
+  if (swapPrompt) swapPrompt.textContent = `Leader ${leader}`;
+  if (swapBtn) swapBtn.title = `Send directly to Leader ${leader} on WhatsApp`;
+  if (satBtn) satBtn.title = `Send preview to Leader ${leader} on WhatsApp`;
+}
+
+function openChangeLeaderModal() {
+  if (!isAdminLoggedIn) {
+    openAdminPinModal();
+    return;
+  }
+  const select = document.getElementById("leaderMemberSelect");
+  const input = document.getElementById("leaderNameInput");
+  const current = getLeaderName();
+
+  if (select) {
+    const members = (appState && Array.isArray(appState.members)) ? appState.members : [];
+    let html = `<option value="">-- Pick from Team Members --</option>`;
+    members.forEach(m => {
+      const sel = isAliasMatch(m.name, current) ? "selected" : "";
+      html += `<option value="${escapeHtml(m.name)}" ${sel}>${escapeHtml(m.name)}${m.phone ? ` (${escapeHtml(m.phone)})` : ""}</option>`;
+    });
+    select.innerHTML = html;
+  }
+  if (input) input.value = current;
+
+  const modal = document.getElementById("changeLeaderModal");
+  if (modal) modal.classList.add("show");
+  if (input) setTimeout(() => input.focus(), 100);
+}
+
+function closeChangeLeaderModal() {
+  const modal = document.getElementById("changeLeaderModal");
+  if (modal) modal.classList.remove("show");
+}
+
+function onLeaderSelectDropdownChange(selectedName) {
+  const input = document.getElementById("leaderNameInput");
+  if (input && selectedName) {
+    input.value = selectedName;
+  }
+}
+
+function saveNewLeaderName() {
+  const input = document.getElementById("leaderNameInput");
+  const newLeader = input ? input.value.trim() : "";
+  if (!newLeader) {
+    alert("Please enter or select a Leader name.");
+    return;
+  }
+  appState.leaderName = newLeader;
+  saveState(false, { leaderName: appState.leaderName });
+  closeChangeLeaderModal();
+  renderAll();
+  showToast(`👑 Team Leader updated to ${newLeader} & synced!`);
 }
 
 // Helper: Calculate all dates for a given day of the week in a month
@@ -427,6 +527,20 @@ function ensureStateIntegrity(state) {
     if (state.members.length === 0) {
       state.members = JSON.parse(JSON.stringify(defaultState.members));
     }
+  }
+  if (!state.leaderName || typeof state.leaderName !== "string" || !state.leaderName.trim()) {
+    state.leaderName = DEFAULT_LEADER_NAME;
+  }
+  if (!state.crewDirectoryVersion || state.crewDirectoryVersion < CURRENT_CREW_DIRECTORY_VERSION) {
+    state.members = state.members.filter(m => !isAliasMatch(m.name, "Andrew"));
+    const lokesh = state.members.find(m => isAliasMatch(m.name, "Lokesh"));
+    if (lokesh) {
+      const cleanPhone = String(lokesh.phone || "").replace(/[^0-9]/g, "");
+      if (!cleanPhone || cleanPhone.endsWith("7010368793")) {
+        lokesh.phone = "+91 63807 95436";
+      }
+    }
+    state.crewDirectoryVersion = CURRENT_CREW_DIRECTORY_VERSION;
   }
   if (!state.memberRolesVersion || state.memberRolesVersion < CURRENT_MEMBER_ROLES_VERSION) {
     state.members.forEach(m => {
@@ -595,11 +709,11 @@ function loadState() {
   if (!appState.morningPrayer.days || appState.morningPrayer.days.length === 0 || hasDayNumbers) {
     appState.morningPrayer.days = [
       { id: 1, day: "Monday", cam1: "Balaji", cam2: "Franklin", gimbal: "Lokesh", liveEditor: "Anand", socialMedia: "Joshua" },
-      { id: 2, day: "Tuesday", cam1: "Andrew", cam2: "Sam Davit", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
+      { id: 2, day: "Tuesday", cam1: "Sanjay", cam2: "Sam Davit", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
       { id: 3, day: "Wednesday", cam1: "Franklin", cam2: "Balaji", gimbal: "Lokesh", liveEditor: "Anand", socialMedia: "Joshua" },
-      { id: 4, day: "Thursday", cam1: "Andrew", cam2: "Franklin", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
+      { id: 4, day: "Thursday", cam1: "Mathew", cam2: "Franklin", gimbal: "Shyam Davit", liveEditor: "Yashwanth", socialMedia: "Joshua" },
       { id: 5, day: "Friday", cam1: "Balaji", cam2: "Sam Davit", gimbal: "Lokesh", liveEditor: "Anand", socialMedia: "Joshua" },
-      { id: 6, day: "Saturday", cam1: "Yashwanth", cam2: "Andrew", gimbal: "Shyam Davit", liveEditor: "Praveen", socialMedia: "Joshua" }
+      { id: 6, day: "Saturday", cam1: "Yashwanth", cam2: "Sanjay", gimbal: "Shyam Davit", liveEditor: "Praveen", socialMedia: "Joshua" }
     ];
   }
 
@@ -2132,6 +2246,7 @@ function renderAll() {
   updateAdminUndoButton();
   renderMembers();
   renderPublicTeamDirectory();
+  renderLeaderBadges();
   renderWorkloadAnalytics();
   renderGearIssues();
   renderChecklists();
@@ -2942,6 +3057,15 @@ function renderPublicTeamDirectory() {
   }
 
   const mName = getMonthName(appState && appState.selectedMonth !== undefined ? appState.selectedMonth : 9);
+  const accentStrips = [
+    "linear-gradient(90deg, #3b82f6, #60a5fa)",
+    "linear-gradient(90deg, #8b5cf6, #a78bfa)",
+    "linear-gradient(90deg, #10b981, #34d399)",
+    "linear-gradient(90deg, #f59e0b, #fbbf24)",
+    "linear-gradient(90deg, #ec4899, #f472b6)",
+    "linear-gradient(90deg, #06b6d4, #22d3ee)"
+  ];
+  const activeLeaderName = getLeaderName();
 
   container.innerHTML = filtered.map(m => {
     const rawName = (m.name || "Member").trim();
@@ -2949,6 +3073,8 @@ function renderPublicTeamDirectory() {
     const shiftCount = typeof calculateMemberShifts === "function" ? calculateMemberShifts(rawName) : 0;
     const gradIndex = Math.abs(rawName.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0)) % avatarGradients.length;
     const avatarBg = avatarGradients[gradIndex];
+    const cardAccent = accentStrips[gradIndex];
+    const isLeader = isAliasMatch(rawName, activeLeaderName);
 
     let shiftTagColor = "#10b981";
     let shiftTagText = `${shiftCount} ${shiftCount === 1 ? 'shift' : 'shifts'} in ${mName}`;
@@ -2982,31 +3108,34 @@ function renderPublicTeamDirectory() {
       : `https://wa.me/?text=${encodedDraft}`;
 
     return `
-      <div class="team-member-card-public">
+      <div class="team-member-card-public ${isLeader ? 'is-leader-card' : ''}" style="--member-accent: ${cardAccent};">
         <div class="team-card-top">
           <div class="team-avatar-lg" style="background: ${avatarBg};">
             ${initials}
           </div>
           <div class="team-meta-info">
             <h3>${escapeQuotes(rawName)}</h3>
-            <span class="team-role-pill" title="${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}">
-              ${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}
-            </span>
+            <div class="team-badges-wrap">
+              <span class="team-role-pill" title="${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}">
+                ${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}
+              </span>
+              ${isLeader ? `<span class="team-leader-crown-pill">👑 Team Leader</span>` : ''}
+            </div>
           </div>
         </div>
 
         <div class="team-card-details">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.76rem; color: #94a3b8;">Serving Shifts:</span>
-            <span style="font-size: 0.76rem; font-weight: 700; color: ${shiftTagColor};">
+          <div class="team-detail-row">
+            <span class="team-detail-label">Serving Shifts</span>
+            <span class="team-shift-pill" style="color: ${shiftTagColor};">
               ${shiftTagText}
             </span>
           </div>
           ${hasPhone ? `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2px;">
-              <span style="font-size: 0.76rem; color: #94a3b8;">Contact:</span>
-              <span style="font-size: 0.76rem; color: #4ade80; font-family: var(--font-mono); font-weight: 700;">
-                📱 ${m.phone}
+            <div class="team-detail-row">
+              <span class="team-detail-label">Contact</span>
+              <span class="team-phone-value">
+                📱 ${escapeHtml(m.phone)}
               </span>
             </div>
           ` : ''}
@@ -3017,7 +3146,7 @@ function renderPublicTeamDirectory() {
             👤 View Duties
           </button>
           ${intlDigits ? `
-            <a href="tel:+${intlDigits}" class="btn btn-secondary btn-sm" style="text-decoration: none; padding: 6px 10px; gap: 4px;" title="Call ${escapeQuotes(rawName)} directly">
+            <a href="tel:+${intlDigits}" class="btn btn-secondary btn-sm" style="text-decoration: none; padding: 6px 11px; gap: 4px;" title="Call ${escapeQuotes(rawName)} directly">
               📞 Call
             </a>
           ` : ''}
@@ -3466,7 +3595,7 @@ function selectActorAndContinue(name) {
 function getActiveChecklistActor() {
   const saved = getSavedMemberActorName();
   if (saved) return saved;
-  return isAdminLoggedIn ? "Lokesh (Admin)" : "Media Team";
+  return isAdminLoggedIn ? `${getLeaderName()} (Admin)` : "Media Team";
 }
 
 function formatChecklistTimestamp() {
@@ -4368,8 +4497,7 @@ function sendSaturdayAlertWhatsApp() {
 function sendSaturdayAlertToLeader() {
   const preview = document.getElementById("saturdayAlertPreview");
   if (!preview) return;
-  const encoded = encodeURIComponent(preview.textContent);
-  window.open(`https://wa.me/917010368793?text=${encoded}`, '_blank');
+  openWhatsAppToLeader(preview.textContent);
 }
 
 // ================= EXPORT & IMPORT BACKUP =================
@@ -5265,9 +5393,7 @@ function sendSwapToWhatsApp() {
 function sendSwapToLeaderWhatsApp() {
   const preview = document.getElementById("swapMessagePreview");
   if (!preview) return;
-  const encoded = encodeURIComponent(preview.textContent);
-  // Leader Lokesh WhatsApp: 917010368793
-  window.open(`https://wa.me/917010368793?text=${encoded}`, '_blank');
+  openWhatsAppToLeader(preview.textContent);
 }
 
 /**
@@ -5381,7 +5507,7 @@ function notifyLeaderClaimWhatsApp(reqId) {
     `🤝 *Covered By:* *${req.coveredBy || 'Volunteer'}*\n\n` +
     `Please confirm and apply this cover to the active schedule roster. 🙌`;
 
-  window.open(`https://wa.me/917010368793?text=${encodeURIComponent(msg)}`, "_blank");
+  openWhatsAppToLeader(msg);
 }
 
 function applyCoverRequestToRoster(reqId) {
@@ -5482,7 +5608,7 @@ function renderOpenCoverBoard() {
       const canAutoApply = isAdminLoggedIn && req.serviceType && req.rawRole;
       actionArea = `
         <div class="cover-req-actions">
-          <button type="button" class="btn btn-whatsapp btn-sm" onclick="notifyLeaderClaimWhatsApp('${escapeQuotes(req.id)}')" title="Send confirmation to Leader Lokesh">
+          <button type="button" class="btn btn-whatsapp btn-sm" onclick="notifyLeaderClaimWhatsApp('${escapeQuotes(req.id)}')" title="Send confirmation to Leader ${escapeQuotes(getLeaderName())}">
             💬 Notify Leader
           </button>
           ${canAutoApply ? `<button type="button" class="btn btn-primary btn-sm" onclick="applyCoverRequestToRoster('${escapeQuotes(req.id)}')" title="Replace ${escapeQuotes(req.volunteer)} with ${escapeQuotes(req.coveredBy)} in the active roster">✅ Apply to Roster</button>` : ''}
@@ -6354,6 +6480,9 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
         const needsCloudCleanup = cloudState.checklistTemplateVersion !== 3
           || !cloudState.memberRolesVersion
           || cloudState.memberRolesVersion < CURRENT_MEMBER_ROLES_VERSION
+          || !cloudState.crewDirectoryVersion
+          || cloudState.crewDirectoryVersion < CURRENT_CREW_DIRECTORY_VERSION
+          || !cloudState.leaderName
           || ("adminPin" in cloudState);
         isSyncingFromCloud = true;
         // Merge received cloud state into appState
@@ -6535,7 +6664,7 @@ function copyRosterSyncLink() {
 function shareRosterSyncWhatsApp() {
   const url = getRosterSyncUrl();
   const mName = getMonthName(appState.selectedMonth);
-  const msg = `🕊️ *Full Life Centre AG Church — Media Schedule Update*\n\nAdmin Lokesh has updated the ${mName} ${appState.selectedYear} media schedule!\n\n📲 *Tap this link to sync the latest schedule onto your phone:*\n${url}\n\n_(Opening the link will instantly save the latest duty assignments to your phone)_`;
+  const msg = `🕊️ *Full Life Centre AG Church — Media Schedule Update*\n\nAdmin ${getLeaderName()} has updated the ${mName} ${appState.selectedYear} media schedule!\n\n📲 *Tap this link to sync the latest schedule onto your phone:*\n${url}\n\n_(Opening the link will instantly save the latest duty assignments to your phone)_`;
   const waUrl = `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(waUrl, "_blank");
 }
@@ -6549,7 +6678,7 @@ function checkUrlForRosterSync() {
       localStorage.setItem("FLAG_MEDIA_PORTAL_STATE", JSON.stringify(appState));
       // Clean up hash from URL bar cleanly
       history.replaceState(null, "", window.location.pathname);
-      showToast("🎉 Successfully synced latest schedule from Admin Lokesh!");
+      showToast(`🎉 Successfully synced latest schedule from Admin ${getLeaderName()}!`);
     }
   }
 }
