@@ -7753,10 +7753,24 @@ html.light-theme .actor-pick-btn:hover {
   color: #0369a1 !important;
 }
 
+/* Mobile-only App Install UI (hidden on laptop/desktop views) */
 .nav-install-btn {
-  display: inline-flex !important;
+  display: none;
   align-items: center;
   flex-shrink: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .nav-install-btn {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 769px) and (pointer: fine) {
+  .nav-install-btn,
+  #pwaInstallBanner {
+    display: none !important;
+  }
 }
 
 .pwa-guide-notice {

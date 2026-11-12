@@ -1,6 +1,7 @@
 {
   "name": "Full Life Centre AG Church - Indoor Media Operations",
   "short_name": "FLAG Media",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

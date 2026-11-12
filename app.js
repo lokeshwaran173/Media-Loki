@@ -5779,9 +5779,9 @@ function applyPwaUpdateNow() {
   window.location.reload();
 }
 
-// Register Service Worker for Offline Access + Live Update Prompt
+// Register Service Worker immediately for Offline Access + Fast Mobile PWA Installability
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+  const registerFlagServiceWorker = () => {
     const hadController = !!navigator.serviceWorker.controller;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (hadController) {
@@ -5804,7 +5804,13 @@ if ('serviceWorker' in navigator) {
         });
       });
     }, err => console.log('FLAG Service Worker registration failed:', err));
-  });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', registerFlagServiceWorker);
+  } else {
+    registerFlagServiceWorker();
+  }
 }
 
 function isPwaInstalled() {
@@ -5818,95 +5824,173 @@ function isIosDevice() {
          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
-function initPWABanner() {
-  // Always keep the top navbar "📲 App" button visible so members & leaders can install or share anytime
-  const navBtn = document.getElementById('navInstallPwaBtn');
-  if (navBtn) navBtn.style.display = 'inline-flex';
+function isAndroidDevice() {
+  return /android/i.test(navigator.userAgent || '');
+}
 
+function isIosNonSafariBrowser() {
+  return isIosDevice() && /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo/i.test(navigator.userAgent || '');
+}
+
+function isInAppBrowser() {
+  return /FBAN|FBAV|Instagram|WhatsApp|MicroMessenger|Line\/|Telegram|Twitter|Snapchat|; wv\)/i.test(navigator.userAgent || '');
+}
+
+function isMobileInstallEligible() {
+  const ua = navigator.userAgent || '';
+  const isMobileUa = isAndroidDevice() || isIosDevice() || /mobile/i.test(ua);
+  const isNarrowViewport = window.matchMedia('(max-width: 768px)').matches || window.innerWidth <= 768;
+  return isMobileUa || isNarrowViewport;
+}
+
+let deferredPwaPrompt = window.__deferredPwaPrompt || null;
+
+function getDeferredPwaPrompt() {
+  return deferredPwaPrompt || window.__deferredPwaPrompt || null;
+}
+
+function syncPwaInstallUi() {
+  const navBtn = document.getElementById('navInstallPwaBtn');
   const banner = document.getElementById('pwaInstallBanner');
-  if (isPwaInstalled()) {
-    if (banner) banner.style.display = 'none';
-    return;
+  const showMobileUi = isMobileInstallEligible() && !isPwaInstalled();
+
+  if (navBtn) {
+    navBtn.style.display = showMobileUi ? 'inline-flex' : 'none';
   }
 
-  const dismissed = sessionStorage.getItem('flag_pwa_dismissed') === 'true';
-  if (banner && !dismissed) {
-    banner.style.display = 'flex';
+  if (banner) {
+    const dismissed = sessionStorage.getItem('flag_pwa_dismissed') === 'true';
+    banner.style.display = (showMobileUi && !dismissed) ? 'flex' : 'none';
+  }
+
+  // Also refresh modal native-install CTA if modal is currently open
+  const modal = document.getElementById('pwaDownloadModal');
+  const nativeBtn = document.getElementById('pwaModalNativeInstallBtn');
+  if (modal && modal.style.display === 'flex' && nativeBtn) {
+    nativeBtn.style.display = (!isPwaInstalled() && getDeferredPwaPrompt()) ? 'inline-flex' : 'none';
   }
 }
 
-let deferredPwaPrompt = null;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPwaPrompt = e;
-  const navBtn = document.getElementById('navInstallPwaBtn');
-  if (navBtn) navBtn.style.display = 'inline-flex';
-  if (!isPwaInstalled()) {
-    const banner = document.getElementById('pwaInstallBanner');
-    if (banner && !sessionStorage.getItem('flag_pwa_dismissed')) {
-      banner.style.display = 'flex';
-    }
+function initPWABanner() {
+  syncPwaInstallUi();
+}
+
+function handlePwaPromptReady(e) {
+  if (e && typeof e.preventDefault === 'function') {
+    e.preventDefault();
+    deferredPwaPrompt = e;
+    window.__deferredPwaPrompt = e;
+  } else if (window.__deferredPwaPrompt) {
+    deferredPwaPrompt = window.__deferredPwaPrompt;
   }
-});
+  syncPwaInstallUi();
+}
+
+window.addEventListener('beforeinstallprompt', handlePwaPromptReady);
+window.addEventListener('flag-pwa-prompt-ready', () => handlePwaPromptReady(window.__deferredPwaPrompt));
+window.addEventListener('resize', syncPwaInstallUi);
 
 window.addEventListener('appinstalled', () => {
-  const banner = document.getElementById('pwaInstallBanner');
-  if (banner) banner.style.display = 'none';
-  const navBtn = document.getElementById('navInstallPwaBtn');
-  if (navBtn) navBtn.style.display = 'inline-flex';
   deferredPwaPrompt = null;
+  window.__deferredPwaPrompt = null;
+  closePwaDownloadModal();
+  syncPwaInstallUi();
   showToast('🎉 FLAG Media App installed to your device!');
 });
 
-function isInAppBrowser() {
-  return /FBAN|FBAV|Instagram|WhatsApp|MicroMessenger|Line\//i.test(navigator.userAgent || '');
-}
-
-function triggerPWAInstall() {
-  if (deferredPwaPrompt) {
-    deferredPwaPrompt.prompt();
-    deferredPwaPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        showToast('Thank you for installing FLAG Media App!');
+async function triggerPWAInstall() {
+  const promptEvent = getDeferredPwaPrompt();
+  if (promptEvent) {
+    deferredPwaPrompt = null;
+    window.__deferredPwaPrompt = null;
+    try {
+      await promptEvent.prompt();
+      const choiceResult = await promptEvent.userChoice;
+      if (choiceResult && choiceResult.outcome === 'accepted') {
+        showToast('🎉 Installing FLAG Media App...');
+        closePwaDownloadModal();
         const banner = document.getElementById('pwaInstallBanner');
         if (banner) banner.style.display = 'none';
-      } else {
-        openPwaDownloadModal();
+        return;
       }
-      deferredPwaPrompt = null;
-    });
-  } else {
-    openPwaDownloadModal();
+    } catch (err) {
+      console.warn('PWA native prompt unavailable, falling back to install steps:', err);
+    }
   }
+  openPwaDownloadModal();
+}
+
+function openInAndroidChrome() {
+  const rawUrl = getCleanPortalUrl();
+  if (!/^https?:\/\//i.test(rawUrl)) {
+    copyPortalAppLink();
+    return;
+  }
+  const scheme = window.location.protocol.replace(':', '') || 'https';
+  const stripped = rawUrl.replace(/^https?:\/\//i, '');
+  const fallback = encodeURIComponent(rawUrl);
+  window.location.href = `intent://${stripped}#Intent;scheme=${scheme};package=com.android.chrome;S.browser_fallback_url=${fallback};end`;
 }
 
 function openPwaDownloadModal() {
   const statusEl = document.getElementById('pwaDownloadStatusNote');
   const stepsEl = document.getElementById('pwaDownloadSteps');
+  const nativeBtn = document.getElementById('pwaModalNativeInstallBtn');
+  const chromeBtn = document.getElementById('pwaOpenChromeBtn');
+
+  const hasPrompt = !isPwaInstalled() && !!getDeferredPwaPrompt();
+  const inApp = isInAppBrowser();
+  const isIos = isIosDevice();
+  const iosNonSafari = isIosNonSafariBrowser();
+
+  if (nativeBtn) nativeBtn.style.display = hasPrompt ? 'inline-flex' : 'none';
+  if (chromeBtn) chromeBtn.style.display = (!isIos && inApp) ? 'inline-flex' : 'none';
+
   if (statusEl) {
     if (isPwaInstalled()) {
       statusEl.innerHTML = '✅ <strong>App Already Installed!</strong> Share the link below with other crew members so they can add it to their phone Home Screen too.';
-    } else if (isInAppBrowser()) {
-      statusEl.innerHTML = '⚠️ <strong>Opened Inside App Browser:</strong> Tap <strong>⋮</strong> or <strong>↗</strong> and choose <strong>"Open in Chrome / Safari"</strong> first so your phone allows app installation.';
-    } else if (isIosDevice()) {
+    } else if (hasPrompt) {
+      statusEl.innerHTML = '🚀 <strong>Ready to Install!</strong> Tap <strong>📲 Install App Now</strong> below to add FLAG Media directly to your phone Home Screen.';
+    } else if (inApp) {
+      statusEl.innerHTML = isIos
+        ? '⚠️ <strong>Opened Inside App Browser:</strong> Tap the browser/Safari icon or copy link below and open it in <strong>Safari</strong> to install the app.'
+        : '⚠️ <strong>Opened Inside App Browser:</strong> Tap <strong>🌐 Open in Chrome</strong> below (or tap <strong>⋮</strong> → <strong>Open in Chrome</strong>) so your phone can download the app.';
+    } else if (iosNonSafari) {
+      statusEl.innerHTML = '🍎 <strong>Open in Safari Required on iPhone/iPad:</strong> Copy the link below and open it in Apple <strong>Safari</strong> to install to your Home Screen.';
+    } else if (isIos) {
       statusEl.innerHTML = '🍎 <strong>iPhone / iPad (Safari):</strong> Follow these 3 quick steps to install FLAG Media onto your Home Screen.';
     } else {
-      statusEl.innerHTML = '📱 <strong>Android / Mobile Chrome:</strong> Add FLAG Media to your Home Screen for 1-tap offline & live-sync access.';
+      statusEl.innerHTML = '📱 <strong>Android / Mobile Chrome:</strong> Install FLAG Media to your Home Screen using the browser menu for 1-tap offline & live-sync access.';
     }
   }
 
   if (stepsEl) {
-    const steps = isIosDevice()
-      ? [
-          'Open this link in <strong>Safari</strong> (not WhatsApp/Chrome in-app view).',
-          'Tap the <strong>Share</strong> icon <span class="ios-icon-pill">⎋ / 📤</span> at the bottom bar.',
-          'Scroll down and tap <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">➕</span> → <strong>Add</strong>.'
-        ]
-      : [
-          'If opened inside WhatsApp, tap <strong>⋮</strong> (top-right) → <strong>Open in Chrome</strong>.',
-          'In Chrome/Edge, tap the browser menu <span class="ios-icon-pill">⋮</span> in the top-right corner.',
-          'Tap <strong style="color: #34d399;">"Add to Home screen"</strong> or <strong>"Install app"</strong> → <strong>Install</strong>.'
-        ];
+    let steps;
+    if (isIos) {
+      steps = (inApp || iosNonSafari)
+        ? [
+            'Tap <strong>📋 Copy Link</strong> below or tap <strong>Open in Safari</strong> from the corner menu.',
+            'Paste and open the link inside <strong>Safari</strong>.',
+            'Tap <strong>Share</strong> <span class="ios-icon-pill">📤</span> → <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">➕</span> → <strong>Add</strong>.'
+          ]
+        : [
+            'Stay on this page in <strong>Safari</strong>.',
+            'Tap the <strong>Share</strong> button <span class="ios-icon-pill">📤</span> at the bottom (or top-right) bar.',
+            'Scroll down and tap <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">➕</span> → <strong>Add</strong>.'
+          ];
+    } else if (inApp) {
+      steps = [
+            'Tap <strong>🌐 Open in Chrome</strong> below (or tap <strong>⋮</strong> at top-right → <strong>Open in Chrome</strong>).',
+            'Once opened in Chrome, tap <strong>📲 Install App</strong> on the banner or header.',
+            'Tap <strong style="color: #34d399;">"Install"</strong> when Android asks to add <strong>FLAG Media</strong>.'
+          ];
+    } else {
+      steps = [
+            'Tap the Chrome/Edge menu <span class="ios-icon-pill">⋮</span> in the top-right corner of your phone.',
+            'Tap <strong style="color: #34d399;">"Add to Home screen"</strong> or <strong style="color: #34d399;">"Install app"</strong>.',
+            'Tap <strong>Install</strong> (or <strong>Add</strong>) — if Chrome says "Create shortcut", refresh once first so offline install activates.'
+          ];
+    }
     stepsEl.innerHTML = steps.map((txt, idx) => `
       <div class="ios-step-card">
         <div class="ios-step-num">${idx + 1}</div>
