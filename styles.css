@@ -9200,6 +9200,48 @@ html.light-theme .edit-leader-checkbox-row {
   color: #78350f !important;
 }
 
+/* Senior Pastor Pill (Hero, Team Directory & Admin Console) */
+.hero-senior-pastor-pill,
+.senior-pastor-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 13px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(99, 102, 241, 0.14));
+  border: 1px solid rgba(192, 132, 252, 0.42);
+  color: #f3e8ff;
+  font-size: 0.81rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  max-width: 100%;
+  backdrop-filter: blur(8px);
+}
+
+.hero-senior-pastor-pill strong,
+.senior-pastor-pill strong {
+  color: #e9d5ff;
+  font-weight: 700;
+}
+
+[data-theme="light"] .hero-senior-pastor-pill,
+html.light-theme .hero-senior-pastor-pill,
+[data-theme="light"] .senior-pastor-pill,
+html.light-theme .senior-pastor-pill {
+  background: #f3e8ff !important;
+  border-color: #c084fc !important;
+  color: #581c87 !important;
+}
+
+[data-theme="light"] .hero-senior-pastor-pill strong,
+html.light-theme .hero-senior-pastor-pill strong,
+[data-theme="light"] .senior-pastor-pill strong,
+html.light-theme .senior-pastor-pill strong {
+  color: #6b21a8 !important;
+}
+
 /* Complete Mobile Fit & Single-line Dept Incharge & Alignment */
 @media (max-width: 640px) {
   .hero-leadership-strip {
@@ -9210,6 +9252,8 @@ html.light-theme .edit-leader-checkbox-row {
     width: 100%;
   }
 
+  .hero-senior-pastor-pill,
+  .senior-pastor-pill,
   .hero-dept-pill,
   .dept-incharge-pill {
     font-size: clamp(0.60rem, 2.75vw, 0.74rem) !important;

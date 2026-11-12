@@ -6,6 +6,7 @@ const CURRENT_MEMBER_ROLES_VERSION = 1;
 const CURRENT_CREW_DIRECTORY_VERSION = 2;
 const DEFAULT_LEADER_NAME = "Lokesh";
 const DEFAULT_LEADER_PHONE = "916380795436";
+const SENIOR_PASTOR_NAME = "Rev.N.Johnson";
 const OVERALL_DEPT_INCHARGE = "Pastor. Jerry Jemson";
 
 const OFFICIAL_CREW_DIRECTORY = [
@@ -426,8 +427,8 @@ function renderLeaderBadges() {
   }
   if (printLine) {
     printLine.innerHTML = isBlankOnMain || !leader
-      ? `✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong>`
-      : `✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong> &bull; 👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
+      ? `🕊️ Senior Pastor: <strong>${escapeHtml(SENIOR_PASTOR_NAME)}</strong> &bull; ✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong>`
+      : `🕊️ Senior Pastor: <strong>${escapeHtml(SENIOR_PASTOR_NAME)}</strong> &bull; ✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong> &bull; 👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
   }
   if (adminLeaderSelect) {
     const members = (appState && Array.isArray(appState.members)) ? appState.members : [];
