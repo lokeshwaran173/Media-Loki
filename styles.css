@@ -10787,6 +10787,10 @@ html.light-theme .badge-custom {
     font-size: 0.76rem !important;
   }
 
+  .festival-admin-card .card-header > div:last-child button:last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+
   .festival-header-wrap {
     flex-direction: column !important;
     align-items: stretch !important;

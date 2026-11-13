@@ -384,50 +384,7 @@ const defaultState = {
     { id: 4, date: "23 Oct 2026", cam1: "Sanjay", live: "Lokesh" },
     { id: 5, date: "30 Oct 2026", cam1: "Balaji", live: "Shyam Davit" }
   ],
-  specialMeetings: [
-    {
-      id: 1,
-      category: "miracle",
-      title: "All-Night Miracle Service",
-      date: "31 Oct 2026",
-      time: "10:00 PM - 04:00 AM",
-      callTime: "09:15 PM",
-      notes: "Signs, Wonders & Prophetic Impartation Night",
-      cam1: "Balaji",
-      cam2: "Lokesh",
-      gimble: "Shyam Davit",
-      live: "Anand",
-      spot: "Joshua"
-    },
-    {
-      id: 2,
-      category: "christmas",
-      title: "Christmas Eve Candlelight Service",
-      date: "24 Dec 2026",
-      time: "06:30 PM - 08:30 PM",
-      callTime: "05:45 PM",
-      notes: "Carols, Nativity Live Broadcast & Candlelight Blessing",
-      cam1: "Franklin",
-      cam2: "Sanjay",
-      gimble: "Lokesh",
-      live: "Yashwanth",
-      spot: "Joshua"
-    },
-    {
-      id: 3,
-      category: "newyear",
-      title: "New Year Eve / Watch Night Service",
-      date: "31 Dec 2026",
-      time: "10:00 PM - 01:30 AM",
-      callTime: "09:00 PM",
-      notes: "Thanksgiving, Countdown & 2027 Promise Card Blessing",
-      cam1: "Balaji",
-      cam2: "Sam Davit",
-      gimble: "Shyam Davit",
-      live: "Anand",
-      spot: "Lokesh"
-    }
-  ],
+  specialMeetings: [],
   specialMeetingsEnabled: true,
   customFestivalCategories: [],
   morningPrayer: {
@@ -1000,8 +957,8 @@ function ensureStateIntegrity(state) {
   if (!state.customFestivalCategories || !Array.isArray(state.customFestivalCategories)) {
     state.customFestivalCategories = [];
   }
-  if (!state.specialMeetings || !Array.isArray(state.specialMeetings) || state.specialMeetings.length === 0) {
-    state.specialMeetings = JSON.parse(JSON.stringify(defaultState.specialMeetings));
+  if (!state.specialMeetings || !Array.isArray(state.specialMeetings)) {
+    state.specialMeetings = [];
   } else {
     state.specialMeetings.forEach((row, idx) => {
       if (!row.id) row.id = Date.now() + idx;
@@ -1126,52 +1083,9 @@ function loadState() {
     ];
   }
 
-  // Ensure specialMeetings exist and have festival metadata
-  if (!appState.specialMeetings || !Array.isArray(appState.specialMeetings) || appState.specialMeetings.length === 0) {
-    appState.specialMeetings = [
-      {
-        id: 1,
-        category: "miracle",
-        title: "All-Night Miracle Service",
-        date: "31 Oct 2026",
-        time: "10:00 PM - 04:00 AM",
-        callTime: "09:15 PM",
-        notes: "Signs, Wonders & Prophetic Impartation Night",
-        cam1: "Balaji",
-        cam2: "Lokesh",
-        gimble: "Shyam Davit",
-        live: "Anand",
-        spot: "Joshua"
-      },
-      {
-        id: 2,
-        category: "christmas",
-        title: "Christmas Eve Candlelight Service",
-        date: "24 Dec 2026",
-        time: "06:30 PM - 08:30 PM",
-        callTime: "05:45 PM",
-        notes: "Carols, Nativity Live Broadcast & Candlelight Blessing",
-        cam1: "Franklin",
-        cam2: "Sanjay",
-        gimble: "Lokesh",
-        live: "Yashwanth",
-        spot: "Joshua"
-      },
-      {
-        id: 3,
-        category: "newyear",
-        title: "New Year Eve / Watch Night Service",
-        date: "31 Dec 2026",
-        time: "10:00 PM - 01:30 AM",
-        callTime: "09:00 PM",
-        notes: "Thanksgiving, Countdown & 2027 Promise Card Blessing",
-        cam1: "Balaji",
-        cam2: "Sam Davit",
-        gimble: "Shyam Davit",
-        live: "Anand",
-        spot: "Lokesh"
-      }
-    ];
+  // Ensure specialMeetings array exists
+  if (!appState.specialMeetings || !Array.isArray(appState.specialMeetings)) {
+    appState.specialMeetings = [];
   } else {
     // Normalize existing rows with time, callTime and category if missing
     appState.specialMeetings.forEach((row, idx) => {
@@ -3093,6 +3007,20 @@ function renderSpecialMeetings() {
 
   if (!appState.specialMeetings) appState.specialMeetings = [];
 
+  if (appState.specialMeetings.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td colspan="11" style="text-align: center; padding: 28px 16px; color: var(--text-muted); font-size: 0.88rem;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+          <span>✨ <strong>No Special Events in Roster</strong></span>
+          <span style="font-size: 0.78rem;">Click <strong>+ Custom Event</strong> to add any special meeting, or <strong>✨ Quick-Load Festival Template</strong> to load holiday presets.</span>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+    return;
+  }
+
   const categoryOptions = getAllFestivalCategories();
 
   appState.specialMeetings.forEach((row, index) => {
@@ -3195,7 +3123,25 @@ function removeSpecialMeeting(index) {
     appState.specialMeetings.splice(index, 1);
     saveState();
     renderAll();
+    populateWhatsAppDateSelect();
+    updateWhatsAppPreview();
     showToast("Special event removed. (Undo available)");
+  }
+}
+
+function clearAllSpecialMeetings() {
+  if (!appState.specialMeetings || appState.specialMeetings.length === 0) {
+    showToast("No special events to clear.");
+    return;
+  }
+  if (confirm(`Remove all ${appState.specialMeetings.length} special events from the schedule? You can add them back anytime with '+ Custom Event' or '✨ Quick-Load Festival Template'.`)) {
+    pushScheduleUndoSnapshot("Clear All Special Events");
+    appState.specialMeetings = [];
+    saveState();
+    renderAll();
+    populateWhatsAppDateSelect();
+    updateWhatsAppPreview();
+    showToast("🗑️ All special events cleared. (Undo available)");
   }
 }
 
