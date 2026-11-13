@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=6.2">
+  <link rel="stylesheet" href="styles.css?v=6.3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -526,12 +526,12 @@
         <div class="schedule-cards-grid" id="publicCardsFridayService" style="display: none;"></div>
       </div>
 
-      <!-- Special Events & Holiday Festival Services Roster -->
+      <!-- Special Event Services -->
       <div class="card card-accent-special festival-roster-card" id="specialEventsSection">
         <div class="card-header festival-header-wrap" style="flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <div class="header-tag tag-purple festival-main-tag">🌟 Special Events &amp; Festival Services Roster</div>
-            <span class="festival-subtitle-badge">🎄 Christmas • 🕊️ New Year • ✝️ Easter • 🔥 Miracle Nights</span>
+            <div class="header-tag tag-purple festival-main-tag">🌟 Special Event Services</div>
+            <span class="festival-subtitle-badge">🎄 Christmas • 🕊️ New Year • ✝️ Easter • 🔥 Miracle Nights • Custom Specials</span>
           </div>
           <div class="festival-actions-bar" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
             <button type="button" class="btn btn-whatsapp btn-sm" onclick="copyFestivalRosterWhatsApp()" title="Copy formatted Festival &amp; Holiday roster for WhatsApp">
@@ -1035,20 +1035,39 @@
           </div>
         </div>
 
-        <!-- Special Events & Holiday Festival Roster (Admin Dropdowns) -->
-        <div class="card festival-admin-card">
+        <!-- Special Event Services (Admin Dropdowns) -->
+        <div class="card festival-admin-card" id="adminSpecialEventServicesCard">
+          <!-- Seasonal Visibility Toggle Banner for Special Event Services -->
+          <div class="seasonal-toggle-banner">
+            <div style="flex: 1 1 220px; min-width: 0;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <strong style="font-size: 0.95rem;">Special Event Services Schedule</strong>
+                <span id="specialMeetingsStatusBadge" class="header-tag tag-emerald" style="font-size: 0.75rem;">🟢 Active &amp; Visible on Public Schedule</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+                Special festival &amp; holiday services roster. When turned OFF, it is completely hidden from the public schedule. Turn it ON to display Christmas, New Year, Easter, Miracle Nights, and special events.
+              </p>
+            </div>
+            <button id="toggleSpecialMeetingsBtn" class="btn btn-secondary" onclick="toggleSpecialMeetingsVisibility()">
+              🚫 Turn OFF (Hide from Schedule)
+            </button>
+          </div>
+
           <div class="card-header" style="flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-              <div class="header-tag tag-purple">🌟 Special Events &amp; Festival Services Editor</div>
-              <span style="font-size: 0.78rem; color: var(--text-muted);">Manage Christmas, New Year, Easter &amp; All-Night services</span>
+              <div class="header-tag tag-purple">🌟 Special Event Services</div>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Manage Christmas, New Year, Easter, Miracle Nights &amp; custom events</span>
             </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
               <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;"
                 onclick="manualSaveSchedule()">💾 Save</button>
-              <button type="button" class="btn btn-festival-preset" onclick="openFestivalTemplateModal()" title="Insert Christmas, New Year, Easter presets">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="promptAddCustomCategory()" title="Add a new custom category (e.g. Baptism, Wedding, Concert)">
+                🏷️ + Add Category
+              </button>
+              <button type="button" class="btn btn-festival-preset btn-sm" onclick="openFestivalTemplateModal()" title="Insert Christmas, New Year, Easter presets">
                 ✨ Quick-Load Festival Template
               </button>
-              <button class="btn btn-primary" onclick="addSpecialMeetingRow()">+ Custom Event</button>
+              <button class="btn btn-primary btn-sm" onclick="addSpecialMeetingRow()">+ Custom Event</button>
             </div>
           </div>
           <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
@@ -2053,7 +2072,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=6.2"></script>
+  <script src="app.js?v=6.3"></script>
 </body>
 
 </html>

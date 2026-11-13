@@ -149,8 +149,115 @@ function getFestivalCategoryMeta(cat) {
       return { icon: "🩸", label: "Convention", badgeClass: "badge-convention", colorTag: "tag-special" };
     case "youth":
       return { icon: "🕊️", label: "Youth Special", badgeClass: "badge-youth", colorTag: "tag-blue" };
-    default:
+    case "special":
       return { icon: "🌟", label: "Special Event", badgeClass: "badge-special", colorTag: "tag-purple" };
+    default: {
+      if (typeof appState !== "undefined" && appState.customFestivalCategories) {
+        const found = appState.customFestivalCategories.find(item => {
+          const id = (typeof item === 'string' ? item : item.id).toLowerCase();
+          return id === c;
+        });
+        if (found) {
+          const label = typeof found === 'string' ? found : found.label;
+          const icon = (typeof found === 'object' && found.icon) ? found.icon : "✨";
+          return { icon: icon, label: label, badgeClass: "badge-special badge-custom", colorTag: "tag-purple" };
+        }
+      }
+      const prettyLabel = c.startsWith("custom_")
+        ? c.replace(/^custom_/, "").replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())
+        : c.charAt(0).toUpperCase() + c.slice(1);
+      return { icon: "✨", label: prettyLabel, badgeClass: "badge-special badge-custom", colorTag: "tag-purple" };
+    }
+  }
+}
+
+function getAllFestivalCategories() {
+  const standard = [
+    { val: "christmas", label: "🎄 Christmas", icon: "🎄" },
+    { val: "newyear", label: "🕊️ New Year", icon: "🕊️" },
+    { val: "easter", label: "✝️ Easter", icon: "✝️" },
+    { val: "miracle", label: "🔥 Miracle Night", icon: "🔥" },
+    { val: "thanksgiving", label: "🌾 Harvest Festival", icon: "🌾" },
+    { val: "convention", label: "🩸 Revival Convention", icon: "🩸" },
+    { val: "youth", label: "🕊️ Youth Special", icon: "🕊️" },
+    { val: "special", label: "🌟 Special Event", icon: "🌟" }
+  ];
+
+  if (typeof appState !== "undefined" && Array.isArray(appState.customFestivalCategories)) {
+    appState.customFestivalCategories.forEach(cc => {
+      const id = typeof cc === 'string' ? cc : cc.id;
+      const label = typeof cc === 'string' ? cc : cc.label;
+      const icon = (typeof cc === 'object' && cc.icon) ? cc.icon : "✨";
+      standard.push({
+        val: id,
+        label: `${icon} ${label} (Custom)`,
+        icon: icon,
+        isCustom: true
+      });
+    });
+  }
+
+  return standard;
+}
+
+function promptAddCustomCategory(targetRowIndex) {
+  const name = prompt("Enter Custom Category Name (e.g. Baptism, Wedding Special, Dedication, Worship Concert):");
+  if (!name || !name.trim()) {
+    if (targetRowIndex !== undefined) {
+      renderSpecialMeetings();
+    }
+    return;
+  }
+  const cleanName = name.trim();
+  const slug = "custom_" + cleanName.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+
+  if (!appState.customFestivalCategories) {
+    appState.customFestivalCategories = [];
+  }
+
+  let icon = "✨";
+  const lower = cleanName.toLowerCase();
+  if (lower.includes("baptism") || lower.includes("water")) icon = "🌊";
+  else if (lower.includes("wedding") || lower.includes("marriage")) icon = "💍";
+  else if (lower.includes("concert") || lower.includes("music") || lower.includes("worship")) icon = "🎵";
+  else if (lower.includes("child") || lower.includes("kid") || lower.includes("baby") || lower.includes("dedication")) icon = "👶";
+  else if (lower.includes("youth") || lower.includes("teen")) icon = "🕊️";
+  else if (lower.includes("revival") || lower.includes("fire") || lower.includes("miracle")) icon = "🔥";
+  else if (lower.includes("fasting") || lower.includes("prayer")) icon = "🙏";
+  else if (lower.includes("thanksgiving") || lower.includes("harvest")) icon = "🌾";
+  else if (lower.includes("christmas")) icon = "🎄";
+  else if (lower.includes("easter")) icon = "✝️";
+
+  const existing = appState.customFestivalCategories.find(c => {
+    const cid = (typeof c === 'string' ? c : c.id).toLowerCase();
+    const clabel = (typeof c === 'string' ? c : c.label).toLowerCase();
+    return cid === slug || clabel === lower;
+  });
+
+  const catId = existing ? (typeof existing === 'string' ? existing : existing.id) : slug;
+
+  if (!existing) {
+    appState.customFestivalCategories.push({
+      id: catId,
+      label: cleanName,
+      icon: icon
+    });
+  }
+
+  if (targetRowIndex !== undefined && appState.specialMeetings && appState.specialMeetings[targetRowIndex]) {
+    appState.specialMeetings[targetRowIndex].category = catId;
+  }
+
+  saveState();
+  renderAll();
+  showToast(`🏷️ Custom category "${icon} ${cleanName}" added!`);
+}
+
+function onCategorySelectChange(index, selectedValue) {
+  if (selectedValue === "__ADD_NEW_CATEGORY__") {
+    promptAddCustomCategory(index);
+  } else {
+    updateSpecialMeeting(index, 'category', selectedValue);
   }
 }
 
@@ -321,6 +428,8 @@ const defaultState = {
       spot: "Lokesh"
     }
   ],
+  specialMeetingsEnabled: true,
+  customFestivalCategories: [],
   morningPrayer: {
     enabled: false,
     title: "21 Days Early Morning Prayer",
@@ -884,6 +993,12 @@ function ensureStateIntegrity(state) {
   }
   if (!state.gearIssues || !Array.isArray(state.gearIssues)) {
     state.gearIssues = [];
+  }
+  if (typeof state.specialMeetingsEnabled !== "boolean") {
+    state.specialMeetingsEnabled = true;
+  }
+  if (!state.customFestivalCategories || !Array.isArray(state.customFestivalCategories)) {
+    state.customFestivalCategories = [];
   }
   if (!state.specialMeetings || !Array.isArray(state.specialMeetings) || state.specialMeetings.length === 0) {
     state.specialMeetings = JSON.parse(JSON.stringify(defaultState.specialMeetings));
@@ -1604,20 +1719,48 @@ function renderPublicSchedule() {
     });
   }
 
-  // Special Events & Festival Services Public
+  // Special Event Services Public
+  const publicSpecialCard = document.getElementById("specialEventsSection");
+  const isSpecialActive = appState.specialMeetingsEnabled !== false;
+  if (publicSpecialCard) {
+    publicSpecialCard.style.display = isSpecialActive ? "block" : "none";
+  }
+
   const ts = document.getElementById("publicTbodySpecialMeetings");
   const countEl = document.getElementById("countAllFestivals");
   const allSpecial = appState.specialMeetings || [];
   if (countEl) countEl.textContent = allSpecial.length;
 
+  // Dynamically render festival category filter chips including custom categories
+  const filterChipsContainer = document.getElementById("festivalFilterChips");
   const currentFilter = window.currentFestivalFilter || "all";
+  if (filterChipsContainer) {
+    let chipsHtml = `
+      <button type="button" class="festival-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all" onclick="filterFestivalRoster('all', this)">All Events (<span id="countAllFestivals">${allSpecial.length}</span>)</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'christmas' ? 'active' : ''}" data-filter="christmas" onclick="filterFestivalRoster('christmas', this)">🎄 Christmas</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'newyear' ? 'active' : ''}" data-filter="newyear" onclick="filterFestivalRoster('newyear', this)">🕊️ New Year</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'easter' ? 'active' : ''}" data-filter="easter" onclick="filterFestivalRoster('easter', this)">✝️ Easter</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'miracle' ? 'active' : ''}" data-filter="miracle" onclick="filterFestivalRoster('miracle', this)">🔥 Miracle Nights</button>
+    `;
+    (appState.customFestivalCategories || []).forEach(cc => {
+      const id = (typeof cc === 'string' ? cc : cc.id).toLowerCase();
+      const label = typeof cc === 'string' ? cc : cc.label;
+      const icon = (typeof cc === 'object' && cc.icon) ? cc.icon : "✨";
+      chipsHtml += `<button type="button" class="festival-filter-btn ${currentFilter === id ? 'active' : ''}" data-filter="${escapeHtml(id)}" onclick="filterFestivalRoster('${escapeHtml(id)}', this)">${icon} ${escapeHtml(label)}</button>`;
+    });
+    chipsHtml += `<button type="button" class="festival-filter-btn ${currentFilter === 'other' ? 'active' : ''}" data-filter="other" onclick="filterFestivalRoster('other', this)">✨ Other Specials</button>`;
+    filterChipsContainer.innerHTML = chipsHtml;
+  }
+
   const filteredEvents = allSpecial.filter(r => {
     if (currentFilter === "all") return true;
     const cat = (r.category || inferFestivalCategory(r.title)).toLowerCase();
     if (currentFilter === "other") {
-      return !["christmas", "newyear", "easter", "miracle"].includes(cat);
+      const standard = ["christmas", "newyear", "easter", "miracle"];
+      const customIds = (appState.customFestivalCategories || []).map(c => (typeof c === 'string' ? c : c.id).toLowerCase());
+      return !standard.includes(cat) && !customIds.includes(cat);
     }
-    return cat === currentFilter;
+    return cat === currentFilter.toLowerCase();
   });
 
   if (ts) {
@@ -2894,7 +3037,7 @@ function renderFridayService() {
   });
 }
 
-// ================= RENDER SPECIAL EVENTS & FESTIVAL MEETINGS =================
+// ================= RENDER SPECIAL EVENT SERVICES =================
 window.currentFestivalFilter = "all";
 
 function filterFestivalRoster(filter, btn) {
@@ -2907,29 +3050,56 @@ function filterFestivalRoster(filter, btn) {
   renderPublicSchedule();
 }
 
+function toggleSpecialMeetingsVisibility() {
+  appState.specialMeetingsEnabled = !(appState.specialMeetingsEnabled !== false);
+  saveState();
+  renderAll();
+
+  if (appState.specialMeetingsEnabled) {
+    showToast("🟢 Special Event Services are now VISIBLE on the public schedule!");
+  } else {
+    showToast("🔴 Special Event Services are now HIDDEN from the public schedule.");
+  }
+}
+
 function renderSpecialMeetings() {
   const tbody = document.getElementById("tbodySpecialMeetings");
+  const statusBadge = document.getElementById("specialMeetingsStatusBadge");
+  const toggleBtn = document.getElementById("toggleSpecialMeetingsBtn");
+
+  const isEnabled = appState.specialMeetingsEnabled !== false;
+  if (statusBadge) {
+    if (isEnabled) {
+      statusBadge.className = "header-tag tag-emerald";
+      statusBadge.textContent = "🟢 Active & Visible on Public Schedule";
+    } else {
+      statusBadge.className = "header-tag tag-amber";
+      statusBadge.textContent = "🔴 Inactive (Hidden on Public Schedule)";
+    }
+  }
+
+  if (toggleBtn) {
+    if (isEnabled) {
+      toggleBtn.className = "btn btn-secondary";
+      toggleBtn.textContent = "🚫 Turn OFF (Hide from Schedule)";
+    } else {
+      toggleBtn.className = "btn btn-primary";
+      toggleBtn.textContent = "👁️ Enable & Show on Schedule";
+    }
+  }
+
   if (!tbody) return;
   tbody.innerHTML = "";
 
   if (!appState.specialMeetings) appState.specialMeetings = [];
 
-  const categoryOptions = [
-    { val: "christmas", label: "🎄 Christmas" },
-    { val: "newyear", label: "🕊️ New Year" },
-    { val: "easter", label: "✝️ Easter" },
-    { val: "miracle", label: "🔥 Miracle Night" },
-    { val: "thanksgiving", label: "🌾 Harvest Festival" },
-    { val: "convention", label: "🩸 Revival Convention" },
-    { val: "youth", label: "🕊️ Youth Special" },
-    { val: "special", label: "🌟 Special Meeting" }
-  ];
+  const categoryOptions = getAllFestivalCategories();
 
   appState.specialMeetings.forEach((row, index) => {
-    const curCat = row.category || inferFestivalCategory(row.title);
+    const curCat = (row.category || inferFestivalCategory(row.title)).toLowerCase();
     const catOptsHtml = categoryOptions.map(c => 
-      `<option value="${c.val}" ${c.val === curCat ? 'selected' : ''}>${c.label}</option>`
-    ).join("");
+      `<option value="${escapeHtml(c.val)}" ${c.val.toLowerCase() === curCat ? 'selected' : ''}>${escapeHtml(c.label)}</option>`
+    ).join("") + `<option value="__ADD_NEW_CATEGORY__">➕ + Add Custom Category...</option>`;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -2938,18 +3108,18 @@ function renderSpecialMeetings() {
         <input type="text" class="input-text" style="width: 100%; font-size: 0.76rem; margin-top: 4px; min-width: 160px;" placeholder="Optional Notes (e.g. Carols, Broadcast)" value="${escapeHtml(row.notes || '')}" onchange="updateSpecialMeeting(${index}, 'notes', this.value)">
       </td>
       <td>
-        <select class="role-select" style="width: 100%; font-weight: 600;" onchange="updateSpecialMeeting(${index}, 'category', this.value)">
+        <select class="role-select" style="width: 100%; font-weight: 600;" onchange="onCategorySelectChange(${index}, this.value)">
           ${catOptsHtml}
         </select>
       </td>
       <td>
-        <input type="text" class="input-text" style="width: 100px;" value="${escapeHtml(row.date || '')}" placeholder="Date" onchange="updateSpecialMeeting(${index}, 'date', this.value)">
+        <input type="text" class="input-text" style="width: 105px;" value="${escapeHtml(row.date || '')}" placeholder="Date" onchange="updateSpecialMeeting(${index}, 'date', this.value)">
       </td>
       <td>
         <input type="text" class="input-text" style="width: 125px;" value="${escapeHtml(row.time || '')}" placeholder="Service Time" onchange="updateSpecialMeeting(${index}, 'time', this.value)">
       </td>
       <td>
-        <input type="text" class="input-text" style="width: 90px;" value="${escapeHtml(row.callTime || '')}" placeholder="Call Time" onchange="updateSpecialMeeting(${index}, 'callTime', this.value)">
+        <input type="text" class="input-text" style="width: 95px;" value="${escapeHtml(row.callTime || '')}" placeholder="Call Time" onchange="updateSpecialMeeting(${index}, 'callTime', this.value)">
       </td>
       <td>
         <select class="role-select" data-slot="specialMeetings:${index}:cam1" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'cam1', this.value)">
@@ -4827,15 +4997,19 @@ function populateWhatsAppDateSelect() {
       dateSelect.appendChild(opt);
     });
   } else if (dayType === "special") {
-    (appState.specialMeetings || []).forEach(r => {
-      const catMeta = getFestivalCategoryMeta(r.category || inferFestivalCategory(r.title));
-      const opt = document.createElement("option");
-      opt.value = r.title + " - " + r.date;
-      opt.textContent = `${catMeta.icon} ${r.title} (${r.date})`;
-      dateSelect.appendChild(opt);
-    });
-    if ((appState.specialMeetings || []).length === 0) {
-      dateSelect.innerHTML = `<option value="">No Festival Services</option>`;
+    if (appState.specialMeetingsEnabled === false) {
+      dateSelect.innerHTML = `<option value="">⚠️ Special Event Services Inactive (Hidden)</option>`;
+    } else {
+      (appState.specialMeetings || []).forEach(r => {
+        const catMeta = getFestivalCategoryMeta(r.category || inferFestivalCategory(r.title));
+        const opt = document.createElement("option");
+        opt.value = r.title + " - " + r.date;
+        opt.textContent = `${catMeta.icon} ${r.title} (${r.date})`;
+        dateSelect.appendChild(opt);
+      });
+      if ((appState.specialMeetings || []).length === 0) {
+        dateSelect.innerHTML = `<option value="">No Festival Services</option>`;
+      }
     }
   } else if (dayType === "morning") {
     if (appState.morningPrayer && appState.morningPrayer.days) {
@@ -4895,10 +5069,10 @@ function generateWhatsAppText() {
       text += `• ${r.date}: 1st Cam: ${r.cam1 || '-'} | Live: ${r.live || '-'}\n`;
     });
 
-    // Append Special Meetings if any
-    if (appState.specialMeetings && appState.specialMeetings.length > 0) {
+    // Append Special Meetings if any (and active)
+    if (appState.specialMeetingsEnabled !== false && appState.specialMeetings && appState.specialMeetings.length > 0) {
       text += `\n══════════════════════════════\n`;
-      text += `🗓️ FESTIVAL SERVICES & SPECIAL ROSTER\n`;
+      text += `🗓️ SPECIAL EVENT SERVICES ROSTER\n`;
       text += `══════════════════════════════\n`;
       appState.specialMeetings.forEach(r => {
         const catMeta = getFestivalCategoryMeta(r.category || inferFestivalCategory(r.title));
@@ -4967,6 +5141,9 @@ function generateWhatsAppText() {
     text += `Serving together for His glory! 🙌`;
     return text;
   } else if (dayType === "special") {
+    if (appState.specialMeetingsEnabled === false) {
+      return "⚠️ Special Event Services schedule is currently inactive.\nYou can turn it ON anytime from the Admin Console.";
+    }
     // Special Meeting
     const spec = (appState.specialMeetings || []).find(r => (r.title + " - " + r.date) === selectedDate || r.title === selectedDate || r.date === selectedDate) || {};
     const catMeta = getFestivalCategoryMeta(spec.category || inferFestivalCategory(spec.title));
@@ -5371,54 +5548,56 @@ function getVolunteerDuties(name) {
     }
   });
 
-  // Special Meetings / Festival Services
-  (appState.specialMeetings || []).forEach(r => {
-    const rolesMap = [
-      { key: 'cam1', label: '🎥 1st Camera' },
-      { key: 'cam2', label: '📹 2nd Camera' },
-      { key: 'gimble', label: '🎯 Gimble Operator' },
-      { key: 'live', label: '💻 Live in System' },
-      { key: 'spot', label: '✂️ Spot Editing' }
-    ];
-    const cat = r.category || inferFestivalCategory(r.title);
-    const catMeta = getFestivalCategoryMeta(cat);
-    const sTime = r.time || inferFestivalTime(r.title) || '';
-    const cTime = r.callTime || inferFestivalCallTime(r.title) || '30 mins before service';
+  // Special Meetings / Festival Services (if active)
+  if (appState.specialMeetingsEnabled !== false) {
+    (appState.specialMeetings || []).forEach(r => {
+      const rolesMap = [
+        { key: 'cam1', label: '🎥 1st Camera' },
+        { key: 'cam2', label: '📹 2nd Camera' },
+        { key: 'gimble', label: '🎯 Gimble Operator' },
+        { key: 'live', label: '💻 Live in System' },
+        { key: 'spot', label: '✂️ Spot Editing' }
+      ];
+      const cat = r.category || inferFestivalCategory(r.title);
+      const catMeta = getFestivalCategoryMeta(cat);
+      const sTime = r.time || inferFestivalTime(r.title) || '';
+      const cTime = r.callTime || inferFestivalCallTime(r.title) || '30 mins before service';
 
-    let sStart = 'TBD';
-    let sEnd = 'TBD';
-    if (sTime) {
-      if (sTime.includes('-')) {
-        const parts = sTime.split('-');
-        sStart = parts[0].trim();
-        sEnd = parts[1].trim();
-      } else {
-        sStart = sTime.trim();
-        sEnd = sTime.trim();
+      let sStart = 'TBD';
+      let sEnd = 'TBD';
+      if (sTime) {
+        if (sTime.includes('-')) {
+          const parts = sTime.split('-');
+          sStart = parts[0].trim();
+          sEnd = parts[1].trim();
+        } else {
+          sStart = sTime.trim();
+          sEnd = sTime.trim();
+        }
       }
-    }
 
-    rolesMap.forEach(rm => {
-      if (matches(r[rm.key])) {
-        duties.push({
-          date: r.date,
-          service: `${catMeta.icon} ${r.title || 'Festival Service'}${sTime ? ` (${sTime})` : ''}`,
-          serviceShort: r.title || 'Festival Service',
-          serviceType: 'specialMeetings',
-          category: cat,
-          role: rm.label,
-          rawRole: rm.key,
-          assignedText: r[rm.key],
-          callTime: cTime,
-          prayerTime: '15 mins before',
-          serviceStart: sStart,
-          serviceEnd: sEnd,
-          notes: r.notes || '',
-          colorTag: catMeta.colorTag || 'tag-purple'
-        });
-      }
+      rolesMap.forEach(rm => {
+        if (matches(r[rm.key])) {
+          duties.push({
+            date: r.date,
+            service: `${catMeta.icon} ${r.title || 'Festival Service'}${sTime ? ` (${sTime})` : ''}`,
+            serviceShort: r.title || 'Festival Service',
+            serviceType: 'specialMeetings',
+            category: cat,
+            role: rm.label,
+            rawRole: rm.key,
+            assignedText: r[rm.key],
+            callTime: cTime,
+            prayerTime: '15 mins before',
+            serviceStart: sStart,
+            serviceEnd: sEnd,
+            notes: r.notes || '',
+            colorTag: catMeta.colorTag || 'tag-purple'
+          });
+        }
+      });
     });
-  });
+  }
 
   // Early Morning Prayer (if seasonal schedule is active)
   if (appState.morningPrayer && appState.morningPrayer.enabled && appState.morningPrayer.days) {
