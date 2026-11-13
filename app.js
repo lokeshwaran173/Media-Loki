@@ -3118,15 +3118,15 @@ function updateSpecialMeeting(index, field, value) {
 }
 
 function removeSpecialMeeting(index) {
-  if (confirm("Remove this special event?")) {
-    pushScheduleUndoSnapshot("Remove Special Event");
-    appState.specialMeetings.splice(index, 1);
-    saveState();
-    renderAll();
-    populateWhatsAppDateSelect();
-    updateWhatsAppPreview();
-    showToast("Special event removed. (Undo available)");
-  }
+  if (!appState.specialMeetings || !appState.specialMeetings[index]) return;
+  pushScheduleUndoSnapshot("Remove Special Event");
+  const removedTitle = appState.specialMeetings[index].title || "Special event";
+  appState.specialMeetings.splice(index, 1);
+  saveState();
+  renderAll();
+  populateWhatsAppDateSelect();
+  updateWhatsAppPreview();
+  showToast(`🗑️ "${removedTitle}" removed. (Tap Undo to restore)`);
 }
 
 function clearAllSpecialMeetings() {
@@ -3134,15 +3134,14 @@ function clearAllSpecialMeetings() {
     showToast("No special events to clear.");
     return;
   }
-  if (confirm(`Remove all ${appState.specialMeetings.length} special events from the schedule? You can add them back anytime with '+ Custom Event' or '✨ Quick-Load Festival Template'.`)) {
-    pushScheduleUndoSnapshot("Clear All Special Events");
-    appState.specialMeetings = [];
-    saveState();
-    renderAll();
-    populateWhatsAppDateSelect();
-    updateWhatsAppPreview();
-    showToast("🗑️ All special events cleared. (Undo available)");
-  }
+  pushScheduleUndoSnapshot("Clear All Special Events");
+  const count = appState.specialMeetings.length;
+  appState.specialMeetings = [];
+  saveState();
+  renderAll();
+  populateWhatsAppDateSelect();
+  updateWhatsAppPreview();
+  showToast(`🗑️ Cleared all ${count} special event(s). (Tap Undo to restore)`);
 }
 
 // 1-Click Festival Template Inserter
@@ -6716,6 +6715,7 @@ if ('serviceWorker' in navigator) {
 
     navigator.serviceWorker.register('./sw.js').then(reg => {
       console.log('FLAG Service Worker registered:', reg.scope);
+      try { reg.update(); } catch (e) {}
       if (reg.waiting && navigator.serviceWorker.controller) {
         showPwaUpdateBanner();
       }
