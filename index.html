@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=6.1">
+  <link rel="stylesheet" href="styles.css?v=6.2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -526,19 +526,42 @@
         <div class="schedule-cards-grid" id="publicCardsFridayService" style="display: none;"></div>
       </div>
 
-      <!-- Special Meetings / Conferences Schedule -->
-      <div class="card card-accent-special">
-        <div class="card-header">
-          <div class="header-tag tag-purple">🌟 Special Meetings & Conferences</div>
+      <!-- Special Events & Holiday Festival Services Roster -->
+      <div class="card card-accent-special festival-roster-card" id="specialEventsSection">
+        <div class="card-header festival-header-wrap" style="flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div class="header-tag tag-purple festival-main-tag">🌟 Special Events &amp; Festival Services Roster</div>
+            <span class="festival-subtitle-badge">🎄 Christmas • 🕊️ New Year • ✝️ Easter • 🔥 Miracle Nights</span>
+          </div>
+          <div class="festival-actions-bar" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <button type="button" class="btn btn-whatsapp btn-sm" onclick="copyFestivalRosterWhatsApp()" title="Copy formatted Festival &amp; Holiday roster for WhatsApp">
+              📋 Copy Festival Roster
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="exportFestivalCalendar()" title="Add Festival services to your Calendar">
+              📅 Add to Calendar
+            </button>
+          </div>
         </div>
-        <div id="publicCardsSpecialMeetings" class="schedule-cards-grid" style="display: none;"></div>
+
+        <!-- Festival Category Filter Chips -->
+        <div class="festival-filter-pills" id="festivalFilterChips">
+          <button type="button" class="festival-filter-btn active" data-filter="all" onclick="filterFestivalRoster('all', this)">All Events (<span id="countAllFestivals">0</span>)</button>
+          <button type="button" class="festival-filter-btn" data-filter="christmas" onclick="filterFestivalRoster('christmas', this)">🎄 Christmas</button>
+          <button type="button" class="festival-filter-btn" data-filter="newyear" onclick="filterFestivalRoster('newyear', this)">🕊️ New Year</button>
+          <button type="button" class="festival-filter-btn" data-filter="easter" onclick="filterFestivalRoster('easter', this)">✝️ Easter</button>
+          <button type="button" class="festival-filter-btn" data-filter="miracle" onclick="filterFestivalRoster('miracle', this)">🔥 Miracle Nights</button>
+          <button type="button" class="festival-filter-btn" data-filter="other" onclick="filterFestivalRoster('other', this)">✨ Other Specials</button>
+        </div>
+
+        <div id="publicCardsSpecialMeetings" class="schedule-cards-grid festival-cards-grid" style="display: none;"></div>
         <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
         <div class="table-wrap">
-          <table class="schedule-table">
+          <table class="schedule-table festival-schedule-table">
             <thead>
               <tr>
-                <th style="width: 180px;">🌟 Meeting Title</th>
-                <th style="width: 130px;">📅 Date</th>
+                <th style="min-width: 210px;">🎉 Festival / Event</th>
+                <th style="min-width: 135px;">📅 Date &amp; Service Time</th>
+                <th style="min-width: 105px;">⏰ Call Time</th>
                 <th>🎥 1st Cam</th>
                 <th>📹 2nd Cam</th>
                 <th>🎯 Gimble</th>
@@ -1012,14 +1035,20 @@
           </div>
         </div>
 
-        <!-- Special Meetings (Admin Dropdowns) -->
-        <div class="card">
-          <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-            <div class="header-tag tag-purple">🌟 Special Meetings & Conferences Editor</div>
+        <!-- Special Events & Holiday Festival Roster (Admin Dropdowns) -->
+        <div class="card festival-admin-card">
+          <div class="card-header" style="flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <div class="header-tag tag-purple">🌟 Special Events &amp; Festival Services Editor</div>
+              <span style="font-size: 0.78rem; color: var(--text-muted);">Manage Christmas, New Year, Easter &amp; All-Night services</span>
+            </div>
             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button class="btn btn-save-schedule" style="padding: 6px 12px; font-size: 0.8rem;"
                 onclick="manualSaveSchedule()">💾 Save</button>
-              <button class="btn btn-primary" onclick="addSpecialMeetingRow()">+ Add Special Meeting</button>
+              <button type="button" class="btn btn-festival-preset" onclick="openFestivalTemplateModal()" title="Insert Christmas, New Year, Easter presets">
+                ✨ Quick-Load Festival Template
+              </button>
+              <button class="btn btn-primary" onclick="addSpecialMeetingRow()">+ Custom Event</button>
             </div>
           </div>
           <div class="mobile-table-hint">👈 Swipe table left / right to view all camera roles 👉</div>
@@ -1027,8 +1056,11 @@
             <table class="schedule-table">
               <thead>
                 <tr>
-                  <th style="width: 180px;">Meeting Title</th>
-                  <th style="width: 120px;">Date</th>
+                  <th style="min-width: 170px;">Event Title</th>
+                  <th style="width: 120px;">Category</th>
+                  <th style="width: 105px;">Date</th>
+                  <th style="width: 130px;">Service Time</th>
+                  <th style="width: 95px;">Call Time</th>
                   <th>1st Cam</th>
                   <th>2nd Cam</th>
                   <th>Gimble</th>
@@ -1990,6 +2022,27 @@
     </div>
   </div>
 
+  <!-- ================= FESTIVAL & SPECIAL EVENT TEMPLATES MODAL ================= -->
+  <div id="festivalTemplateModal" class="modal-overlay" onclick="if(event.target === this) closeFestivalTemplateModal()">
+    <div class="modal-card" style="max-width: 660px;">
+      <div class="modal-header">
+        <h3>✨ 1-Click Church Festival &amp; Holiday Presets</h3>
+        <button class="modal-close" onclick="closeFestivalTemplateModal()">&times;</button>
+      </div>
+      <p style="font-size: 0.84rem; color: var(--text-muted); margin-bottom: 14px;">
+        Tap any festival service below to instantly add it to your live media roster with pre-set dates, service hours, and call times:
+      </p>
+
+      <div class="festival-preset-grid" id="festivalPresetCardsGrid">
+        <!-- Rendered dynamically via app.js -->
+      </div>
+
+      <div class="modal-actions-row" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn btn-secondary" onclick="closeFestivalTemplateModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= TOAST NOTIFICATION ================= -->
   <div id="toast" class="toast-box">
     <span id="toastIcon">✔️</span>
@@ -2000,7 +2053,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=6.1"></script>
+  <script src="app.js?v=6.2"></script>
 </body>
 
 </html>

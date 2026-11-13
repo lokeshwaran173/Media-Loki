@@ -28,6 +28,171 @@ const OFFICIAL_CREW_DIRECTORY = [
   { name: "Franklin", role: DEFAULT_MEMBER_ROLE, phone: "" }
 ];
 
+// Curated Church Festival & Holiday Service Presets
+const FESTIVAL_EVENT_TEMPLATES = [
+  {
+    category: "christmas",
+    badgeText: "🎄 Christmas Eve",
+    icon: "🎄",
+    title: "Christmas Eve Candlelight Service",
+    date: "24 Dec 2026",
+    time: "06:30 PM - 08:30 PM",
+    callTime: "05:45 PM",
+    notes: "Carols, Nativity Live Broadcast & Candlelight Blessing"
+  },
+  {
+    category: "christmas",
+    badgeText: "🌟 Christmas Day",
+    icon: "🌟",
+    title: "Christmas Day Celebration Service",
+    date: "25 Dec 2026",
+    time: "08:30 AM - 11:30 AM",
+    callTime: "07:45 AM",
+    notes: "Grand Festive Worship & Christmas Broadcast"
+  },
+  {
+    category: "newyear",
+    badgeText: "🕊️ Watch Night",
+    icon: "🕊️",
+    title: "New Year Eve / Watch Night Service",
+    date: "31 Dec 2026",
+    time: "10:00 PM - 01:30 AM",
+    callTime: "09:00 PM",
+    notes: "Thanksgiving, Countdown & 2027 Promise Card Blessing"
+  },
+  {
+    category: "newyear",
+    badgeText: "🌅 New Year Day",
+    icon: "🌅",
+    title: "New Year Morning Blessing Service",
+    date: "01 Jan 2027",
+    time: "08:30 AM - 10:30 AM",
+    callTime: "07:45 AM",
+    notes: "First Fruits & New Year Covenant Service"
+  },
+  {
+    category: "easter",
+    badgeText: "✝️ Good Friday",
+    icon: "✝️",
+    title: "Good Friday Solemn Service",
+    date: "03 Apr 2026",
+    time: "11:00 AM - 02:00 PM",
+    callTime: "10:15 AM",
+    notes: "The 7 Words of the Cross & Holy Communion"
+  },
+  {
+    category: "easter",
+    badgeText: "🌅 Easter Sunrise",
+    icon: "🌅",
+    title: "Easter Resurrection Sunrise Service",
+    date: "05 Apr 2026",
+    time: "05:00 AM - 07:30 AM",
+    callTime: "04:15 AM",
+    notes: "He is Risen! Resurrection Sunday Broadcast"
+  },
+  {
+    category: "thanksgiving",
+    badgeText: "🌾 Harvest Festival",
+    icon: "🌾",
+    title: "Annual Harvest Festival & Thanksgiving",
+    date: "15 Nov 2026",
+    time: "09:00 AM - 01:00 PM",
+    callTime: "08:00 AM",
+    notes: "Auction, Thanksgiving Praise & Special Video"
+  },
+  {
+    category: "miracle",
+    badgeText: "🔥 Miracle Night",
+    icon: "🔥",
+    title: "All-Night Miracle & Anointing Service",
+    date: "31 Oct 2026",
+    time: "10:00 PM - 04:00 AM",
+    callTime: "09:15 PM",
+    notes: "Signs, Wonders & Prophetic Impartation Night"
+  },
+  {
+    category: "convention",
+    badgeText: "🩸 Revival Convention",
+    icon: "🩸",
+    title: "3-Day Fasting & Prayer Revival Convention",
+    date: "10 Nov 2026",
+    time: "06:30 PM - 09:30 PM",
+    callTime: "05:45 PM",
+    notes: "Guest Speaker & Special Evening Live Stream"
+  },
+  {
+    category: "youth",
+    badgeText: "🕊️ Youth Special",
+    icon: "🕊️",
+    title: "Youth Sunday & Media Workshop",
+    date: "14 Nov 2026",
+    time: "09:00 AM - 12:00 PM",
+    callTime: "08:15 AM",
+    notes: "Youth-Led Worship, Media Production & Drama"
+  }
+];
+
+function getFestivalCategoryMeta(cat) {
+  const c = String(cat || "special").toLowerCase();
+  switch (c) {
+    case "christmas":
+      return { icon: "🎄", label: "Christmas", badgeClass: "badge-christmas", colorTag: "tag-emerald" };
+    case "newyear":
+      return { icon: "🕊️", label: "New Year", badgeClass: "badge-newyear", colorTag: "tag-purple" };
+    case "easter":
+      return { icon: "✝️", label: "Easter", badgeClass: "badge-easter", colorTag: "tag-purple" };
+    case "miracle":
+      return { icon: "🔥", label: "Miracle Night", badgeClass: "badge-miracle", colorTag: "tag-amber" };
+    case "thanksgiving":
+      return { icon: "🌾", label: "Harvest", badgeClass: "badge-thanksgiving", colorTag: "tag-amber" };
+    case "convention":
+      return { icon: "🩸", label: "Convention", badgeClass: "badge-convention", colorTag: "tag-special" };
+    case "youth":
+      return { icon: "🕊️", label: "Youth Special", badgeClass: "badge-youth", colorTag: "tag-blue" };
+    default:
+      return { icon: "🌟", label: "Special Event", badgeClass: "badge-special", colorTag: "tag-purple" };
+  }
+}
+
+function inferFestivalCategory(title) {
+  const t = String(title || "").toLowerCase();
+  if (t.includes("christmas") || t.includes("carol") || t.includes("nativity")) return "christmas";
+  if (t.includes("new year") || t.includes("watch night") || t.includes("watchnight") || t.includes("31 dec") || t.includes("01 jan")) return "newyear";
+  if (t.includes("good friday") || t.includes("easter") || t.includes("resurrection") || t.includes("passion")) return "easter";
+  if (t.includes("miracle") || t.includes("all-night") || t.includes("all night") || t.includes("anointing")) return "miracle";
+  if (t.includes("harvest") || t.includes("thanksgiving")) return "thanksgiving";
+  if (t.includes("convention") || t.includes("revival") || t.includes("fasting")) return "convention";
+  if (t.includes("youth") || t.includes("children")) return "youth";
+  return "special";
+}
+
+function inferFestivalTime(title, category) {
+  const cat = category || inferFestivalCategory(title);
+  if (cat === "christmas") {
+    return String(title).toLowerCase().includes("eve") ? "06:30 PM - 08:30 PM" : "08:30 AM - 11:30 AM";
+  }
+  if (cat === "newyear") {
+    return String(title).toLowerCase().includes("morning") ? "08:30 AM - 10:30 AM" : "10:00 PM - 01:30 AM";
+  }
+  if (cat === "easter") {
+    return String(title).toLowerCase().includes("sunrise") ? "05:00 AM - 07:30 AM" : "11:00 AM - 02:00 PM";
+  }
+  if (cat === "miracle") return "10:00 PM - 04:00 AM";
+  if (cat === "thanksgiving") return "09:00 AM - 01:00 PM";
+  if (cat === "convention") return "06:30 PM - 09:30 PM";
+  return "06:30 PM - 08:30 PM";
+}
+
+function inferFestivalCallTime(title, timeStr) {
+  if (timeStr && timeStr.includes("10:00 PM")) return "09:15 PM";
+  if (timeStr && timeStr.includes("08:30 AM")) return "07:45 AM";
+  if (timeStr && timeStr.includes("05:00 AM")) return "04:15 AM";
+  if (timeStr && timeStr.includes("06:30 PM")) return "05:45 PM";
+  if (timeStr && timeStr.includes("09:00 AM")) return "08:15 AM";
+  if (timeStr && timeStr.includes("11:00 AM")) return "10:15 AM";
+  return "45 mins before service";
+}
+
 function isAliasMatch(strA, strB) {
   if (!strA || !strB) return false;
   const splitParts = (s) => String(s)
@@ -113,7 +278,48 @@ const defaultState = {
     { id: 5, date: "30 Oct 2026", cam1: "Balaji", live: "Shyam Davit" }
   ],
   specialMeetings: [
-    { id: 1, title: "All-Night Miracle Service", date: "31 Oct 2026", cam1: "Balaji", cam2: "Lokesh", gimble: "Shyam Davit", live: "Anand", spot: "Joshua" }
+    {
+      id: 1,
+      category: "miracle",
+      title: "All-Night Miracle Service",
+      date: "31 Oct 2026",
+      time: "10:00 PM - 04:00 AM",
+      callTime: "09:15 PM",
+      notes: "Signs, Wonders & Prophetic Impartation Night",
+      cam1: "Balaji",
+      cam2: "Lokesh",
+      gimble: "Shyam Davit",
+      live: "Anand",
+      spot: "Joshua"
+    },
+    {
+      id: 2,
+      category: "christmas",
+      title: "Christmas Eve Candlelight Service",
+      date: "24 Dec 2026",
+      time: "06:30 PM - 08:30 PM",
+      callTime: "05:45 PM",
+      notes: "Carols, Nativity Live Broadcast & Candlelight Blessing",
+      cam1: "Franklin",
+      cam2: "Sanjay",
+      gimble: "Lokesh",
+      live: "Yashwanth",
+      spot: "Joshua"
+    },
+    {
+      id: 3,
+      category: "newyear",
+      title: "New Year Eve / Watch Night Service",
+      date: "31 Dec 2026",
+      time: "10:00 PM - 01:30 AM",
+      callTime: "09:00 PM",
+      notes: "Thanksgiving, Countdown & 2027 Promise Card Blessing",
+      cam1: "Balaji",
+      cam2: "Sam Davit",
+      gimble: "Shyam Davit",
+      live: "Anand",
+      spot: "Lokesh"
+    }
   ],
   morningPrayer: {
     enabled: false,
@@ -679,8 +885,16 @@ function ensureStateIntegrity(state) {
   if (!state.gearIssues || !Array.isArray(state.gearIssues)) {
     state.gearIssues = [];
   }
-  if (!state.specialMeetings || !Array.isArray(state.specialMeetings)) {
-    state.specialMeetings = [];
+  if (!state.specialMeetings || !Array.isArray(state.specialMeetings) || state.specialMeetings.length === 0) {
+    state.specialMeetings = JSON.parse(JSON.stringify(defaultState.specialMeetings));
+  } else {
+    state.specialMeetings.forEach((row, idx) => {
+      if (!row.id) row.id = Date.now() + idx;
+      if (!row.category) row.category = inferFestivalCategory(row.title);
+      if (!row.time) row.time = inferFestivalTime(row.title, row.category);
+      if (!row.callTime) row.callTime = inferFestivalCallTime(row.title, row.time);
+      if (row.notes === undefined) row.notes = "";
+    });
   }
   if (!state.morningPrayer) {
     state.morningPrayer = { enabled: false, title: "21 Days Early Morning Prayer", days: [] };
@@ -797,11 +1011,61 @@ function loadState() {
     ];
   }
 
-  // Ensure specialMeetings and morningPrayer exist
-  if (!appState.specialMeetings) {
+  // Ensure specialMeetings exist and have festival metadata
+  if (!appState.specialMeetings || !Array.isArray(appState.specialMeetings) || appState.specialMeetings.length === 0) {
     appState.specialMeetings = [
-      { id: 1, title: "All-Night Miracle Service", date: "31 Oct 2026", cam1: "Balaji", cam2: "Lokesh", gimble: "Shyam Davit", live: "Anand", spot: "Joshua" }
+      {
+        id: 1,
+        category: "miracle",
+        title: "All-Night Miracle Service",
+        date: "31 Oct 2026",
+        time: "10:00 PM - 04:00 AM",
+        callTime: "09:15 PM",
+        notes: "Signs, Wonders & Prophetic Impartation Night",
+        cam1: "Balaji",
+        cam2: "Lokesh",
+        gimble: "Shyam Davit",
+        live: "Anand",
+        spot: "Joshua"
+      },
+      {
+        id: 2,
+        category: "christmas",
+        title: "Christmas Eve Candlelight Service",
+        date: "24 Dec 2026",
+        time: "06:30 PM - 08:30 PM",
+        callTime: "05:45 PM",
+        notes: "Carols, Nativity Live Broadcast & Candlelight Blessing",
+        cam1: "Franklin",
+        cam2: "Sanjay",
+        gimble: "Lokesh",
+        live: "Yashwanth",
+        spot: "Joshua"
+      },
+      {
+        id: 3,
+        category: "newyear",
+        title: "New Year Eve / Watch Night Service",
+        date: "31 Dec 2026",
+        time: "10:00 PM - 01:30 AM",
+        callTime: "09:00 PM",
+        notes: "Thanksgiving, Countdown & 2027 Promise Card Blessing",
+        cam1: "Balaji",
+        cam2: "Sam Davit",
+        gimble: "Shyam Davit",
+        live: "Anand",
+        spot: "Lokesh"
+      }
     ];
+  } else {
+    // Normalize existing rows with time, callTime and category if missing
+    appState.specialMeetings.forEach((row, idx) => {
+      if (!row.id) row.id = Date.now() + idx;
+      if (!row.category) row.category = inferFestivalCategory(row.title);
+      if (!row.time) row.time = inferFestivalTime(row.title, row.category);
+      if (!row.callTime) row.callTime = inferFestivalCallTime(row.title, row.time);
+      if (row.notes === undefined) row.notes = "";
+    });
   }
 
   if (!appState.morningPrayer) {
@@ -1340,62 +1604,117 @@ function renderPublicSchedule() {
     });
   }
 
-  // Special Meetings Public
+  // Special Events & Festival Services Public
   const ts = document.getElementById("publicTbodySpecialMeetings");
+  const countEl = document.getElementById("countAllFestivals");
+  const allSpecial = appState.specialMeetings || [];
+  if (countEl) countEl.textContent = allSpecial.length;
+
+  const currentFilter = window.currentFestivalFilter || "all";
+  const filteredEvents = allSpecial.filter(r => {
+    if (currentFilter === "all") return true;
+    const cat = (r.category || inferFestivalCategory(r.title)).toLowerCase();
+    if (currentFilter === "other") {
+      return !["christmas", "newyear", "easter", "miracle"].includes(cat);
+    }
+    return cat === currentFilter;
+  });
+
   if (ts) {
     ts.innerHTML = "";
-    (appState.specialMeetings || []).forEach(r => {
+    if (filteredEvents.length === 0) {
       const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><strong style="color: #67e8f9; font-weight: 700;">🌟 ${r.title}</strong></td>
-        <td><span class="date-chip date-chip-purple">${r.date}</span></td>
-        <td>${badgeForName(r.cam1, r.date)}</td>
-        <td>${badgeForName(r.cam2, r.date)}</td>
-        <td>${badgeForName(r.gimble, r.date)}</td>
-        <td>${badgeForName(r.live, r.date)}</td>
-        <td>${badgeForName(r.spot, r.date)}</td>
-      `;
+      tr.innerHTML = `<td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">
+        ✨ No events under filter "<strong>${escapeHtml(currentFilter)}</strong>". Switch to <strong>All Events</strong> or load presets from Admin Console!
+      </td>`;
       ts.appendChild(tr);
-    });
+    } else {
+      filteredEvents.forEach(r => {
+        const cat = r.category || inferFestivalCategory(r.title);
+        const meta = getFestivalCategoryMeta(cat);
+        const tr = document.createElement("tr");
+        tr.className = `festival-table-row festival-row-${cat}`;
+        tr.innerHTML = `
+          <td>
+            <div class="festival-title-cell">
+              <span class="festival-badge ${meta.badgeClass}">${meta.icon} ${meta.label}</span>
+              <strong class="festival-name-text">${escapeHtml(r.title || 'Special Event')}</strong>
+              ${r.notes ? `<span class="festival-notes-sub">📝 ${escapeHtml(r.notes)}</span>` : ''}
+            </div>
+          </td>
+          <td>
+            <div class="festival-datetime-cell">
+              <span class="date-chip date-chip-purple">${escapeHtml(r.date)}</span>
+              ${r.time ? `<span class="festival-time-sub">⏰ ${escapeHtml(r.time)}</span>` : ''}
+            </div>
+          </td>
+          <td>
+            <span class="call-time-badge festival-call-time">🔔 ${escapeHtml(r.callTime || '45m prior')}</span>
+          </td>
+          <td>${badgeForName(r.cam1, r.date)}</td>
+          <td>${badgeForName(r.cam2, r.date)}</td>
+          <td>${badgeForName(r.gimble, r.date)}</td>
+          <td>${badgeForName(r.live, r.date)}</td>
+          <td>${badgeForName(r.spot, r.date)}</td>
+        `;
+        ts.appendChild(tr);
+      });
+    }
   }
 
   // Special Meetings Public (Mobile Card View)
   const cs = document.getElementById("publicCardsSpecialMeetings");
   if (cs) {
     cs.innerHTML = "";
-    (appState.specialMeetings || []).forEach(r => {
-      const card = document.createElement("div");
-      card.className = "schedule-service-card card-accent-purple";
-      card.innerHTML = `
-        <div class="sched-card-top">
-          <div class="sched-card-date">🌟 ${r.title || 'Special Meeting'}</div>
-          <span class="duty-badge-time">📅 ${r.date}</span>
-        </div>
-        <div class="sched-card-roles">
-          <div class="sched-role-row">
-            <span class="sched-role-label">🎥 1st Cam:</span>
-            <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
+    if (filteredEvents.length === 0) {
+      cs.innerHTML = `<div class="card" style="text-align:center; padding: 20px; color: var(--text-muted);">
+        ✨ No events under filter "<strong>${escapeHtml(currentFilter)}</strong>".
+      </div>`;
+    } else {
+      filteredEvents.forEach(r => {
+        const cat = r.category || inferFestivalCategory(r.title);
+        const meta = getFestivalCategoryMeta(cat);
+        const card = document.createElement("div");
+        card.className = `schedule-service-card card-accent-special festival-card festival-card-${cat}`;
+        card.innerHTML = `
+          <div class="sched-card-top festival-card-top">
+            <div class="festival-card-header-main">
+              <span class="festival-badge ${meta.badgeClass}">${meta.icon} ${meta.label}</span>
+              <div class="sched-card-date festival-card-title">${escapeHtml(r.title || 'Special Meeting')}</div>
+            </div>
+            <div class="festival-card-chips">
+              <span class="duty-badge-time">📅 ${escapeHtml(r.date)}</span>
+              ${r.time ? `<span class="festival-time-chip">⏰ ${escapeHtml(r.time)}</span>` : ''}
+              <span class="call-time-badge festival-call-badge">🔔 Call: ${escapeHtml(r.callTime || '45m prior')}</span>
+            </div>
+            ${r.notes ? `<div class="festival-card-notes">📝 ${escapeHtml(r.notes)}</div>` : ''}
           </div>
-          <div class="sched-role-row">
-            <span class="sched-role-label">📹 2nd Cam:</span>
-            <div class="sched-role-val">${badgeForName(r.cam2, r.date)}</div>
+          <div class="sched-card-roles">
+            <div class="sched-role-row">
+              <span class="sched-role-label">🎥 1st Cam:</span>
+              <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">📹 2nd Cam:</span>
+              <div class="sched-role-val">${badgeForName(r.cam2, r.date)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">🎯 Gimble:</span>
+              <div class="sched-role-val">${badgeForName(r.gimble, r.date)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">💻 Live System:</span>
+              <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
+            </div>
+            <div class="sched-role-row">
+              <span class="sched-role-label">✂️ Spot Edit:</span>
+              <div class="sched-role-val">${badgeForName(r.spot, r.date)}</div>
+            </div>
           </div>
-          <div class="sched-role-row">
-            <span class="sched-role-label">🎯 Gimble:</span>
-            <div class="sched-role-val">${badgeForName(r.gimble, r.date)}</div>
-          </div>
-          <div class="sched-role-row">
-            <span class="sched-role-label">💻 Live System:</span>
-            <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
-          </div>
-          <div class="sched-role-row">
-            <span class="sched-role-label">✂️ Spot Edit:</span>
-            <div class="sched-role-val">${badgeForName(r.spot, r.date)}</div>
-          </div>
-        </div>
-      `;
-      cs.appendChild(card);
-    });
+        `;
+        cs.appendChild(card);
+      });
+    }
   }
 
   // Early Morning Prayer Public (Only shown if enabled)
@@ -2575,7 +2894,19 @@ function renderFridayService() {
   });
 }
 
-// ================= RENDER SPECIAL MEETINGS =================
+// ================= RENDER SPECIAL EVENTS & FESTIVAL MEETINGS =================
+window.currentFestivalFilter = "all";
+
+function filterFestivalRoster(filter, btn) {
+  window.currentFestivalFilter = filter || "all";
+  const container = document.getElementById("festivalFilterChips");
+  if (container) {
+    container.querySelectorAll(".festival-filter-btn").forEach(b => b.classList.remove("active"));
+  }
+  if (btn) btn.classList.add("active");
+  renderPublicSchedule();
+}
+
 function renderSpecialMeetings() {
   const tbody = document.getElementById("tbodySpecialMeetings");
   if (!tbody) return;
@@ -2583,14 +2914,42 @@ function renderSpecialMeetings() {
 
   if (!appState.specialMeetings) appState.specialMeetings = [];
 
+  const categoryOptions = [
+    { val: "christmas", label: "🎄 Christmas" },
+    { val: "newyear", label: "🕊️ New Year" },
+    { val: "easter", label: "✝️ Easter" },
+    { val: "miracle", label: "🔥 Miracle Night" },
+    { val: "thanksgiving", label: "🌾 Harvest Festival" },
+    { val: "convention", label: "🩸 Revival Convention" },
+    { val: "youth", label: "🕊️ Youth Special" },
+    { val: "special", label: "🌟 Special Meeting" }
+  ];
+
   appState.specialMeetings.forEach((row, index) => {
+    const curCat = row.category || inferFestivalCategory(row.title);
+    const catOptsHtml = categoryOptions.map(c => 
+      `<option value="${c.val}" ${c.val === curCat ? 'selected' : ''}>${c.label}</option>`
+    ).join("");
+
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>
-        <input type="text" class="input-text" style="width: 100%; font-weight: 600;" placeholder="Meeting Name (e.g. Anointing Night)" value="${row.title || ''}" onchange="updateSpecialMeeting(${index}, 'title', this.value)">
+        <input type="text" class="input-text" style="width: 100%; font-weight: 700; min-width: 160px;" placeholder="Event Title" value="${escapeHtml(row.title || '')}" onchange="updateSpecialMeeting(${index}, 'title', this.value)">
+        <input type="text" class="input-text" style="width: 100%; font-size: 0.76rem; margin-top: 4px; min-width: 160px;" placeholder="Optional Notes (e.g. Carols, Broadcast)" value="${escapeHtml(row.notes || '')}" onchange="updateSpecialMeeting(${index}, 'notes', this.value)">
       </td>
       <td>
-        <input type="text" class="input-text" style="width: 110px;" value="${row.date || ''}" placeholder="Date" onchange="updateSpecialMeeting(${index}, 'date', this.value)">
+        <select class="role-select" style="width: 100%; font-weight: 600;" onchange="updateSpecialMeeting(${index}, 'category', this.value)">
+          ${catOptsHtml}
+        </select>
+      </td>
+      <td>
+        <input type="text" class="input-text" style="width: 100px;" value="${escapeHtml(row.date || '')}" placeholder="Date" onchange="updateSpecialMeeting(${index}, 'date', this.value)">
+      </td>
+      <td>
+        <input type="text" class="input-text" style="width: 125px;" value="${escapeHtml(row.time || '')}" placeholder="Service Time" onchange="updateSpecialMeeting(${index}, 'time', this.value)">
+      </td>
+      <td>
+        <input type="text" class="input-text" style="width: 90px;" value="${escapeHtml(row.callTime || '')}" placeholder="Call Time" onchange="updateSpecialMeeting(${index}, 'callTime', this.value)">
       </td>
       <td>
         <select class="role-select" data-slot="specialMeetings:${index}:cam1" onchange="onScheduleDropdownChange('specialMeetings', ${index}, 'cam1', this.value)">
@@ -2618,7 +2977,7 @@ function renderSpecialMeetings() {
         </select>
       </td>
       <td>
-        <button class="btn-icon-del" onclick="removeSpecialMeeting(${index})" title="Delete Special Meeting">
+        <button class="btn-icon-del" onclick="removeSpecialMeeting(${index})" title="Delete Event">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
         </button>
       </td>
@@ -2629,10 +2988,15 @@ function renderSpecialMeetings() {
 
 function addSpecialMeetingRow() {
   if (!appState.specialMeetings) appState.specialMeetings = [];
+  pushScheduleUndoSnapshot("Add Special Event");
   appState.specialMeetings.push({
     id: Date.now(),
+    category: "special",
     title: "Special Meeting",
     date: "Date",
+    time: "06:30 PM - 08:30 PM",
+    callTime: "05:45 PM",
+    notes: "",
     cam1: "",
     cam2: "",
     gimble: "",
@@ -2640,26 +3004,181 @@ function addSpecialMeetingRow() {
     spot: ""
   });
   saveState();
-  renderSpecialMeetings();
+  renderAll();
   populateWhatsAppDateSelect();
   updateWhatsAppPreview();
-  showToast("Added new special meeting slot!");
+  showToast("Added new special event slot!");
 }
 
 function updateSpecialMeeting(index, field, value) {
+  if (!appState.specialMeetings || !appState.specialMeetings[index]) return;
   appState.specialMeetings[index][field] = value;
   saveState();
+  renderPublicSchedule();
+  populateWhatsAppDateSelect();
   updateWhatsAppPreview();
 }
 
 function removeSpecialMeeting(index) {
-  if (confirm("Remove this special meeting?")) {
-    pushScheduleUndoSnapshot("Remove Special Meeting");
+  if (confirm("Remove this special event?")) {
+    pushScheduleUndoSnapshot("Remove Special Event");
     appState.specialMeetings.splice(index, 1);
     saveState();
     renderAll();
-    showToast("Special meeting removed. (Undo available)");
+    showToast("Special event removed. (Undo available)");
   }
+}
+
+// 1-Click Festival Template Inserter
+function openFestivalTemplateModal() {
+  const modal = document.getElementById("festivalTemplateModal");
+  const grid = document.getElementById("festivalPresetCardsGrid");
+  if (!modal || !grid) return;
+
+  grid.innerHTML = FESTIVAL_EVENT_TEMPLATES.map((tpl, idx) => {
+    const meta = getFestivalCategoryMeta(tpl.category);
+    return `
+      <div class="festival-preset-card">
+        <div class="preset-card-top">
+          <span class="festival-badge ${meta.badgeClass}">${meta.icon} ${tpl.badgeText || meta.label}</span>
+          <span class="preset-date-chip">📅 ${escapeHtml(tpl.date)}</span>
+        </div>
+        <h4 class="preset-title">${escapeHtml(tpl.title)}</h4>
+        <div class="preset-meta-row">
+          <span>⏰ <strong>Service:</strong> ${escapeHtml(tpl.time)}</span>
+          <span>🔔 <strong>Call:</strong> ${escapeHtml(tpl.callTime)}</span>
+        </div>
+        <p class="preset-notes">${escapeHtml(tpl.notes || '')}</p>
+        <button type="button" class="btn btn-primary btn-sm preset-insert-btn" onclick="addFestivalFromTemplate(${idx})">
+          ➕ Insert into Roster
+        </button>
+      </div>
+    `;
+  }).join("");
+
+  modal.classList.add("active");
+}
+
+function closeFestivalTemplateModal() {
+  const modal = document.getElementById("festivalTemplateModal");
+  if (modal) modal.classList.remove("active");
+}
+
+function addFestivalFromTemplate(idx) {
+  const tpl = FESTIVAL_EVENT_TEMPLATES[idx];
+  if (!tpl) return;
+  if (!appState.specialMeetings) appState.specialMeetings = [];
+
+  const exists = appState.specialMeetings.some(r => r.title.toLowerCase() === tpl.title.toLowerCase());
+  if (exists) {
+    if (!confirm(`An event titled "${tpl.title}" is already in the roster. Add another slot anyway?`)) {
+      return;
+    }
+  }
+
+  pushScheduleUndoSnapshot(`Add Festival Preset: ${tpl.title}`);
+  appState.specialMeetings.push({
+    id: Date.now(),
+    category: tpl.category,
+    title: tpl.title,
+    date: tpl.date,
+    time: tpl.time,
+    callTime: tpl.callTime,
+    notes: tpl.notes || "",
+    cam1: "",
+    cam2: "",
+    gimble: "",
+    live: "",
+    spot: ""
+  });
+  saveState();
+  renderAll();
+  populateWhatsAppDateSelect();
+  updateWhatsAppPreview();
+  closeFestivalTemplateModal();
+  showToast(`🎉 Added "${tpl.title}" to Festival Roster!`);
+}
+
+function copyFestivalRosterWhatsApp() {
+  const events = appState.specialMeetings || [];
+  if (events.length === 0) {
+    showToast("ℹ️ No festival or special events scheduled yet.");
+    return;
+  }
+  let text = `🕊️ *FULL LIFE CENTRE AG CHURCH (FLAG)*\n`;
+  text += `🌟 *SPECIAL EVENTS & HOLIDAY FESTIVAL MEDIA ROSTER*\n\n`;
+
+  events.forEach((r) => {
+    const meta = getFestivalCategoryMeta(r.category || inferFestivalCategory(r.title));
+    text += `${meta.icon} *${r.title || 'Special Service'}*\n`;
+    text += `📅 Date: ${r.date || '-'}${r.time ? ` | ⏰ ${r.time}` : ''}\n`;
+    if (r.callTime) {
+      text += `🔔 *Call Time: ${r.callTime} Sharp* (Media Desk)\n`;
+    }
+    if (r.notes) {
+      text += `📝 Notes: ${r.notes}\n`;
+    }
+    text += `🎥 1st Cam: ${r.cam1 || '—'} | 📹 2nd Cam: ${r.cam2 || '—'}\n`;
+    text += `🎯 Gimble: ${r.gimble || '—'} | 💻 Live: ${r.live || '—'}${r.spot ? ` | ✂️ Spot: ${r.spot}` : ''}\n\n`;
+  });
+
+  text += `_"Whatever you do, work at it with all your heart, as working for the Lord." - Colossians 3:23_ 🙏✨`;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast("📋 Festival Roster copied for WhatsApp!");
+    }).catch(() => {
+      fallbackCopyText(text);
+      showToast("📋 Festival Roster copied!");
+    });
+  } else {
+    fallbackCopyText(text);
+    showToast("📋 Festival Roster copied!");
+  }
+}
+
+function exportFestivalCalendar() {
+  const events = appState.specialMeetings || [];
+  if (events.length === 0) {
+    showToast("ℹ️ No festival events to export.");
+    return;
+  }
+  const nowStamp = formatIcsStampNow();
+  let vEvents = "";
+  events.forEach((r, idx) => {
+    const dutyFake = {
+      date: r.date,
+      service: `🌟 ${r.title || 'Festival Service'}`,
+      role: 'Media Ministry Crew',
+      callTime: r.callTime || (r.time ? r.time.split('-')[0].trim() : '06:00 PM'),
+      serviceEnd: r.time && r.time.includes('-') ? r.time.split('-')[1].trim() : '',
+      volunteerName: 'FLAG Media Team'
+    };
+    vEvents += buildDutyVeventBlock(dutyFake, nowStamp, idx);
+  });
+
+  const icsBody = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Full Life Centre AG Church//Festival Media Roster v6.2//EN",
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    "X-WR-CALNAME:FLAG Church Festival & Special Events",
+    "X-WR-TIMEZONE:Asia/Kolkata",
+    vEvents.trim(),
+    "END:VCALENDAR"
+  ].join("\r\n");
+
+  const blob = new Blob([icsBody], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `FLAG_Festival_Media_Roster_2026.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  showToast("📅 Festival Calendar (.ics) downloaded!");
 }
 
 // ================= RENDER EARLY MORNING PRAYER (SEASONAL: MON - SAT) =================
@@ -4309,13 +4828,14 @@ function populateWhatsAppDateSelect() {
     });
   } else if (dayType === "special") {
     (appState.specialMeetings || []).forEach(r => {
+      const catMeta = getFestivalCategoryMeta(r.category || inferFestivalCategory(r.title));
       const opt = document.createElement("option");
       opt.value = r.title + " - " + r.date;
-      opt.textContent = `${r.title} (${r.date})`;
+      opt.textContent = `${catMeta.icon} ${r.title} (${r.date})`;
       dateSelect.appendChild(opt);
     });
     if ((appState.specialMeetings || []).length === 0) {
-      dateSelect.innerHTML = `<option value="">No Special Meetings</option>`;
+      dateSelect.innerHTML = `<option value="">No Festival Services</option>`;
     }
   } else if (dayType === "morning") {
     if (appState.morningPrayer && appState.morningPrayer.days) {
@@ -4378,12 +4898,18 @@ function generateWhatsAppText() {
     // Append Special Meetings if any
     if (appState.specialMeetings && appState.specialMeetings.length > 0) {
       text += `\n══════════════════════════════\n`;
-      text += `🌟 SPECIAL MEETINGS & CONFERENCES\n`;
+      text += `🗓️ FESTIVAL SERVICES & SPECIAL ROSTER\n`;
       text += `══════════════════════════════\n`;
       appState.specialMeetings.forEach(r => {
-        text += `• ${r.title} (${r.date}):\n`;
+        const catMeta = getFestivalCategoryMeta(r.category || inferFestivalCategory(r.title));
+        const sTime = r.time || inferFestivalTime(r.title);
+        const cTime = r.callTime || inferFestivalCallTime(r.title);
+        text += `• ${catMeta.icon} ${r.title} (${r.date}):\n`;
+        if (sTime) text += `  ⏰ Service Time: ${sTime}${cTime ? ` | Call Time: ${cTime}` : ''}\n`;
         text += `  - 1st Cam: ${r.cam1 || '-'} | 2nd Cam: ${r.cam2 || '-'}\n`;
-        text += `  - Gimble: ${r.gimble || '-'} | Live: ${r.live || '-'} | Spot: ${r.spot || '-'}\n\n`;
+        text += `  - Gimble: ${r.gimble || '-'} | Live: ${r.live || '-'} | Spot: ${r.spot || '-'}\n`;
+        if (r.notes) text += `  📝 Note: ${r.notes}\n`;
+        text += `\n`;
       });
     }
 
@@ -4443,14 +4969,21 @@ function generateWhatsAppText() {
   } else if (dayType === "special") {
     // Special Meeting
     const spec = (appState.specialMeetings || []).find(r => (r.title + " - " + r.date) === selectedDate || r.title === selectedDate || r.date === selectedDate) || {};
+    const catMeta = getFestivalCategoryMeta(spec.category || inferFestivalCategory(spec.title));
+    const sTime = spec.time || inferFestivalTime(spec.title);
+    const cTime = spec.callTime || inferFestivalCallTime(spec.title);
 
     let text = `🕊️ FULL LIFE CENTRE AG CHURCH (FLAG)\n`;
-    text += `🌟 SPECIAL MEETING MEDIA SCHEDULE\n\n`;
-    text += `📅 Meeting: ${spec.title || 'Special Meeting'}\n`;
-    text += `📆 Date: ${spec.date || '-'}\n\n`;
+    text += `${catMeta.icon} ${catMeta.label.toUpperCase()} — MEDIA SCHEDULE\n\n`;
+    text += `🎉 Event: ${spec.title || 'Festival Service'}\n`;
+    text += `📆 Date: ${spec.date || '-'}\n`;
+    if (sTime) text += `⏰ Service Time: ${sTime}\n`;
+    if (cTime) text += `⏱️ Crew Call Time: ${cTime}\n`;
+    if (spec.notes) text += `📝 Notes: ${spec.notes}\n`;
+    text += `\n`;
 
     text += `══════════════════════════════\n`;
-    text += `🎥 MEDIA CREW\n`;
+    text += `🎥 MEDIA CREW ON DUTY\n`;
     text += `══════════════════════════════\n`;
     text += `• 1st Cam: ${spec.cam1 || '-'}\n`;
     text += `• 2nd Cam: ${spec.cam2 || '-'}\n`;
@@ -4458,7 +4991,7 @@ function generateWhatsAppText() {
     text += `• Live in System: ${spec.live || '-'}\n`;
     text += `• Spot Editing: ${spec.spot || '-'}\n\n`;
 
-    text += `Serving together for His glory! 🙌`;
+    text += `Let's capture every moment for His glory! 🙌`;
     return text;
   } else if (dayType === "morning") {
     // Early Morning Prayer
@@ -4838,7 +5371,7 @@ function getVolunteerDuties(name) {
     }
   });
 
-  // Special Meetings
+  // Special Meetings / Festival Services
   (appState.specialMeetings || []).forEach(r => {
     const rolesMap = [
       { key: 'cam1', label: '🎥 1st Camera' },
@@ -4847,21 +5380,41 @@ function getVolunteerDuties(name) {
       { key: 'live', label: '💻 Live in System' },
       { key: 'spot', label: '✂️ Spot Editing' }
     ];
+    const cat = r.category || inferFestivalCategory(r.title);
+    const catMeta = getFestivalCategoryMeta(cat);
+    const sTime = r.time || inferFestivalTime(r.title) || '';
+    const cTime = r.callTime || inferFestivalCallTime(r.title) || '30 mins before service';
+
+    let sStart = 'TBD';
+    let sEnd = 'TBD';
+    if (sTime) {
+      if (sTime.includes('-')) {
+        const parts = sTime.split('-');
+        sStart = parts[0].trim();
+        sEnd = parts[1].trim();
+      } else {
+        sStart = sTime.trim();
+        sEnd = sTime.trim();
+      }
+    }
+
     rolesMap.forEach(rm => {
       if (matches(r[rm.key])) {
         duties.push({
           date: r.date,
-          service: `🌟 ${r.title || 'Special Meeting'}`,
-          serviceShort: r.title || 'Special Meeting',
+          service: `${catMeta.icon} ${r.title || 'Festival Service'}${sTime ? ` (${sTime})` : ''}`,
+          serviceShort: r.title || 'Festival Service',
           serviceType: 'specialMeetings',
+          category: cat,
           role: rm.label,
           rawRole: rm.key,
           assignedText: r[rm.key],
-          callTime: '30 mins before service',
+          callTime: cTime,
           prayerTime: '15 mins before',
-          serviceStart: 'TBD',
-          serviceEnd: 'TBD',
-          colorTag: 'tag-purple'
+          serviceStart: sStart,
+          serviceEnd: sEnd,
+          notes: r.notes || '',
+          colorTag: catMeta.colorTag || 'tag-purple'
         });
       }
     });
