@@ -675,7 +675,9 @@ function renderLeaderBadges() {
       heroBadge.innerHTML = `<span class="leader-medallion" aria-hidden="true">👑</span><div class="leader-showcase-text"><span class="leader-role-eyebrow">Team Leader</span><strong class="leader-person-name">${escapeHtml(leader)}</strong></div>`;
     }
   }
-  if (teamBadge) teamBadge.textContent = `👑 Team Leader: ${leader}`;
+  if (teamBadge) {
+    teamBadge.innerHTML = `<span class="leader-medallion" aria-hidden="true">👑</span><div class="leader-showcase-text"><span class="leader-role-eyebrow">Team Leader</span><strong class="leader-person-name">${escapeHtml(leader)}</strong></div>`;
+  }
   if (adminBadge) {
     adminBadge.textContent = isBlankOnMain
       ? `👑 Team Leader: ${leader} (Blank on Main Page)`
