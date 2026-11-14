@@ -387,58 +387,48 @@ body {
   width: 100%;
 }
 
-/* Executive Eyebrow Pill */
+/* Executive Church Badge */
 .hero-welcome-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: 9999px;
-  background: rgba(37, 99, 235, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.24);
-  margin-bottom: 12px;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.32);
+  margin-bottom: 14px;
   max-width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
 }
 
 .hero-welcome-icon {
-  font-size: 0.95rem;
+  font-size: 1.25rem;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .hero-welcome-text {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #93c5fd;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hero-welcome-badge-sep {
-  color: rgba(148, 163, 184, 0.4);
-  font-size: 0.72rem;
-}
-
-.hero-welcome-tag {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #cbd5e1;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: clamp(0.96rem, 2.3vw, 1.16rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #dbeafe;
+  line-height: 1.35;
+  white-space: normal;
+  overflow: visible;
+  text-transform: none;
 }
 
 .hero-title {
-  font-size: clamp(1.85rem, 3.8vw, 2.35rem);
+  font-size: clamp(1.85rem, 3.8vw, 2.45rem);
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.2;
   color: #ffffff;
-  margin: 0 0 8px 0;
+  margin: 0 0 16px 0;
 }
 
 .hero-title .gradient-text {
@@ -3132,25 +3122,35 @@ body {
   }
 
   .hero-welcome-pill {
-    padding: 4px 10px;
-    gap: 6px;
-    margin-bottom: 8px;
-    max-width: 100%;
+    display: flex;
+    width: 100%;
+    padding: 8px 12px;
+    gap: 8px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    align-items: center;
+    flex-wrap: wrap;
   }
 
   .hero-welcome-text {
-    font-size: 0.7rem;
-    font-weight: 700;
-    line-height: 1.3;
+    font-size: 0.94rem;
+    font-weight: 800;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: normal;
+    overflow: visible;
   }
 
   .hero-welcome-icon {
-    font-size: 0.85rem;
+    font-size: 1.15rem;
+    flex-shrink: 0;
   }
 
   .hero-title {
-    font-size: 1.4rem;
-    line-height: 1.28;
+    font-size: 1.6rem;
+    line-height: 1.25;
+    margin: 0 0 14px 0;
   }
 
   .hero-subtitle {
@@ -3808,16 +3808,21 @@ body {
   }
 
   .hero-welcome-pill {
-    padding: 3px 8px !important;
-    gap: 4px !important;
+    padding: 6px 10px !important;
+    gap: 6px !important;
+    border-radius: 9px !important;
   }
 
   .hero-welcome-text {
-    font-size: 0.65rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    line-height: 1.35 !important;
+    white-space: normal !important;
   }
 
   .hero-title {
-    font-size: 1.2rem !important;
+    font-size: 1.45rem !important;
+    margin-bottom: 12px !important;
   }
 
   .hero-stats-grid {
@@ -4506,22 +4511,25 @@ html.light-theme .hero-banner {
 [data-theme="light"] .hero-welcome-pill,
 html.light-theme .hero-welcome-pill {
   background: #f1f5f9 !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 [data-theme="light"] .hero-welcome-text,
 html.light-theme .hero-welcome-text {
   background: transparent !important;
   background-image: none !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
   -webkit-text-fill-color: #1e3a8a !important;
   color: #1e3a8a !important;
   text-shadow: none !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
-  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+  font-size: clamp(0.96rem, 2.3vw, 1.16rem) !important;
+  white-space: normal !important;
+  overflow: visible !important;
 }
 
 [data-theme="light"] .hero-welcome-tag,
@@ -8085,21 +8093,25 @@ input:focus-visible {
 .hero-welcome-pill {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 5px 14px;
-  border-radius: 9999px;
-  background: rgba(37, 99, 235, 0.08);
-  border: 1px solid rgba(59, 130, 246, 0.24);
-  margin-bottom: 12px;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.32);
+  margin-bottom: 14px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .hero-welcome-text {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #93c5fd;
+  font-size: clamp(0.96rem, 2.3vw, 1.16rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #dbeafe;
   margin-bottom: 0;
+  white-space: normal;
+  overflow: visible;
+  text-transform: none;
 }
 
 .hero-title {
@@ -8276,7 +8288,8 @@ html.light-theme .hero-banner {
 [data-theme="light"] .hero-welcome-pill,
 html.light-theme .hero-welcome-pill {
   background: #f1f5f9 !important;
-  border: 1px solid #e2e8f0 !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
 
 [data-theme="light"] .hero-welcome-text,
@@ -8285,10 +8298,12 @@ html.light-theme .hero-welcome-text {
   border: none !important;
   -webkit-text-fill-color: #1e3a8a !important;
   color: #1e3a8a !important;
-  font-weight: 700 !important;
-  font-size: 0.74rem !important;
-  letter-spacing: 0.04em !important;
-  text-transform: uppercase !important;
+  font-weight: 800 !important;
+  font-size: clamp(0.96rem, 2.3vw, 1.16rem) !important;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+  white-space: normal !important;
+  overflow: visible !important;
 }
 
 [data-theme="light"] .hero-stat-card,
@@ -8478,16 +8493,29 @@ html.light-theme .roster-pair {
   }
 
   .hero-welcome-pill {
-    padding: 4px 10px;
+    display: flex;
+    width: 100%;
+    padding: 8px 12px;
+    gap: 8px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    align-items: center;
+    flex-wrap: wrap;
   }
 
   .hero-welcome-text {
-    font-size: 0.7rem;
+    font-size: 0.94rem;
+    font-weight: 800;
     line-height: 1.35;
+    white-space: normal;
+    overflow: visible;
   }
 
   .hero-title {
-    font-size: 1.55rem;
+    font-size: 1.6rem;
+    line-height: 1.25;
+    margin: 0 0 14px 0;
   }
 
   .card {
