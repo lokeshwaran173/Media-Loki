@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=6.5">
+  <link rel="stylesheet" href="styles.css?v=6.6">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -95,7 +95,6 @@
 
       <div class="nav-actions">
         <button id="navInstallPwaBtn" class="theme-toggle-btn nav-install-btn"
-          style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); color: #34d399;"
           onclick="triggerPWAInstall()" title="Install or Share FLAG Media App">
           <span style="font-size: 0.95rem;">📲</span>
           <span>App</span>
@@ -221,68 +220,64 @@
           </div>
         </div>
 
-        <!-- 4 Colorful Animated Metric Overview Cards -->
+        <!-- 4 Stat Overview Cards (Unified Executive Telemetry) -->
         <div class="hero-stats-grid">
-          <div class="hero-stat-card stat-blue">
-            <div class="stat-top-bar bar-blue"></div>
+          <div class="hero-stat-card">
             <div class="stat-content">
-              <div class="stat-icon-wrapper blue-glow">🎥</div>
+              <div class="stat-icon-wrapper">🎥</div>
               <div class="stat-info">
                 <span class="stat-label">1st Service (Starts 06:00 AM)</span>
                 <strong class="stat-value">05:30 AM Call</strong>
                 <span class="stat-sub">1st &amp; 2nd Cam, Gimble, Live, Spot</span>
               </div>
             </div>
-            <div class="stat-status-pill blue-pill">
-              <span class="beacon-dot blue-beacon"></span>
+            <div class="stat-status-pill">
+              <span class="beacon-dot"></span>
               <span>1st Service</span>
             </div>
           </div>
 
-          <div class="hero-stat-card stat-amber">
-            <div class="stat-top-bar bar-amber"></div>
+          <div class="hero-stat-card">
             <div class="stat-content">
-              <div class="stat-icon-wrapper amber-glow">👥</div>
+              <div class="stat-icon-wrapper">👥</div>
               <div class="stat-info">
                 <span class="stat-label">Active Media Crew</span>
                 <strong class="stat-value" id="heroMemberCount">17 Crew Members</strong>
                 <span class="stat-sub">Assigned across Sunday &amp; Friday</span>
               </div>
             </div>
-            <div class="stat-status-pill amber-pill">
-              <span class="beacon-dot amber-beacon"></span>
+            <div class="stat-status-pill">
+              <span class="beacon-dot"></span>
               <span>Ready to Serve</span>
             </div>
           </div>
 
-          <div class="hero-stat-card stat-emerald">
-            <div class="stat-top-bar bar-emerald"></div>
+          <div class="hero-stat-card">
             <div class="stat-content">
-              <div class="stat-icon-wrapper emerald-glow">✅</div>
+              <div class="stat-icon-wrapper">✅</div>
               <div class="stat-info">
                 <span class="stat-label">Saturday Prep Checklist</span>
                 <strong class="stat-value" id="heroChecklistProgress">0/15 Done (0%)</strong>
                 <span class="stat-sub">Cameras, System, Charging, Live &amp; TV</span>
               </div>
             </div>
-            <div class="stat-status-pill emerald-pill">
-              <span class="beacon-dot emerald-beacon"></span>
+            <div class="stat-status-pill">
+              <span class="beacon-dot"></span>
               <span>Live Status</span>
             </div>
           </div>
 
-          <div class="hero-stat-card stat-purple">
-            <div class="stat-top-bar bar-purple"></div>
+          <div class="hero-stat-card">
             <div class="stat-content">
-              <div class="stat-icon-wrapper purple-glow">📅</div>
+              <div class="stat-icon-wrapper">📅</div>
               <div class="stat-info">
                 <span class="stat-label">Active Schedule Month</span>
                 <strong class="stat-value" id="heroActiveMonth">October 2026</strong>
                 <span class="stat-sub">Sundays &amp; Fridays Auto-Synced</span>
               </div>
             </div>
-            <div class="stat-status-pill purple-pill">
-              <span class="beacon-dot purple-beacon"></span>
+            <div class="stat-status-pill">
+              <span class="beacon-dot"></span>
               <span>Auto-Synced</span>
             </div>
           </div>
@@ -290,7 +285,7 @@
       </div>
 
       <!-- Public Schedule Active Period Banner (Admin Controlled) -->
-      <div class="card header-card card-accent-blue">
+      <div class="card header-card">
         <div class="card-row">
           <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
             <div class="badge-icon-chip">🗓️</div>
@@ -320,7 +315,7 @@
               title="Download High-Res PNG Schedule Image">
               📸 Download Image (PNG)
             </button>
-            <span class="header-tag tag-emerald" style="font-size: 0.8rem; padding: 6px 12px;">
+            <span class="header-tag" style="font-size: 0.8rem; padding: 6px 12px;">
               ✓ Auto-Generated Dates
             </span>
           </div>
@@ -328,11 +323,10 @@
       </div>
 
       <!-- ================= VOLUNTEER PERSONAL FILTER & ACTIONS ================= -->
-      <div class="card my-schedule-card card-accent-amber">
+      <div class="card my-schedule-card">
         <div class="my-schedule-header">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <div class="badge-icon-chip"
-              style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">👤</div>
+            <div class="badge-icon-chip">👤</div>
             <div>
               <h3 class="section-title" style="font-size: 1.15rem;">My Serving Schedule (Personal Filter)</h3>
               <p class="section-desc">Select your name to see your personal duties, call times, export to calendar, or
@@ -341,18 +335,18 @@
           </div>
           <div class="volunteer-filter-controls">
             <select id="volunteerFilterSelect" class="role-select"
-              style="min-width: 175px; font-weight: 700; border-color: rgba(245, 158, 11, 0.5);"
+              style="min-width: 175px; font-weight: 700;"
               onchange="onVolunteerFilterChange(this.value)">
               <option value="">👤 Select Your Name...</option>
               <!-- Dynamically populated with team members -->
             </select>
             <button class="btn btn-secondary"
-              style="padding: 7px 12px; font-size: 0.82rem; gap: 5px; border-color: rgba(245, 158, 11, 0.4);"
+              style="padding: 7px 12px; font-size: 0.82rem; gap: 5px;"
               onclick="openSwapRequestModal()" title="Request schedule swap or report absence">
               <span>🔄</span> Swap / Absence
             </button>
             <button class="btn btn-secondary"
-              style="padding: 7px 12px; font-size: 0.82rem; gap: 5px; border-color: rgba(239, 68, 68, 0.38);"
+              style="padding: 7px 12px; font-size: 0.82rem; gap: 5px;"
               onclick="openAvailabilityModal()" title="Mark upcoming dates when you are unavailable / away">
               <span>🚫</span> Away Dates
             </button>
@@ -370,12 +364,12 @@
       </div>
 
       <!-- ================= LIVE OPEN SHIFT COVER REQUESTS BOARD ================= -->
-      <div id="openCoverBoardCard" class="card cover-board-card card-accent-amber" style="display: none;">
+      <div id="openCoverBoardCard" class="card cover-board-card" style="display: none;">
         <!-- Dynamically populated via renderOpenCoverBoard() in app.js -->
       </div>
 
       <!-- 1st Service Table (Public / Team View) -->
-      <div class="card card-accent-blue">
+      <div class="card">
         <div class="card-header">
           <div class="header-tag tag-blue">1st Service (06:00 AM &ndash; 08:00 AM)</div>
           <span class="call-time-badge">⏰ Call Time: 05:30 AM | Prayer: 05:45 AM</span>
@@ -405,7 +399,7 @@
       </div>
 
       <!-- Compact WhatsApp Announcement Bar -->
-      <div class="card whatsapp-compact-card card-accent-whatsapp">
+      <div class="card whatsapp-compact-card">
         <div class="whatsapp-compact-bar">
           <div class="whatsapp-mini-brand">
             <span class="whatsapp-dot-pulse"></span>
@@ -440,7 +434,7 @@
               title="Copy formatted WhatsApp text">
               📋 Copy
             </button>
-            <button class="btn btn-whatsapp wa-mini-btn" style="background: #15803d;" onclick="openWhatsAppDirect()"
+            <button class="btn btn-whatsapp wa-mini-btn" onclick="openWhatsAppDirect()"
               title="Open directly in WhatsApp Web/App">
               💬 Open
             </button>
@@ -448,8 +442,8 @@
               title="Show/hide live message preview">
               👁️ Preview
             </button>
-            <button class="btn btn-whatsapp wa-mini-btn"
-              style="background: linear-gradient(135deg, #d97706, #b45309); font-weight: 700; gap: 4px; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.35);"
+            <button class="btn btn-secondary wa-mini-btn"
+              style="font-weight: 700; gap: 4px;"
               onclick="openSaturdayAlertModal()" title="1-Click WhatsApp duty reminder for tomorrow's serving crew">
               ⏰ Saturday Alert
             </button>
@@ -465,7 +459,7 @@
       <!-- 2nd & 3rd Service Grid -->
       <div class="grid-2col">
         <!-- 2nd Service -->
-        <div class="card card-accent-amber">
+        <div class="card">
           <div class="card-header">
             <div class="header-tag tag-amber">2nd Service (08:30 AM &ndash; 10:30 AM)</div>
             <span class="call-time-badge">⏰ Call Time: 08:00 AM</span>
@@ -485,7 +479,7 @@
         </div>
 
         <!-- 3rd Service -->
-        <div class="card card-accent-purple">
+        <div class="card">
           <div class="card-header">
             <div class="header-tag tag-purple">3rd Service (11:00 AM &ndash; 01:00 PM)</div>
             <span class="call-time-badge">⏰ Call Time: 10:30 AM</span>
@@ -506,7 +500,7 @@
       </div>
 
       <!-- Friday Fasting Prayer -->
-      <div class="card card-accent-emerald">
+      <div class="card">
         <div class="card-header">
           <div class="header-tag tag-emerald">Friday Fasting Prayer Schedule</div>
           <span class="call-time-badge">⏰ Call Time: 09:30 AM</span>
@@ -527,7 +521,7 @@
       </div>
 
       <!-- Special Event Services -->
-      <div class="card card-accent-special festival-roster-card" id="specialEventsSection">
+      <div class="card festival-roster-card" id="specialEventsSection">
         <div class="card-header festival-header-wrap" style="flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div class="header-tag tag-purple festival-main-tag">🌟 Special Event Services</div>
@@ -575,7 +569,7 @@
       </div>
 
       <!-- Early Morning Prayer Schedule (Seasonal: Monday to Saturday) -->
-      <div id="publicMorningPrayerCard" class="card card-accent-morning" style="display: none;">
+      <div id="publicMorningPrayerCard" class="card" style="display: none;">
         <div class="card-header">
           <div id="publicMorningPrayerTitle" class="header-tag tag-amber">🌅 Early Morning Prayer Schedule</div>
           <span class="call-time-badge">⏰ Call Time: 05:00 AM Sharp</span>
@@ -604,7 +598,7 @@
     <!-- ================= VIEW 2: CHECKLISTS (PUBLIC & VOLUNTEERS) ================= -->
     <section id="checklistsView" class="view-panel">
       <!-- Live Crew Sync Status Notice -->
-      <div class="card checklist-sync-banner card-accent-emerald">
+      <div class="card checklist-sync-banner">
         <div class="sync-banner-content">
           <span class="sync-dot connected"></span>
           <div>
@@ -615,13 +609,13 @@
             </p>
           </div>
         </div>
-        <span class="header-tag tag-emerald sync-banner-tag">
+        <span class="header-tag sync-banner-tag">
           👥 Live Shared Checklist
         </span>
       </div>
 
       <!-- Weekly Service Checklist Command Bar -->
-      <div class="card week-checklist-banner card-accent-emerald">
+      <div class="card week-checklist-banner">
         <div class="week-banner-top">
           <div class="week-banner-info">
             <div class="week-live-indicator">
@@ -684,12 +678,10 @@
       </div>
 
       <!-- ================= 1-TAP CATEGORY READINESS COMMAND BOX ================= -->
-      <div class="card category-readiness-card card-accent-emerald" style="margin-bottom: 22px;">
+      <div class="card category-readiness-card" style="margin-bottom: 22px;">
         <div class="category-readiness-header">
           <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-            <div class="badge-icon-chip"
-              style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.4); font-size: 1.3rem;">⚡
-            </div>
+            <div class="badge-icon-chip" style="font-size: 1.3rem;">⚡</div>
             <div>
               <h3 style="font-size: 1.1rem; font-weight: 800; margin: 0; color: #fff;" class="cat-readiness-title">1-Tap
                 Category Readiness Status</h3>
@@ -727,7 +719,7 @@
       </div>
 
       <!-- Team Instruction Banner -->
-      <div class="card card-accent-emerald checklist-team-instruction">
+      <div class="card checklist-team-instruction">
         <p class="checklist-instruction-text">
           🙌 <strong>Team instruction:</strong> Please complete all the above tasks every Saturday and update the checklist once each task is completed.
         </p>
@@ -737,7 +729,7 @@
     <!-- ================= VIEW 3: MEDIA TEAM DIRECTORY (PUBLIC TO ALL CREW) ================= -->
     <section id="teamView" class="view-panel">
       <!-- Media Team Hero / Header Card -->
-      <div class="card header-card card-accent-blue team-hero-card" style="margin-bottom: 20px;">
+      <div class="card header-card team-hero-card" style="margin-bottom: 20px;">
         <div class="team-hero-grid">
           <div class="team-hero-main">
             <div class="team-hero-headline">
@@ -815,11 +807,11 @@
     <!-- ================= VIEW 4: ADMIN CONSOLE (LEADER ONLY) ================= -->
     <section id="adminView" class="view-panel">
       <!-- Admin Header Bar -->
-      <div class="card header-card admin-header-card" style="border-left: 5px solid #f59e0b;">
+      <div class="card header-card admin-header-card">
         <div class="card-row">
           <div>
             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-              <span class="header-tag tag-amber" style="font-weight: 800;">👑 ADMIN CONSOLE ACTIVE</span>
+              <span class="header-tag" style="font-weight: 800;">👑 ADMIN CONSOLE ACTIVE</span>
               <span class="call-time-badge senior-pastor-pill"><span class="dept-text-inner">🕊️ Senior Pastor: <strong>Rev.N.Johnson</strong></span></span>
               <span class="call-time-badge dept-incharge-pill"><span class="dept-text-inner">✝️ Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
               <span class="call-time-badge team-leader-pill" id="adminLeaderBadge">👑 Team Leader: Lokesh</span>
@@ -887,11 +879,10 @@
         </div>
 
         <!-- Month & Year Controls Bar (Admin Only Access) -->
-        <div class="card header-card card-accent-amber" style="margin-bottom: 20px;">
+        <div class="card header-card" style="margin-bottom: 20px;">
           <div class="card-row">
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-              <div class="badge-icon-chip"
-                style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🗓️</div>
+              <div class="badge-icon-chip">🗓️</div>
               <div>
                 <h3 class="section-title" style="font-size: 1.15rem;">Set Active Schedule Month (Admin Access)</h3>
                 <p class="section-desc">Select Month &amp; Year to configure and display on the public schedule. All
@@ -1180,12 +1171,12 @@
 
       <!-- SUB-TAB 2: TEAM MEMBERS MANAGER -->
       <div id="adminMembersTab" class="admin-tab-content">
-        <div class="card card-accent-amber admin-leadership-card" style="margin-bottom: 20px;">
+        <div class="card admin-leadership-card" style="margin-bottom: 20px;">
           <div class="admin-leadership-row">
             <div class="admin-leadership-info">
               <div class="admin-leadership-badges">
-                <span class="header-tag tag-purple senior-pastor-pill"><span class="dept-text-inner">🕊️ Senior Pastor: <strong>Rev.N.Johnson</strong></span></span>
-                <span class="header-tag tag-blue dept-incharge-pill"><span class="dept-text-inner">✝️ Overall Media Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
+                <span class="header-tag senior-pastor-pill"><span class="dept-text-inner">🕊️ Senior Pastor: <strong>Rev.N.Johnson</strong></span></span>
+                <span class="header-tag dept-incharge-pill"><span class="dept-text-inner">✝️ Overall Media Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
                 <span class="call-time-badge team-leader-pill" id="adminTabLeaderBadge">👑 Team Leader: Lokesh</span>
               </div>
               <p class="section-desc" style="margin-top: 8px;">Select a member and click <strong>Save</strong> to update <strong>👑 Team Leader</strong>, or click <strong>Blank on Main Page</strong> to hide it on the main page.</p>
@@ -1224,10 +1215,10 @@
         </div>
 
         <!-- Team Serving Analytics & Workload Balancer Card -->
-        <div id="adminWorkloadAnalyticsCard" class="card card-accent-blue" style="margin-bottom: 24px;">
+        <div id="adminWorkloadAnalyticsCard" class="card" style="margin-bottom: 24px;">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="header-tag tag-blue">📊 Serving Analytics &amp; Workload Balancer</span>
+              <span class="header-tag">📊 Serving Analytics &amp; Workload Balancer</span>
               <span class="call-time-badge" id="workloadMonthBadge">Active Month</span>
             </div>
             <div style="font-size: 0.82rem; color: var(--text-muted);">
@@ -1301,11 +1292,10 @@
       <!-- SUB-TAB 3: GEAR & EQUIPMENT ISSUE LOG -->
       <div id="adminGearTab" class="admin-tab-content">
         <!-- Equipment Incharge Callout Card -->
-        <div class="card card-accent-amber" style="margin-bottom: 20px;">
+        <div class="card" style="margin-bottom: 20px;">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="badge-icon-chip"
-                style="background: rgba(245, 158, 11, 0.18); border-color: rgba(245, 158, 11, 0.4);">🛠️</div>
+              <div class="badge-icon-chip">🛠️</div>
               <div>
                 <h3 class="section-title" style="font-size: 1.15rem;">Equipment Maintenance &amp; Fault Log</h3>
                 <p class="section-desc">Track broken cables, battery health, camera firmware, switcher issues, and send
@@ -1314,7 +1304,7 @@
             </div>
             <div class="gear-incharge-badge">
               <span style="font-size: 0.78rem; color: #94a3b8; display: block;">Equipment Incharge:</span>
-              <strong style="color: #f59e0b; font-size: 0.95rem;">Yashwanth &amp; Sam Davit</strong>
+              <strong style="font-size: 0.95rem;">Yashwanth &amp; Sam Davit</strong>
               <a href="https://wa.me/917010368793" target="_blank" rel="noopener" class="gear-phone-pill"
                 title="WhatsApp Yashwanth">
                 📱 7010368793
@@ -1404,9 +1394,9 @@
       <!-- SUB-TAB 3: CUSTOMIZE CHECKLISTS -->
       <div id="adminChecklistsTab" class="admin-tab-content">
         <!-- Set Checklist Week Card in Admin -->
-        <div class="card card-accent-blue" style="margin-bottom: 20px;">
+        <div class="card" style="margin-bottom: 20px;">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
-            <div class="header-tag tag-blue">📅 Set Checklist Service Week</div>
+            <div class="header-tag">📅 Set Checklist Service Week</div>
             <span class="call-time-badge" id="adminActiveWeekBadge">Active: Week 1</span>
           </div>
           <p class="section-desc" style="margin-bottom: 14px;">
@@ -1430,7 +1420,7 @@
           </div>
         </div>
 
-        <div id="newCategoryCard" class="card card-accent-blue">
+        <div id="newCategoryCard" class="card">
           <h3 class="card-inner-title">+ Create New Checklist Category</h3>
           <p class="section-desc" style="margin-bottom: 12px;">Add custom checklist categories for your church
             operations.</p>
@@ -1449,11 +1439,10 @@
       <!-- SUB-TAB 5: CLOUD SYNC, BACKUP & RESTORE -->
       <div id="adminBackupTab" class="admin-tab-content">
         <!-- ☁️ Multi-Device Live Cloud Sync (Firebase Realtime Database) -->
-        <div class="card card-accent-blue" style="margin-bottom: 24px;">
+        <div class="card" style="margin-bottom: 24px;">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <div class="badge-icon-chip"
-                style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">☁️</div>
+              <div class="badge-icon-chip">☁️</div>
               <div>
                 <h3 class="section-title" style="font-size: 1.15rem;">Live Multi-Device Cloud Sync (Netlify &amp;
                   Mobile)</h3>
@@ -1537,10 +1526,10 @@
         </div>
 
         <!-- 🔗 Instant WhatsApp Team Sync Link (Works Right Now with 0 Setup!) -->
-        <div class="card card-accent-emerald" style="margin-bottom: 24px;">
+        <div class="card" style="margin-bottom: 24px;">
           <div class="card-header" style="flex-wrap: wrap; gap: 10px;">
             <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="header-tag tag-emerald">🔗 1-Click WhatsApp Team Sync Link (Instant Fallback)</span>
+              <span class="header-tag">🔗 1-Click WhatsApp Team Sync Link (Instant Fallback)</span>
             </div>
           </div>
           <p class="section-desc" style="margin-bottom: 12px;">
@@ -2092,7 +2081,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=6.5"></script>
+  <script src="app.js?v=6.6"></script>
 </body>
 
 </html>
