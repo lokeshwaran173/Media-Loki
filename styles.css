@@ -371,119 +371,89 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Ambient Lighting - Calm Executive Focus */
-.hero-ambient-orb {
+/* Ambient Lighting - Fully Clean & Distraction-Free */
+.hero-ambient-orb,
+.hero-brand-logo {
   display: none !important;
 }
 
 .hero-header-row {
   position: relative;
   z-index: 1;
+  margin-bottom: 22px;
 }
 
-.hero-branding-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  flex-wrap: wrap;
-  margin-bottom: 18px;
+.hero-content {
+  width: 100%;
 }
 
-.hero-brand-logo {
-  width: 76px;
-  height: 76px;
-  border-radius: 18px;
-  object-fit: contain;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
-  padding: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 0 25px rgba(59, 130, 246, 0.45), 0 0 45px rgba(245, 158, 11, 0.25);
-  animation: logoHalo 6s infinite ease-in-out;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
-}
-
-.hero-brand-logo:hover {
-  transform: scale(1.08) rotate(3deg);
-}
-
-.hero-welcome-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.28rem;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  background: linear-gradient(90deg, #ffffff 0%, #fef08a 40%, #fde047 70%, #7dd3fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
-  text-shadow: 0 0 35px rgba(250, 204, 21, 0.4);
-  line-height: 1.35;
-}
-
-.hero-welcome-icon {
-  font-size: 1.35rem;
-  -webkit-text-fill-color: initial;
-  filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.5));
-  display: inline-block;
-  animation: gentleFloat 3s ease-in-out infinite alternate;
-}
-
-@keyframes gentleFloat {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-3px) scale(1.08); }
-}
-
-.hero-pill-badge {
+/* Executive Eyebrow Pill */
+.hero-welcome-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.22) 0%, rgba(139, 92, 246, 0.22) 100%);
-  border: 1px solid rgba(147, 197, 253, 0.4);
   padding: 5px 14px;
   border-radius: 9999px;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #bfdbfe;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
-  margin-bottom: 10px;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.24);
+  margin-bottom: 12px;
+  max-width: 100%;
 }
 
-.hero-pill-dot {
-  width: 7px;
-  height: 7px;
-  background: #38bdf8;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #38bdf8;
-  animation: liveBlink 1.6s infinite ease-in-out;
+.hero-welcome-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-welcome-text {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hero-welcome-badge-sep {
+  color: rgba(148, 163, 184, 0.4);
+  font-size: 0.72rem;
+}
+
+.hero-welcome-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .hero-title {
-  font-size: 2.1rem;
+  font-size: clamp(1.85rem, 3.8vw, 2.35rem);
   font-weight: 800;
   letter-spacing: -0.03em;
-  line-height: 1.25;
-  color: #fff;
-  margin-bottom: 0;
+  line-height: 1.2;
+  color: #ffffff;
+  margin: 0 0 8px 0;
 }
 
-.gradient-text {
-  color: #ffffff;
-  background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-  letter-spacing: -0.02em;
+.hero-title .gradient-text {
+  color: inherit;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: initial;
 }
 
 .hero-subtitle {
   font-size: 0.92rem;
-  color: #cbd5e1;
-  max-width: 850px;
-  line-height: 1.55;
-  margin-bottom: 0;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+  max-width: 760px;
 }
 
 .hero-actions {
@@ -3161,28 +3131,21 @@ body {
     margin-bottom: 16px;
   }
 
-  .hero-branding-wrapper {
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  .hero-brand-logo {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    padding: 4px;
+  .hero-welcome-pill {
+    padding: 4px 10px;
+    gap: 6px;
+    margin-bottom: 8px;
+    max-width: 100%;
   }
 
   .hero-welcome-text {
-    font-size: 1.05rem;
-    font-weight: 800;
-    line-height: 1.35;
-    margin-bottom: 6px;
-    gap: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.3;
   }
 
   .hero-welcome-icon {
-    font-size: 1.15rem;
+    font-size: 0.85rem;
   }
 
   .hero-title {
@@ -3844,8 +3807,13 @@ body {
     padding: 1px 3px !important;
   }
 
+  .hero-welcome-pill {
+    padding: 3px 8px !important;
+    gap: 4px !important;
+  }
+
   .hero-welcome-text {
-    font-size: 0.92rem !important;
+    font-size: 0.65rem !important;
   }
 
   .hero-title {
@@ -4529,8 +4497,16 @@ html.light-theme .card-inner-title {
 /* Hero Command Banner in Light Mode */
 [data-theme="light"] .hero-banner,
 html.light-theme .hero-banner {
-  background: linear-gradient(135deg, #f0f9ff 0%, #f0fdf4 100%) !important;
-  border-color: #bae6fd !important;
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-top: 2px solid #2563eb !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
+}
+
+[data-theme="light"] .hero-welcome-pill,
+html.light-theme .hero-welcome-pill {
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
 }
 
 [data-theme="light"] .hero-welcome-text,
@@ -4539,13 +4515,18 @@ html.light-theme .hero-welcome-text {
   background-image: none !important;
   -webkit-background-clip: border-box !important;
   background-clip: border-box !important;
-  -webkit-text-fill-color: #64748b !important;
-  color: #64748b !important;
+  -webkit-text-fill-color: #1e3a8a !important;
+  color: #1e3a8a !important;
   text-shadow: none !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.05em !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
   font-size: 0.78rem !important;
+}
+
+[data-theme="light"] .hero-welcome-tag,
+html.light-theme .hero-welcome-tag {
+  color: #64748b !important;
 }
 
 [data-theme="light"] .hero-title,
@@ -8096,45 +8077,42 @@ input:focus-visible {
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.hero-ambient-orb {
+.hero-ambient-orb,
+.hero-brand-logo {
   display: none !important;
 }
 
-.hero-brand-logo {
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-}
-
-.hero-welcome-text {
+.hero-welcome-pill {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 12px;
+  padding: 5px 14px;
   border-radius: 9999px;
-  background: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(125, 211, 252, 0.26);
-  font-size: 0.86rem;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.24);
+  margin-bottom: 12px;
+}
+
+.hero-welcome-text {
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.01em;
-  background-image: none;
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-  -webkit-text-fill-color: #bae6fd;
-  color: #bae6fd;
-  text-shadow: none;
-  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #93c5fd;
+  margin-bottom: 0;
 }
 
 .hero-title {
-  font-size: 2.2rem;
-  letter-spacing: -0.035em;
+  font-size: clamp(1.85rem, 3.8vw, 2.35rem);
+  letter-spacing: -0.03em;
+  color: #ffffff;
 }
 
 .hero-title .gradient-text {
-  background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #ffffff;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: initial;
 }
 
 .hero-stat-card {
@@ -8295,15 +8273,21 @@ html.light-theme .hero-banner {
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05) !important;
 }
 
-[data-theme="light"] .hero-welcome-text,
-html.light-theme .hero-welcome-text {
+[data-theme="light"] .hero-welcome-pill,
+html.light-theme .hero-welcome-pill {
   background: #f1f5f9 !important;
   border: 1px solid #e2e8f0 !important;
-  -webkit-text-fill-color: #475569 !important;
-  color: #475569 !important;
+}
+
+[data-theme="light"] .hero-welcome-text,
+html.light-theme .hero-welcome-text {
+  background: transparent !important;
+  border: none !important;
+  -webkit-text-fill-color: #1e3a8a !important;
+  color: #1e3a8a !important;
   font-weight: 700 !important;
-  font-size: 0.72rem !important;
-  letter-spacing: 0.06em !important;
+  font-size: 0.74rem !important;
+  letter-spacing: 0.04em !important;
   text-transform: uppercase !important;
 }
 
@@ -8493,9 +8477,12 @@ html.light-theme .roster-pair {
     border-radius: 18px;
   }
 
-  .hero-welcome-text {
-    font-size: 0.76rem;
+  .hero-welcome-pill {
     padding: 4px 10px;
+  }
+
+  .hero-welcome-text {
+    font-size: 0.7rem;
     line-height: 1.35;
   }
 
@@ -9125,7 +9112,10 @@ html.light-theme .senior-pastor-pill strong {
   background: rgba(15, 23, 42, 0.75);
 }
 
-.leader-medallion {
+.leader-medallion,
+.tier-pastor .leader-medallion,
+.tier-incharge .leader-medallion,
+.tier-team .leader-medallion {
   width: 32px;
   height: 32px;
   border-radius: 9px;
@@ -9134,23 +9124,8 @@ html.light-theme .senior-pastor-pill strong {
   justify-content: center;
   font-size: 0.95rem;
   flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.tier-pastor .leader-medallion {
-  background: rgba(245, 158, 11, 0.16);
-  border-color: rgba(245, 158, 11, 0.38);
-}
-
-.tier-incharge .leader-medallion {
-  background: rgba(37, 99, 235, 0.16);
-  border-color: rgba(59, 130, 246, 0.38);
-}
-
-.tier-team .leader-medallion {
-  background: rgba(100, 116, 139, 0.16);
-  border-color: rgba(148, 163, 184, 0.32);
+  background: rgba(37, 99, 235, 0.08) !important;
+  border: 1px solid rgba(59, 130, 246, 0.22) !important;
 }
 
 .leader-showcase-text {
@@ -9162,26 +9137,17 @@ html.light-theme .senior-pastor-pill strong {
   min-width: 0;
 }
 
-.leader-role-eyebrow {
+.leader-role-eyebrow,
+.tier-pastor .leader-role-eyebrow,
+.tier-incharge .leader-role-eyebrow,
+.tier-team .leader-role-eyebrow {
   font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   line-height: 1.2;
   white-space: nowrap;
-  color: #94a3b8;
-}
-
-.tier-pastor .leader-role-eyebrow {
-  color: #fbbf24;
-}
-
-.tier-incharge .leader-role-eyebrow {
-  color: #93c5fd;
-}
-
-.tier-team .leader-role-eyebrow {
-  color: #cbd5e1;
+  color: #94a3b8 !important;
 }
 
 .leader-person-name {
@@ -9195,12 +9161,7 @@ html.light-theme .senior-pastor-pill strong {
 
 /* Light Theme Executive Leadership Cards */
 [data-theme="light"] .leader-showcase-card,
-html.light-theme .leader-showcase-card {
-  background: #ffffff !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
+html.light-theme .leader-showcase-card,
 [data-theme="light"] .leader-showcase-card.tier-pastor,
 [data-theme="light"] .leader-showcase-card.tier-incharge,
 [data-theme="light"] .leader-showcase-card.tier-team,
@@ -9208,6 +9169,7 @@ html.light-theme .leader-showcase-card.tier-pastor,
 html.light-theme .leader-showcase-card.tier-incharge,
 html.light-theme .leader-showcase-card.tier-team {
   background: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
   border: 1px solid #e2e8f0 !important;
 }
 
@@ -9220,28 +9182,18 @@ html.light-theme .tier-pastor .leader-medallion,
 html.light-theme .tier-incharge .leader-medallion,
 html.light-theme .tier-team .leader-medallion {
   background: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
-[data-theme="light"] .tier-team .leader-medallion,
-html.light-theme .tier-team .leader-medallion {
-  background: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-}
-
+[data-theme="light"] .leader-role-eyebrow,
+html.light-theme .leader-role-eyebrow,
 [data-theme="light"] .tier-pastor .leader-role-eyebrow,
-html.light-theme .tier-pastor .leader-role-eyebrow {
-  color: #b45309 !important;
-}
-
 [data-theme="light"] .tier-incharge .leader-role-eyebrow,
-html.light-theme .tier-incharge .leader-role-eyebrow {
-  color: #1d4ed8 !important;
-}
-
 [data-theme="light"] .tier-team .leader-role-eyebrow,
+html.light-theme .tier-pastor .leader-role-eyebrow,
+html.light-theme .tier-incharge .leader-role-eyebrow,
 html.light-theme .tier-team .leader-role-eyebrow {
-  color: #475569 !important;
+  color: #64748b !important;
 }
 
 [data-theme="light"] .leader-person-name,
