@@ -5254,6 +5254,30 @@ function toggleWhatsAppPreview() {
   }
 }
 
+// ================= HERO / OVERVIEW CARDS MOBILE COLLAPSE & EXPAND =================
+function toggleHeroOverviewCards() {
+  const grid = document.getElementById("heroStatsGrid");
+  const btn = document.getElementById("heroOverviewToggleBtn");
+  const badge = document.getElementById("heroOverviewToggleBadge");
+  if (!grid || !btn) return;
+
+  const isExpanded = grid.classList.contains("is-expanded-mobile");
+  if (isExpanded) {
+    grid.classList.remove("is-expanded-mobile");
+    grid.classList.add("is-collapsed-mobile");
+    btn.classList.remove("is-active");
+    btn.setAttribute("aria-expanded", "false");
+    if (badge) badge.textContent = "Expand";
+  } else {
+    grid.classList.remove("is-collapsed-mobile");
+    grid.classList.add("is-expanded-mobile");
+    btn.classList.add("is-active");
+    btn.setAttribute("aria-expanded", "true");
+    if (badge) badge.textContent = "Collapse";
+  }
+}
+window.toggleHeroOverviewCards = toggleHeroOverviewCards;
+
 // ================= SATURDAY EVENING DUTY REMINDER GENERATOR =================
 function getNextUpcomingSundayDate() {
   const sundays = (appState.firstService || []).map(r => r.date);

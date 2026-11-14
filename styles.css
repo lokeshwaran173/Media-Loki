@@ -10627,3 +10627,256 @@ html.light-theme .badge-custom {
   background-color: #ef4444;
   box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
 }
+
+/* ================= OVERVIEW SECTION: LAPTOP VS MOBILE COLLAPSE/EXPAND ================= */
+/* Desktop / Laptop: Always show full 4 cards grid, hide toggle button completely */
+@media (min-width: 769px) {
+  .hero-overview-toggle-wrap {
+    display: none !important;
+  }
+  #heroStatsGrid,
+  .hero-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)) !important;
+    gap: 16px !important;
+    margin-top: 24px !important;
+  }
+}
+
+/* Mobile & Tablet: Sleek Expand/Collapse toggle button & smooth card visibility */
+@media (max-width: 768px) {
+  .hero-overview-toggle-wrap {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 14px !important;
+  }
+
+  .hero-overview-toggle-btn {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding: 11px 15px !important;
+    background: rgba(15, 23, 42, 0.78) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 12px !important;
+    color: #f1f5f9 !important;
+    font-family: inherit !important;
+    font-size: 0.86rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.22s ease !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.24) !important;
+    box-sizing: border-box !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+
+  .hero-overview-toggle-btn:hover,
+  .hero-overview-toggle-btn:focus-visible {
+    background: rgba(30, 41, 59, 0.92) !important;
+    border-color: rgba(37, 99, 235, 0.5) !important;
+    outline: none !important;
+  }
+
+  .hero-overview-toggle-btn.is-active {
+    background: rgba(30, 41, 59, 0.95) !important;
+    border-color: rgba(59, 130, 246, 0.55) !important;
+    box-shadow: 0 4px 16px rgba(37, 99, 235, 0.25) !important;
+  }
+
+  .overview-toggle-left {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+
+  .overview-toggle-left .v-icon {
+    color: #60a5fa !important;
+    flex-shrink: 0 !important;
+  }
+
+  .overview-toggle-title {
+    font-weight: 700 !important;
+    color: #f8fafc !important;
+    font-size: 0.86rem !important;
+    letter-spacing: -0.01em !important;
+  }
+
+  .overview-toggle-count {
+    color: #94a3b8 !important;
+    font-size: 0.76rem !important;
+    font-weight: 500 !important;
+  }
+
+  .overview-toggle-right {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .overview-toggle-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 3px 9px !important;
+    border-radius: 20px !important;
+    font-size: 0.72rem !important;
+    font-weight: 700 !important;
+    background: rgba(37, 99, 235, 0.22) !important;
+    color: #93c5fd !important;
+    border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    letter-spacing: 0.02em !important;
+    text-transform: uppercase !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .chevron-toggle-icon {
+    color: #94a3b8 !important;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .hero-overview-toggle-btn.is-active .chevron-toggle-icon {
+    transform: rotate(180deg) !important;
+    color: #60a5fa !important;
+  }
+
+  .hero-overview-toggle-btn.is-active .overview-toggle-badge {
+    background: rgba(148, 163, 184, 0.16) !important;
+    color: #e2e8f0 !important;
+    border-color: rgba(148, 163, 184, 0.28) !important;
+  }
+
+  /* Default collapsed state on mobile */
+  #heroStatsGrid.is-collapsed-mobile,
+  .hero-stats-grid.is-collapsed-mobile {
+    display: none !important;
+  }
+
+  /* Expanded state on mobile */
+  #heroStatsGrid.is-expanded-mobile,
+  .hero-stats-grid.is-expanded-mobile {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    margin-top: 14px !important;
+    animation: overviewGridEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .hero-stats-grid.is-expanded-mobile .hero-stat-card {
+    padding: 12px 10px !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+  }
+
+  .hero-stats-grid.is-expanded-mobile .hero-stat-card .stat-sub {
+    display: block !important;
+    font-size: 0.72rem !important;
+    line-height: 1.3 !important;
+    color: #94a3b8 !important;
+    margin-top: 2px !important;
+  }
+
+  .hero-stats-grid.is-expanded-mobile .hero-stat-card .stat-value {
+    font-size: 0.94rem !important;
+    line-height: 1.25 !important;
+    margin: 2px 0 !important;
+  }
+
+  .hero-stats-grid.is-expanded-mobile .hero-stat-card .stat-value.stat-value-compact {
+    font-size: 0.82rem !important;
+    line-height: 1.25 !important;
+  }
+}
+
+/* Single column on phones <= 480px for spacious layout */
+@media (max-width: 480px) {
+  #heroStatsGrid.is-expanded-mobile,
+  .hero-stats-grid.is-expanded-mobile {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .hero-stats-grid.is-expanded-mobile .hero-stat-card {
+    padding: 12px 14px !important;
+  }
+}
+
+@keyframes overviewGridEnter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Light Theme overrides for Overview Toggle */
+[data-theme="light"] .hero-overview-toggle-btn,
+html.light-theme .hero-overview-toggle-btn {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+[data-theme="light"] .hero-overview-toggle-btn:hover,
+html.light-theme .hero-overview-toggle-btn:hover,
+[data-theme="light"] .hero-overview-toggle-btn:focus-visible,
+html.light-theme .hero-overview-toggle-btn:focus-visible {
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+}
+
+[data-theme="light"] .hero-overview-toggle-btn.is-active,
+html.light-theme .hero-overview-toggle-btn.is-active {
+  background: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12) !important;
+}
+
+[data-theme="light"] .overview-toggle-title,
+html.light-theme .overview-toggle-title {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .overview-toggle-left .v-icon,
+html.light-theme .overview-toggle-left .v-icon {
+  color: #2563eb !important;
+}
+
+[data-theme="light"] .overview-toggle-count,
+html.light-theme .overview-toggle-count {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .overview-toggle-badge,
+html.light-theme .overview-toggle-badge {
+  background: #dbeafe !important;
+  color: #1e40af !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+[data-theme="light"] .hero-overview-toggle-btn.is-active .overview-toggle-badge,
+html.light-theme .hero-overview-toggle-btn.is-active .overview-toggle-badge {
+  background: #e2e8f0 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+
+[data-theme="light"] .chevron-toggle-icon,
+html.light-theme .chevron-toggle-icon {
+  color: #64748b !important;
+}
+
+[data-theme="light"] .hero-stats-grid.is-expanded-mobile .hero-stat-card .stat-sub,
+html.light-theme .hero-stats-grid.is-expanded-mobile .hero-stat-card .stat-sub {
+  color: #64748b !important;
+}

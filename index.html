@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=7.3">
+  <link rel="stylesheet" href="styles.css?v=7.4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -83,7 +83,7 @@
           </svg>
           <span class="nav-label-long">Media Team</span>
           <span class="nav-label-short">Team</span>
-          <span class="nav-badge-pill" id="publicMemberCountBadge">17</span>
+          <span class="nav-badge-pill" id="publicMemberCountBadge">16</span>
         </button>
         <button id="adminNavBtn" class="nav-btn btn-admin-nav" onclick="handleAdminNavClick(this)">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -149,7 +149,7 @@
       <div class="print-header-text">
         <h1 class="print-church-title">Full Life Centre Assembly of God Church</h1>
         <h2 class="print-roster-title">Indoor Media Team &bull; Broadcast Schedule &mdash; <span
-            id="printActiveMonthYear">October 2026</span></h2>
+            id="printActiveMonthYear">November 2026</span></h2>
         <p class="print-meta-info" id="printLeadershipLine">Senior Pastor: <strong>Rev.N.Johnson</strong> &bull; Overall
           Media Department Incharge: <strong>Pastor. Jerry Jemson</strong> &bull; Team Leader: <strong>Lokesh</strong>
         </p>
@@ -274,8 +274,30 @@
           </div>
         </div>
 
+        <!-- Mobile Overview Expand/Collapse Toggle Button -->
+        <div class="hero-overview-toggle-wrap" id="heroOverviewToggleWrap">
+          <button type="button" class="hero-overview-toggle-btn" id="heroOverviewToggleBtn" onclick="toggleHeroOverviewCards()" aria-expanded="false" aria-controls="heroStatsGrid">
+            <span class="overview-toggle-left">
+              <svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span class="overview-toggle-title">Overview Details</span>
+              <span class="overview-toggle-count">(4 Cards)</span>
+            </span>
+            <span class="overview-toggle-right">
+              <span class="overview-toggle-badge" id="heroOverviewToggleBadge">Expand</span>
+              <svg class="v-icon v-icon-sm chevron-toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </span>
+          </button>
+        </div>
+
         <!-- 4 Stat Overview Cards (Unified Executive Telemetry) -->
-        <div class="hero-stats-grid">
+        <div class="hero-stats-grid is-collapsed-mobile" id="heroStatsGrid">
           <div class="hero-stat-card">
             <div class="stat-content">
               <div class="stat-icon-wrapper"><svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -306,7 +328,7 @@
                 </svg></div>
               <div class="stat-info">
                 <span class="stat-label">Active Media Crew</span>
-                <strong class="stat-value" id="heroMemberCount">17 Crew Members</strong>
+                <strong class="stat-value" id="heroMemberCount">16 Crew Members</strong>
                 <span class="stat-sub">Assigned across Sunday &amp; Friday</span>
               </div>
             </div>
@@ -346,7 +368,7 @@
                 </svg></div>
               <div class="stat-info">
                 <span class="stat-label">Active Schedule Month</span>
-                <strong class="stat-value" id="heroActiveMonth">October 2026</strong>
+                <strong class="stat-value" id="heroActiveMonth">November 2026</strong>
                 <span class="stat-sub">Sundays &amp; Fridays Auto-Synced</span>
               </div>
             </div>
@@ -378,7 +400,7 @@
             <div class="active-month-pill">
               <span class="active-month-dot"></span>
               <span class="active-month-label">ACTIVE SCHEDULE:</span>
-              <strong id="publicActiveMonthBadge" class="active-month-name">October 2026</strong>
+              <strong id="publicActiveMonthBadge" class="active-month-name">November 2026</strong>
             </div>
             <div class="schedule-view-switcher">
               <button id="schedViewTableBtn" class="sched-view-btn active" onclick="setScheduleLayoutMode('table')"
@@ -2970,7 +2992,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=7.3"></script>
+  <script src="app.js?v=7.4"></script>
 </body>
 
 </html>
