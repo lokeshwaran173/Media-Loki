@@ -8983,6 +8983,19 @@ html.light-theme .edit-leader-checkbox-row {
   font-weight: 700;
 }
 
+.senior-pastor-pill .v-icon {
+  width: 14px;
+  height: 14px;
+  color: #fbbf24;
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+
+[data-theme="light"] .senior-pastor-pill .v-icon,
+html.light-theme .senior-pastor-pill .v-icon {
+  color: #b45309;
+}
+
 [data-theme="light"] .hero-senior-pastor-pill,
 html.light-theme .hero-senior-pastor-pill,
 [data-theme="light"] .senior-pastor-pill,
@@ -9156,15 +9169,19 @@ html.light-theme .senior-pastor-pill strong {
   transform: translateY(-1px);
 }
 
-.leader-showcase-card.tier-pastor,
 .leader-showcase-card.tier-incharge,
 .leader-showcase-card.tier-team {
   border: 1px solid var(--border);
   background: rgba(15, 23, 42, 0.75);
 }
 
+.leader-showcase-card.tier-pastor {
+  border: 1px solid rgba(245, 158, 11, 0.35) !important;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.09), rgba(15, 23, 42, 0.88)) !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.08) !important;
+}
+
 .leader-medallion,
-.tier-pastor .leader-medallion,
 .tier-incharge .leader-medallion,
 .tier-team .leader-medallion {
   width: 32px;
@@ -9179,6 +9196,20 @@ html.light-theme .senior-pastor-pill strong {
   border: 1px solid rgba(59, 130, 246, 0.22) !important;
 }
 
+.tier-pastor .leader-medallion {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+  background: rgba(245, 158, 11, 0.16) !important;
+  border: 1px solid rgba(245, 158, 11, 0.42) !important;
+  color: #fbbf24 !important;
+}
+
 .leader-showcase-text {
   display: flex;
   flex-direction: column;
@@ -9189,7 +9220,6 @@ html.light-theme .senior-pastor-pill strong {
 }
 
 .leader-role-eyebrow,
-.tier-pastor .leader-role-eyebrow,
 .tier-incharge .leader-role-eyebrow,
 .tier-team .leader-role-eyebrow {
   font-size: 0.65rem;
@@ -9199,6 +9229,16 @@ html.light-theme .senior-pastor-pill strong {
   line-height: 1.2;
   white-space: nowrap;
   color: #94a3b8 !important;
+}
+
+.tier-pastor .leader-role-eyebrow {
+  font-size: 0.65rem;
+  font-weight: 800 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+  white-space: nowrap;
+  color: #fbbf24 !important;
 }
 
 .leader-person-name {
@@ -9213,10 +9253,8 @@ html.light-theme .senior-pastor-pill strong {
 /* Light Theme Executive Leadership Cards */
 [data-theme="light"] .leader-showcase-card,
 html.light-theme .leader-showcase-card,
-[data-theme="light"] .leader-showcase-card.tier-pastor,
 [data-theme="light"] .leader-showcase-card.tier-incharge,
 [data-theme="light"] .leader-showcase-card.tier-team,
-html.light-theme .leader-showcase-card.tier-pastor,
 html.light-theme .leader-showcase-card.tier-incharge,
 html.light-theme .leader-showcase-card.tier-team {
   background: #ffffff !important;
@@ -9224,27 +9262,43 @@ html.light-theme .leader-showcase-card.tier-team {
   border: 1px solid #e2e8f0 !important;
 }
 
+[data-theme="light"] .leader-showcase-card.tier-pastor,
+html.light-theme .leader-showcase-card.tier-pastor {
+  background: linear-gradient(135deg, #fffbeb, #ffffff) !important;
+  border: 1px solid #fcd34d !important;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.12) !important;
+}
+
 [data-theme="light"] .leader-medallion,
 html.light-theme .leader-medallion,
-[data-theme="light"] .tier-pastor .leader-medallion,
 [data-theme="light"] .tier-incharge .leader-medallion,
 [data-theme="light"] .tier-team .leader-medallion,
-html.light-theme .tier-pastor .leader-medallion,
 html.light-theme .tier-incharge .leader-medallion,
 html.light-theme .tier-team .leader-medallion {
   background: #f1f5f9 !important;
   border: 1px solid #cbd5e1 !important;
 }
 
+[data-theme="light"] .tier-pastor .leader-medallion,
+html.light-theme .tier-pastor .leader-medallion {
+  background: #fef3c7 !important;
+  border: 1px solid #fcd34d !important;
+  color: #b45309 !important;
+}
+
 [data-theme="light"] .leader-role-eyebrow,
 html.light-theme .leader-role-eyebrow,
-[data-theme="light"] .tier-pastor .leader-role-eyebrow,
 [data-theme="light"] .tier-incharge .leader-role-eyebrow,
 [data-theme="light"] .tier-team .leader-role-eyebrow,
-html.light-theme .tier-pastor .leader-role-eyebrow,
 html.light-theme .tier-incharge .leader-role-eyebrow,
 html.light-theme .tier-team .leader-role-eyebrow {
   color: #64748b !important;
+}
+
+[data-theme="light"] .tier-pastor .leader-role-eyebrow,
+html.light-theme .tier-pastor .leader-role-eyebrow {
+  color: #b45309 !important;
+  font-weight: 800 !important;
 }
 
 [data-theme="light"] .leader-person-name,
