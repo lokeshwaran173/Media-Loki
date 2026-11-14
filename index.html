@@ -29,7 +29,7 @@
       });
     })();
   </script>
-  <link rel="stylesheet" href="styles.css?v=6.5">
+  <link rel="stylesheet" href="styles.css?v=6.4">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -316,7 +316,7 @@
               </button>
             </div>
             <button class="btn btn-primary" onclick="exportScheduleImagePNG()"
-              style="padding: 6px 14px; font-size: 0.82rem; font-weight: 700; gap: 6px;"
+              style="padding: 6px 14px; font-size: 0.82rem; background: linear-gradient(135deg, #0284c7, #0f766e); font-weight: 700; gap: 6px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);"
               title="Download High-Res PNG Schedule Image">
               📸 Download Image (PNG)
             </button>
@@ -750,30 +750,12 @@
               </div>
             </div>
             <div class="team-hero-leaders">
-              <div class="leader-showcase-card tier-pastor">
-                <span class="leader-medallion" aria-hidden="true">🕊️</span>
-                <div class="leader-showcase-text">
-                  <span class="leader-role-eyebrow">Senior Pastor</span>
-                  <strong class="leader-person-name">Rev.N.Johnson</strong>
-                </div>
-              </div>
-              <div class="leader-showcase-card tier-incharge">
-                <span class="leader-medallion" aria-hidden="true">✝️</span>
-                <div class="leader-showcase-text">
-                  <span class="leader-role-eyebrow">Overall Media Dept. Incharge</span>
-                  <strong class="leader-person-name">Pastor. Jerry Jemson</strong>
-                </div>
-              </div>
-              <div class="leader-showcase-card tier-team" id="teamLeaderBadge">
-                <span class="leader-medallion" aria-hidden="true">👑</span>
-                <div class="leader-showcase-text">
-                  <span class="leader-role-eyebrow">Team Leader</span>
-                  <strong class="leader-person-name">Lokesh</strong>
-                </div>
-              </div>
+              <span class="call-time-badge senior-pastor-pill"><span class="dept-text-inner">🕊️ Senior Pastor: <strong>Rev.N.Johnson</strong></span></span>
+              <span class="call-time-badge dept-incharge-pill"><span class="dept-text-inner">✝️ Overall Dept. Incharge: <strong>Pastor. Jerry Jemson</strong></span></span>
+              <span class="call-time-badge team-leader-pill" id="teamLeaderBadge">👑 Team Leader: Lokesh</span>
             </div>
           </div>
-          <div class="team-strength-card">
+          <div class="gear-incharge-badge team-strength-card">
             <div class="team-strength-top">
               <span class="crew-badge-label">Active Crew Strength</span>
               <strong class="crew-count-value" id="teamDirectoryCount">16 Crew Members</strong>
@@ -1818,9 +1800,10 @@
         <button class="btn btn-primary" onclick="postSwapRequestToPortal()"
           title="Post this cover need directly to the Schedule page board">📌 Post to Board</button>
         <button class="btn btn-whatsapp" onclick="copySwapMessage()">📋 Copy</button>
-        <button class="btn btn-primary" id="btnSendSwapToLeader" style="background: #2563eb; border-color: #1d4ed8;"
-          onclick="sendSwapToLeaderWhatsApp()" title="Send directly to Team Leader on WhatsApp">👤 Send to Leader</button>
-        <button class="btn btn-whatsapp" onclick="sendSwapToWhatsApp()"
+        <button class="btn btn-whatsapp" id="btnSendSwapToLeader" style="background: linear-gradient(135deg, #0284c7, #0369a1);"
+          onclick="sendSwapToLeaderWhatsApp()" title="Send directly to Team Leader on WhatsApp">👤 Send to
+          Leader</button>
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSwapToWhatsApp()"
           title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
       </div>
     </div>
@@ -1948,9 +1931,9 @@
       <div class="modal-actions-row" style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="closeSaturdayAlertModal()">Close</button>
         <button class="btn btn-whatsapp" onclick="copySaturdayAlertText()">📋 Copy</button>
-        <button class="btn btn-primary" id="btnSendSatAlertToLeader" style="background: #2563eb; border-color: #1d4ed8;"
+        <button class="btn btn-whatsapp" id="btnSendSatAlertToLeader" style="background: linear-gradient(135deg, #0284c7, #0369a1);"
           onclick="sendSaturdayAlertToLeader()" title="Send preview to Team Leader on WhatsApp">👤 To Leader</button>
-        <button class="btn btn-whatsapp" onclick="sendSaturdayAlertWhatsApp()"
+        <button class="btn btn-whatsapp" style="background: #15803d;" onclick="sendSaturdayAlertWhatsApp()"
           title="Share to Media Team WhatsApp Group">💬 Send to Media Group</button>
       </div>
     </div>
@@ -2092,7 +2075,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-  <script src="app.js?v=6.5"></script>
+  <script src="app.js?v=6.4"></script>
 </body>
 
 </html>
