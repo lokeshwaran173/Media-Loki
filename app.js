@@ -1,5 +1,80 @@
 // FLAG Church - Indoor Media Application Logic
 
+// ================= VECTOR SVG ICONS DICTIONARY =================
+const SVG_ICONS = {
+  calendar: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>',
+  users: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>',
+  user: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+  crown: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"></path><path d="M4 20h16"></path></svg>',
+  dove: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4c0 3-2 5-5 5-2 0-4-1-5-3 0 5 4 8 9 8 3.5 0 6.5-2 7.5-5 1.5 0 2.5-1 2.5-2.5 0-1.5-1.5-2.5-3-2.5-1 0-2 .5-3 1-.5-1-1.5-1-3-1z"></path></svg>',
+  cross: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"></line><line x1="7" y1="8" x2="17" y2="8"></line></svg>',
+  pray: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+  video: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>',
+  camera: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
+  target: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
+  monitor: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>',
+  scissors: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><line x1="20" y1="4" x2="8.12" y2="15.88"></line><line x1="14.47" y1="14.48" x2="20" y2="20"></line><line x1="8.12" y1="8.12" x2="12" y2="12"></line></svg>',
+  battery: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="18" height="12" rx="2" ry="2"></rect><line x1="23" y1="13" x2="23" y2="11"></line><polyline points="11 8 7 12 12 12 8 16"></polyline></svg>',
+  clock: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>',
+  check: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>',
+  checkCircle: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+  save: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>',
+  cloud: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg>',
+  cloudOff: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.61 16.95A5 5 0 0 0 18 10h-1.26a8 8 0 0 0-7.05-6M5 5a8 8 0 0 0-4 7h1.18M1 1l22 22"></path></svg>',
+  eye: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>',
+  eyeOff: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>',
+  ban: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>',
+  moon: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>',
+  sun: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>',
+  bell: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>',
+  clipboard: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>',
+  alertTriangle: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+  alert: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>',
+  info: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>',
+  lock: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>',
+  unlock: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 9.9-1"></path></svg>',
+  star: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
+  sparkles: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.912 5.885L20 10.8l-4.885 3.912L16.2 21 12 17.8 7.8 21l1.085-6.288L4 10.8l6.088-1.915L12 3z"></path></svg>',
+  zap: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
+  heart: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>',
+  search: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>',
+  download: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>',
+  upload: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>',
+  copy: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>',
+  externalLink: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>',
+  edit: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
+  chevronDown: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>',
+  chevronUp: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>',
+  chevronRight: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>',
+  filter: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>',
+  settings: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>',
+  shield: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
+  messageCircle: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>',
+  smartphone: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>',
+  radio: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"></circle><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"></path></svg>',
+  music: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>',
+  refresh: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>',
+  whatsapp: '<svg class="v-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.311.045-.698.059-2.072-.511-1.636-.68-2.684-2.339-2.766-2.449-.081-.11-.659-.877-.659-1.674 0-.797.417-1.19.565-1.353.148-.162.324-.203.432-.203.109 0 .217.001.312.006.101.005.234-.038.366.279.135.324.461 1.123.502 1.205.041.082.069.177.014.286-.055.109-.083.177-.164.273-.082.095-.172.213-.246.286-.082.081-.168.17-.072.335.096.164.428.706.918 1.142.631.562 1.163.736 1.328.818.164.082.261.071.358-.041.097-.112.417-.487.528-.654.111-.167.222-.139.373-.083.151.056.955.451 1.12.533.165.082.275.123.316.192.041.069.041.401-.103.806z"/></svg>',
+  trash: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>',
+  key: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-1.5 1.5L16 7l-1.5-1.5L13 7l-1.5-1.5L10 7l-2-2a6 6 0 1 0 8.5 8.5L22 8l-1-6z"></path><circle cx="7.5" cy="16.5" r="1.5"></circle></svg>',
+  link: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>',
+  plug: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22v-5"></path><path d="M9 8V2"></path><path d="M15 8V2"></path><path d="M18 8v5a6 6 0 0 1-12 0V8z"></path></svg>',
+  chart: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>',
+  pin: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+  folder: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>',
+  share: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>',
+  plus: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>',
+  tool: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>',
+  package: '<svg class="v-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>'
+};
+
+function vIcon(name, extraClass) {
+  const icon = SVG_ICONS[name] || SVG_ICONS['sparkles'] || '';
+  if (!extraClass) return icon;
+  return icon.replace('class="v-icon"', 'class="v-icon ' + extraClass + '"');
+}
+
+
 // Official Full Life Centre AG Church Indoor Media Crew Directory & Contacts
 const DEFAULT_MEMBER_ROLE = "Media Crew Member";
 const CURRENT_MEMBER_ROLES_VERSION = 1;
@@ -32,8 +107,8 @@ const OFFICIAL_CREW_DIRECTORY = [
 const FESTIVAL_EVENT_TEMPLATES = [
   {
     category: "christmas",
-    badgeText: "🎄 Christmas Eve",
-    icon: "🎄",
+    badgeText: "Christmas Eve",
+    icon: "star",
     title: "Christmas Eve Candlelight Service",
     date: "24 Dec 2026",
     time: "06:30 PM - 08:30 PM",
@@ -42,8 +117,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "christmas",
-    badgeText: "🌟 Christmas Day",
-    icon: "🌟",
+    badgeText: "Christmas Day",
+    icon: "star",
     title: "Christmas Day Celebration Service",
     date: "25 Dec 2026",
     time: "08:30 AM - 11:30 AM",
@@ -52,8 +127,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "newyear",
-    badgeText: "🕊️ Watch Night",
-    icon: "🕊️",
+    badgeText: "Watch Night",
+    icon: "calendar",
     title: "New Year Eve / Watch Night Service",
     date: "31 Dec 2026",
     time: "10:00 PM - 01:30 AM",
@@ -62,8 +137,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "newyear",
-    badgeText: "🌅 New Year Day",
-    icon: "🌅",
+    badgeText: "New Year Day",
+    icon: "calendar",
     title: "New Year Morning Blessing Service",
     date: "01 Jan 2027",
     time: "08:30 AM - 10:30 AM",
@@ -72,8 +147,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "easter",
-    badgeText: "✝️ Good Friday",
-    icon: "✝️",
+    badgeText: "Good Friday",
+    icon: "cross",
     title: "Good Friday Solemn Service",
     date: "03 Apr 2026",
     time: "11:00 AM - 02:00 PM",
@@ -82,8 +157,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "easter",
-    badgeText: "🌅 Easter Sunrise",
-    icon: "🌅",
+    badgeText: "Easter Sunrise",
+    icon: "cross",
     title: "Easter Resurrection Sunrise Service",
     date: "05 Apr 2026",
     time: "05:00 AM - 07:30 AM",
@@ -92,8 +167,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "thanksgiving",
-    badgeText: "🌾 Harvest Festival",
-    icon: "🌾",
+    badgeText: "Harvest Festival",
+    icon: "heart",
     title: "Annual Harvest Festival & Thanksgiving",
     date: "15 Nov 2026",
     time: "09:00 AM - 01:00 PM",
@@ -102,8 +177,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "miracle",
-    badgeText: "🔥 Miracle Night",
-    icon: "🔥",
+    badgeText: "Miracle Night",
+    icon: "zap",
     title: "All-Night Miracle & Anointing Service",
     date: "31 Oct 2026",
     time: "10:00 PM - 04:00 AM",
@@ -112,8 +187,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "convention",
-    badgeText: "🩸 Revival Convention",
-    icon: "🩸",
+    badgeText: "Revival Convention",
+    icon: "users",
     title: "3-Day Fasting & Prayer Revival Convention",
     date: "10 Nov 2026",
     time: "06:30 PM - 09:30 PM",
@@ -122,8 +197,8 @@ const FESTIVAL_EVENT_TEMPLATES = [
   },
   {
     category: "youth",
-    badgeText: "🕊️ Youth Special",
-    icon: "🕊️",
+    badgeText: "Youth Special",
+    icon: "users",
     title: "Youth Sunday & Media Workshop",
     date: "14 Nov 2026",
     time: "09:00 AM - 12:00 PM",
@@ -136,21 +211,21 @@ function getFestivalCategoryMeta(cat) {
   const c = String(cat || "special").toLowerCase();
   switch (c) {
     case "christmas":
-      return { icon: "🎄", label: "Christmas", badgeClass: "badge-christmas", colorTag: "tag-emerald" };
+      return { icon: vIcon("star", "v-icon-sm"), iconName: "star", label: "Christmas", badgeClass: "badge-christmas", colorTag: "tag-emerald" };
     case "newyear":
-      return { icon: "🕊️", label: "New Year", badgeClass: "badge-newyear", colorTag: "tag-purple" };
+      return { icon: vIcon("calendar", "v-icon-sm"), iconName: "calendar", label: "New Year", badgeClass: "badge-newyear", colorTag: "tag-purple" };
     case "easter":
-      return { icon: "✝️", label: "Easter", badgeClass: "badge-easter", colorTag: "tag-purple" };
+      return { icon: vIcon("cross", "v-icon-sm"), iconName: "cross", label: "Easter", badgeClass: "badge-easter", colorTag: "tag-purple" };
     case "miracle":
-      return { icon: "🔥", label: "Miracle Night", badgeClass: "badge-miracle", colorTag: "tag-amber" };
+      return { icon: vIcon("zap", "v-icon-sm"), iconName: "zap", label: "Miracle Night", badgeClass: "badge-miracle", colorTag: "tag-amber" };
     case "thanksgiving":
-      return { icon: "🌾", label: "Harvest", badgeClass: "badge-thanksgiving", colorTag: "tag-amber" };
+      return { icon: vIcon("heart", "v-icon-sm"), iconName: "heart", label: "Harvest", badgeClass: "badge-thanksgiving", colorTag: "tag-amber" };
     case "convention":
-      return { icon: "🩸", label: "Convention", badgeClass: "badge-convention", colorTag: "tag-special" };
+      return { icon: vIcon("users", "v-icon-sm"), iconName: "users", label: "Convention", badgeClass: "badge-convention", colorTag: "tag-special" };
     case "youth":
-      return { icon: "🕊️", label: "Youth Special", badgeClass: "badge-youth", colorTag: "tag-blue" };
+      return { icon: vIcon("users", "v-icon-sm"), iconName: "users", label: "Youth Special", badgeClass: "badge-youth", colorTag: "tag-blue" };
     case "special":
-      return { icon: "🌟", label: "Special Event", badgeClass: "badge-special", colorTag: "tag-purple" };
+      return { icon: vIcon("sparkles", "v-icon-sm"), iconName: "sparkles", label: "Special Event", badgeClass: "badge-special", colorTag: "tag-purple" };
     default: {
       if (typeof appState !== "undefined" && appState.customFestivalCategories) {
         const found = appState.customFestivalCategories.find(item => {
@@ -159,39 +234,39 @@ function getFestivalCategoryMeta(cat) {
         });
         if (found) {
           const label = typeof found === 'string' ? found : found.label;
-          const icon = (typeof found === 'object' && found.icon) ? found.icon : "✨";
-          return { icon: icon, label: label, badgeClass: "badge-special badge-custom", colorTag: "tag-purple" };
+          const iconName = (typeof found === 'object' && found.iconName) ? found.iconName : "sparkles";
+          return { icon: vIcon(iconName, "v-icon-sm"), iconName: iconName, label: label, badgeClass: "badge-special badge-custom", colorTag: "tag-purple" };
         }
       }
       const prettyLabel = c.startsWith("custom_")
         ? c.replace(/^custom_/, "").replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())
         : c.charAt(0).toUpperCase() + c.slice(1);
-      return { icon: "✨", label: prettyLabel, badgeClass: "badge-special badge-custom", colorTag: "tag-purple" };
+      return { icon: vIcon("sparkles", "v-icon-sm"), iconName: "sparkles", label: prettyLabel, badgeClass: "badge-special badge-custom", colorTag: "tag-purple" };
     }
   }
 }
 
 function getAllFestivalCategories() {
   const standard = [
-    { val: "christmas", label: "🎄 Christmas", icon: "🎄" },
-    { val: "newyear", label: "🕊️ New Year", icon: "🕊️" },
-    { val: "easter", label: "✝️ Easter", icon: "✝️" },
-    { val: "miracle", label: "🔥 Miracle Night", icon: "🔥" },
-    { val: "thanksgiving", label: "🌾 Harvest Festival", icon: "🌾" },
-    { val: "convention", label: "🩸 Revival Convention", icon: "🩸" },
-    { val: "youth", label: "🕊️ Youth Special", icon: "🕊️" },
-    { val: "special", label: "🌟 Special Event", icon: "🌟" }
+    { val: "christmas", label: "Christmas", iconName: "star" },
+    { val: "newyear", label: "New Year", iconName: "calendar" },
+    { val: "easter", label: "Easter", iconName: "cross" },
+    { val: "miracle", label: "Miracle Night", iconName: "zap" },
+    { val: "thanksgiving", label: "Harvest Festival", iconName: "heart" },
+    { val: "convention", label: "Revival Convention", iconName: "users" },
+    { val: "youth", label: "Youth Special", iconName: "users" },
+    { val: "special", label: "Special Event", iconName: "sparkles" }
   ];
 
   if (typeof appState !== "undefined" && Array.isArray(appState.customFestivalCategories)) {
     appState.customFestivalCategories.forEach(cc => {
       const id = typeof cc === 'string' ? cc : cc.id;
       const label = typeof cc === 'string' ? cc : cc.label;
-      const icon = (typeof cc === 'object' && cc.icon) ? cc.icon : "✨";
+      const iconName = (typeof cc === 'object' && cc.iconName) ? cc.iconName : "sparkles";
       standard.push({
         val: id,
-        label: `${icon} ${label} (Custom)`,
-        icon: icon,
+        label: `${label} (Custom)`,
+        iconName: iconName,
         isCustom: true
       });
     });
@@ -215,18 +290,18 @@ function promptAddCustomCategory(targetRowIndex) {
     appState.customFestivalCategories = [];
   }
 
-  let icon = "✨";
+  let iconName = "sparkles";
   const lower = cleanName.toLowerCase();
-  if (lower.includes("baptism") || lower.includes("water")) icon = "🌊";
-  else if (lower.includes("wedding") || lower.includes("marriage")) icon = "💍";
-  else if (lower.includes("concert") || lower.includes("music") || lower.includes("worship")) icon = "🎵";
-  else if (lower.includes("child") || lower.includes("kid") || lower.includes("baby") || lower.includes("dedication")) icon = "👶";
-  else if (lower.includes("youth") || lower.includes("teen")) icon = "🕊️";
-  else if (lower.includes("revival") || lower.includes("fire") || lower.includes("miracle")) icon = "🔥";
-  else if (lower.includes("fasting") || lower.includes("prayer")) icon = "🙏";
-  else if (lower.includes("thanksgiving") || lower.includes("harvest")) icon = "🌾";
-  else if (lower.includes("christmas")) icon = "🎄";
-  else if (lower.includes("easter")) icon = "✝️";
+  if (lower.includes("baptism") || lower.includes("water")) iconName = "cloud";
+  else if (lower.includes("wedding") || lower.includes("marriage")) iconName = "heart";
+  else if (lower.includes("concert") || lower.includes("music") || lower.includes("worship")) iconName = "music";
+  else if (lower.includes("child") || lower.includes("kid") || lower.includes("baby") || lower.includes("dedication")) iconName = "user";
+  else if (lower.includes("youth") || lower.includes("teen")) iconName = "users";
+  else if (lower.includes("revival") || lower.includes("fire") || lower.includes("miracle")) iconName = "zap";
+  else if (lower.includes("fasting") || lower.includes("prayer")) iconName = "clock";
+  else if (lower.includes("thanksgiving") || lower.includes("harvest")) iconName = "heart";
+  else if (lower.includes("christmas")) iconName = "star";
+  else if (lower.includes("easter")) iconName = "cross";
 
   const existing = appState.customFestivalCategories.find(c => {
     const cid = (typeof c === 'string' ? c : c.id).toLowerCase();
@@ -240,7 +315,7 @@ function promptAddCustomCategory(targetRowIndex) {
     appState.customFestivalCategories.push({
       id: catId,
       label: cleanName,
-      icon: icon
+      iconName: iconName
     });
   }
 
@@ -250,7 +325,7 @@ function promptAddCustomCategory(targetRowIndex) {
 
   saveState();
   renderAll();
-  showToast(`🏷️ Custom category "${icon} ${cleanName}" added!`);
+  showToast(`Custom category "${cleanName}" added!`);
 }
 
 function onCategorySelectChange(index, selectedValue) {
@@ -545,7 +620,7 @@ function unlockAdminWithPin() {
     }
 
     renderOpenCoverBoard();
-    showToast(`👑 Admin Console Unlocked! Welcome ${getLeaderName()}.`);
+    showToast(`Admin Console Unlocked! Welcome ${getLeaderName()}.`);
   } else {
     alert("Incorrect Admin PIN. Please try again.");
     document.getElementById("adminPinInput").select();
@@ -558,7 +633,7 @@ function lockAdminConsole() {
   renderOpenCoverBoard();
   const scheduleBtn = document.querySelector(".nav-links .nav-btn:first-child");
   switchView("scheduleView", scheduleBtn);
-  showToast("🔒 Admin Console Locked.");
+  showToast("Admin Console Locked.");
 }
 
 function updateAdminNavUI() {
@@ -569,8 +644,8 @@ function updateAdminNavUI() {
   if (isAdminLoggedIn) {
     btn.classList.add("active");
     text.innerHTML = `
-      <span class="nav-label-long">Admin 🔓 (Unlocked)</span>
-      <span class="nav-label-short">Admin 🔓</span>
+      <span class="nav-label-long">Admin (Unlocked)</span>
+      <span class="nav-label-short">Admin</span>
     `;
   } else {
     btn.classList.remove("active");
@@ -646,7 +721,7 @@ function openWhatsAppToLeader(messageText) {
     window.open(`https://wa.me/${digits}?text=${encoded}`, "_blank");
   } else {
     window.open(`https://wa.me/?text=${encoded}`, "_blank");
-    showToast(`ℹ️ No mobile number saved for Leader ${leader} — choose contact in WhatsApp.`);
+    showToast(`No mobile number saved for Leader ${leader} — choose contact in WhatsApp.`);
   }
 }
 
@@ -672,37 +747,37 @@ function renderLeaderBadges() {
     } else {
       heroBadge.style.display = "";
       heroBadge.removeAttribute("aria-hidden");
-      heroBadge.innerHTML = `<span class="leader-medallion" aria-hidden="true">👑</span><div class="leader-showcase-text"><span class="leader-role-eyebrow">Team Leader</span><strong class="leader-person-name">${escapeHtml(leader)}</strong></div>`;
+      heroBadge.innerHTML = `<span class="leader-medallion" aria-hidden="true">${vIcon("crown")}</span><div class="leader-showcase-text"><span class="leader-role-eyebrow">Team Leader</span><strong class="leader-person-name">${escapeHtml(leader)}</strong></div>`;
     }
   }
   if (teamBadge) {
-    teamBadge.innerHTML = `<span class="leader-medallion" aria-hidden="true">👑</span><div class="leader-showcase-text"><span class="leader-role-eyebrow">Team Leader</span><strong class="leader-person-name">${escapeHtml(leader)}</strong></div>`;
+    teamBadge.innerHTML = `<span class="leader-medallion" aria-hidden="true">${vIcon("crown")}</span><div class="leader-showcase-text"><span class="leader-role-eyebrow">Team Leader</span><strong class="leader-person-name">${escapeHtml(leader)}</strong></div>`;
   }
   if (adminBadge) {
     adminBadge.textContent = isBlankOnMain
-      ? `👑 Team Leader: ${leader} (Blank on Main Page)`
-      : `👑 Team Leader: ${leader}`;
+      ? `Team Leader: ${leader} (Blank on Main Page)`
+      : `Team Leader: ${leader}`;
   }
   if (adminTabBadge) {
     adminTabBadge.textContent = isBlankOnMain
-      ? `👑 Team Leader: ${leader} (Blank on Main Page)`
-      : `👑 Team Leader: ${leader}`;
+      ? `Team Leader: ${leader} (Blank on Main Page)`
+      : `Team Leader: ${leader}`;
   }
   if (blankBtn) {
     blankBtn.classList.toggle("active", isBlankOnMain);
-    blankBtn.textContent = isBlankOnMain ? "👁️ Show on Main Page" : "🚫 Blank on Main Page";
+    blankBtn.innerHTML = isBlankOnMain ? `${vIcon("eye")} Show on Main Page` : `${vIcon("ban")} Blank on Main Page`;
     blankBtn.title = isBlankOnMain
       ? "Currently blank on the main page — click to show Team Leader again"
       : "Hide Team Leader badge on the main page";
   }
   if (modalBlankBtn) {
     modalBlankBtn.classList.toggle("active", isBlankOnMain);
-    modalBlankBtn.textContent = isBlankOnMain ? "👁️ Show on Main Page" : "🚫 Blank on Main Page";
+    modalBlankBtn.innerHTML = isBlankOnMain ? `${vIcon("eye")} Show on Main Page` : `${vIcon("ban")} Blank on Main Page`;
   }
   if (printLine) {
     printLine.innerHTML = isBlankOnMain || !leader
-      ? `🕊️ Senior Pastor: <strong>${escapeHtml(SENIOR_PASTOR_NAME)}</strong> &bull; ✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong>`
-      : `🕊️ Senior Pastor: <strong>${escapeHtml(SENIOR_PASTOR_NAME)}</strong> &bull; ✝️ Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong> &bull; 👑 Team Leader: <strong>${escapeHtml(leader)}</strong>`;
+      ? `Senior Pastor: <strong>${escapeHtml(SENIOR_PASTOR_NAME)}</strong> &bull; Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong>`
+      : `Senior Pastor: <strong>${escapeHtml(SENIOR_PASTOR_NAME)}</strong> &bull; Overall Media Department Incharge: <strong>${escapeHtml(OVERALL_DEPT_INCHARGE)}</strong> &bull; Team Leader: <strong>${escapeHtml(leader)}</strong>`;
   }
   if (adminLeaderSelect) {
     const members = (appState && Array.isArray(appState.members)) ? appState.members : [];
@@ -712,10 +787,10 @@ function renderLeaderBadges() {
       if (!m || !m.name) return;
       const isMatch = isAliasMatch(m.name, leader);
       if (isMatch) hasSelectedMember = true;
-      opts.push(`<option value="${escapeHtml(m.name)}" ${isMatch ? "selected" : ""}>👑 ${escapeHtml(m.name)}</option>`);
+      opts.push(`<option value="${escapeHtml(m.name)}" ${isMatch ? "selected" : ""}>${escapeHtml(m.name)}</option>`);
     });
     if (!hasSelectedMember && leader) {
-      opts.push(`<option value="${escapeHtml(leader)}" selected>👑 ${escapeHtml(leader)}</option>`);
+      opts.push(`<option value="${escapeHtml(leader)}" selected>${escapeHtml(leader)}</option>`);
     }
     adminLeaderSelect.innerHTML = opts.join("");
   }
@@ -731,14 +806,14 @@ function setTeamLeaderByName(name) {
   appState.hideLeaderOnMainPage = false;
   saveState(false, { leaderName: appState.leaderName, hideLeaderOnMainPage: false });
   renderAll();
-  showToast(`👑 Team Leader saved as ${newLeader}!`);
+  showToast(`Team Leader saved as ${newLeader}!`);
 }
 
 function saveAdminSelectedLeader() {
   const sel = document.getElementById("adminTeamLeaderSelect");
   const picked = sel ? sel.value.trim() : "";
   if (!picked) {
-    showToast("⚠️ Please choose a Team Leader from the list first.");
+    showToast("️ Please choose a Team Leader from the list first.");
     return;
   }
   setTeamLeaderByName(picked);
@@ -750,8 +825,8 @@ function toggleLeaderMainPageBlank() {
   renderAll();
   showToast(
     appState.hideLeaderOnMainPage
-      ? "🙈 Team Leader is now blank on the Main Page!"
-      : `👁️ Team Leader (${getLeaderName()}) is now shown on the Main Page!`
+      ? "Team Leader is now blank on the Main Page!"
+      : `Team Leader (${getLeaderName()}) is now shown on the Main Page!`
   );
 }
 
@@ -762,8 +837,8 @@ function setLeaderBlankFromModal() {
   renderAll();
   showToast(
     appState.hideLeaderOnMainPage
-      ? "🙈 Team Leader is now blank on the Main Page!"
-      : `👁️ Team Leader (${getLeaderName()}) is now shown on the Main Page!`
+      ? "Team Leader is now blank on the Main Page!"
+      : `Team Leader (${getLeaderName()}) is now shown on the Main Page!`
   );
 }
 
@@ -864,12 +939,12 @@ function setTheme(theme) {
   const metaTheme = document.querySelector('meta[name="theme-color"]');
 
   if (current === "light") {
-    if (iconEl) iconEl.textContent = "🌙";
+    if (iconEl) iconEl.innerHTML = vIcon("moon");
     if (textEl) textEl.textContent = "Dark";
     if (toggleBtn) toggleBtn.setAttribute("title", "Currently in Light Mode &bull; Click for Dark Theme");
     if (metaTheme) metaTheme.setAttribute("content", "#f8fafc");
   } else {
-    if (iconEl) iconEl.textContent = "☀️";
+    if (iconEl) iconEl.innerHTML = vIcon("sun");
     if (textEl) textEl.textContent = "Light";
     if (toggleBtn) toggleBtn.setAttribute("title", "Currently in Dark Mode &bull; Click for Light Theme");
     if (metaTheme) metaTheme.setAttribute("content", "#0f172a");
@@ -880,7 +955,7 @@ function toggleTheme() {
   const current = document.documentElement.getAttribute("data-theme") || "dark";
   const next = current === "light" ? "dark" : "light";
   setTheme(next);
-  showToast(next === "light" ? "☀️ Light mode activated" : "🌙 Dark mode activated");
+  showToast(next === "light" ? "Light mode activated" : "Dark mode activated");
 }
 
 function initTheme() {
@@ -1228,9 +1303,9 @@ function manualSaveSchedule() {
   const statusEl = document.getElementById("saveStatusIndicator");
   if (statusEl) {
     if (cloudSyncConnected) {
-      statusEl.innerHTML = `✅ Saved locally &amp; ☁️ Synced to Cloud at <strong>${timeStr}</strong>!`;
+      statusEl.innerHTML = `${vIcon("checkCircle")} Saved locally &bull; ${vIcon("cloud")} Synced to Cloud at <strong>${timeStr}</strong>!`;
     } else {
-      statusEl.innerHTML = `✅ All changes successfully saved locally at <strong>${timeStr}</strong>!`;
+      statusEl.innerHTML = `${vIcon("checkCircle")} All changes successfully saved locally at <strong>${timeStr}</strong>!`;
     }
   }
 
@@ -1238,7 +1313,7 @@ function manualSaveSchedule() {
   saveBtns.forEach(btn => {
     btn.classList.add("saved-pulse");
     const originalHtml = btn.innerHTML;
-    btn.innerHTML = `✅ Saved!`;
+    btn.innerHTML = `${vIcon("check")} Saved!`;
     setTimeout(() => {
       btn.classList.remove("saved-pulse");
       btn.innerHTML = originalHtml;
@@ -1246,9 +1321,9 @@ function manualSaveSchedule() {
   });
 
   if (cloudSyncConnected) {
-    showToast(`💾 Schedule saved & ☁️ synced to Cloud at ${timeStr}!`);
+    showToast(`Schedule saved & ️ synced to Cloud at ${timeStr}!`);
   } else {
-    showToast(`💾 Schedule saved locally at ${timeStr}!`);
+    showToast(`Schedule saved locally at ${timeStr}!`);
   }
 }
 
@@ -1417,12 +1492,12 @@ function badgeForName(name, dateStr = "") {
   if (dateStr) {
     const awayPeople = splitAssignedNames(name).filter(p => isMemberUnavailableOnDate(p, dateStr));
     if (awayPeople.length > 0) {
-      awayBadge = ` <span class="roster-away-flag" title="${escapeHtml(awayPeople.join(', '))} marked Away on ${escapeHtml(dateStr)}">🚫 Away</span>`;
+      awayBadge = ` <span class="roster-away-flag" title="${escapeHtml(awayPeople.join(', '))} marked Away on ${escapeHtml(dateStr)}">${vIcon("ban", "v-icon-sm")} Away</span>`;
     }
   }
 
   if (name.includes("&")) {
-    return `<span class="roster-name roster-pair${highlightClass}"><span class="roster-icon">👥</span><span>${name}</span>${awayBadge}</span>`;
+    return `<span class="roster-name roster-pair${highlightClass}"><span class="roster-icon">${vIcon("users", "v-icon-sm")}</span><span>${name}</span>${awayBadge}</span>`;
   }
   return `<span class="roster-name${highlightClass}"><span>${name}</span>${awayBadge}</span>`;
 }
@@ -1435,7 +1510,7 @@ function setScheduleLayoutMode(mode) {
   try { localStorage.setItem("FLAG_SCHEDULE_LAYOUT_MODE", currentScheduleLayoutMode); } catch (e) {}
 
   updateScheduleLayoutVisibility();
-  showToast(currentScheduleLayoutMode === "card" ? "📱 Switched to Mobile Card View" : "📋 Switched to Table View");
+  showToast(currentScheduleLayoutMode === "card" ? "Switched to Mobile Card View" : "Switched to Table View");
 }
 
 function updateScheduleLayoutVisibility() {
@@ -1485,32 +1560,32 @@ function renderPublicSchedule() {
       card.className = "schedule-service-card card-accent-blue";
       card.innerHTML = `
         <div class="sched-card-top">
-          <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">🙏 Prayer: 05:30 AM | Service: 06:00 AM &ndash; 08:00 AM</span>
+          <div class="sched-card-date">${vIcon("calendar", "v-icon-sm")} ${r.date}</div>
+          <span class="duty-badge-time">${vIcon("clock", "v-icon-sm")} Prayer: 05:30 AM | Service: 06:00 AM &ndash; 08:00 AM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
-            <span class="sched-role-label">🎥 1st Cam:</span>
+            <span class="sched-role-label">${vIcon("video", "v-icon-sm")} 1st Cam:</span>
             <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
           </div>
           <div class="sched-role-row">
-            <span class="sched-role-label">📹 2nd Cam:</span>
+            <span class="sched-role-label">${vIcon("camera", "v-icon-sm")} 2nd Cam:</span>
             <div class="sched-role-val">${badgeForName(r.cam2, r.date)}</div>
           </div>
           <div class="sched-role-row">
-            <span class="sched-role-label">🎯 Gimble:</span>
+            <span class="sched-role-label">${vIcon("target", "v-icon-sm")} Gimble:</span>
             <div class="sched-role-val">${badgeForName(r.gimble, r.date)}</div>
           </div>
           <div class="sched-role-row">
-            <span class="sched-role-label">💻 Live System:</span>
+            <span class="sched-role-label">${vIcon("monitor", "v-icon-sm")} Live System:</span>
             <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
           </div>
           <div class="sched-role-row">
-            <span class="sched-role-label">✂️ Spot Editing:</span>
+            <span class="sched-role-label">${vIcon("scissors", "v-icon-sm")} Spot Edit:</span>
             <div class="sched-role-val">${badgeForName(r.spot, r.date)}</div>
           </div>
           <div class="sched-role-row">
-            <span class="sched-role-label">🔋 Battery & Charging (Sat):</span>
+            <span class="sched-role-label">${vIcon("battery", "v-icon-sm")} Battery &amp; Prep (Sat):</span>
             <div class="sched-role-val">${badgeForName(r.charging, prepDate)}</div>
           </div>
         </div>
@@ -1542,12 +1617,12 @@ function renderPublicSchedule() {
       card.className = "schedule-service-card card-accent-amber";
       card.innerHTML = `
         <div class="sched-card-top">
-          <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">🙏 Prayer: 08:00 AM | Service: 08:30 AM &ndash; 10:30 AM</span>
+          <div class="sched-card-date">${vIcon("calendar", "v-icon-sm")} ${r.date}</div>
+          <span class="duty-badge-time">${vIcon("clock", "v-icon-sm")} Prayer: 08:00 AM | Service: 08:30 AM &ndash; 10:30 AM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
-            <span class="sched-role-label">🎥 Cam & Live Operator:</span>
+            <span class="sched-role-label">${vIcon("camera", "v-icon-sm")} Cam &amp; Live Operator:</span>
             <div class="sched-role-val">${badgeForName(r.operator, r.date)}</div>
           </div>
         </div>
@@ -1579,12 +1654,12 @@ function renderPublicSchedule() {
       card.className = "schedule-service-card card-accent-purple";
       card.innerHTML = `
         <div class="sched-card-top">
-          <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">🙏 Prayer: 10:30 AM | Service: 11:00 AM &ndash; 01:00 PM</span>
+          <div class="sched-card-date">${vIcon("calendar", "v-icon-sm")} ${r.date}</div>
+          <span class="duty-badge-time">${vIcon("clock", "v-icon-sm")} Prayer: 10:30 AM | Service: 11:00 AM &ndash; 01:00 PM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
-            <span class="sched-role-label">🎥 Cam & Live Operator:</span>
+            <span class="sched-role-label">${vIcon("camera", "v-icon-sm")} Cam &amp; Live Operator:</span>
             <div class="sched-role-val">${badgeForName(r.operator, r.date)}</div>
           </div>
         </div>
@@ -1617,16 +1692,16 @@ function renderPublicSchedule() {
       card.className = "schedule-service-card card-accent-emerald";
       card.innerHTML = `
         <div class="sched-card-top">
-          <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">🙏 Prayer: 09:30 AM | Service: 10:00 AM &ndash; 01:00 PM</span>
+          <div class="sched-card-date">${vIcon("calendar", "v-icon-sm")} ${r.date}</div>
+          <span class="duty-badge-time">${vIcon("clock", "v-icon-sm")} Prayer: 09:30 AM | Service: 10:00 AM &ndash; 01:00 PM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
-            <span class="sched-role-label">🎥 1st Cam:</span>
+            <span class="sched-role-label">${vIcon("video", "v-icon-sm")} 1st Cam:</span>
             <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
           </div>
           <div class="sched-role-row">
-            <span class="sched-role-label">💻 Live System:</span>
+            <span class="sched-role-label">${vIcon("monitor", "v-icon-sm")} Live System:</span>
             <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
           </div>
         </div>
@@ -1653,18 +1728,18 @@ function renderPublicSchedule() {
   if (filterChipsContainer) {
     let chipsHtml = `
       <button type="button" class="festival-filter-btn ${currentFilter === 'all' ? 'active' : ''}" data-filter="all" onclick="filterFestivalRoster('all', this)">All Events (<span id="countAllFestivals">${allSpecial.length}</span>)</button>
-      <button type="button" class="festival-filter-btn ${currentFilter === 'christmas' ? 'active' : ''}" data-filter="christmas" onclick="filterFestivalRoster('christmas', this)">🎄 Christmas</button>
-      <button type="button" class="festival-filter-btn ${currentFilter === 'newyear' ? 'active' : ''}" data-filter="newyear" onclick="filterFestivalRoster('newyear', this)">🕊️ New Year</button>
-      <button type="button" class="festival-filter-btn ${currentFilter === 'easter' ? 'active' : ''}" data-filter="easter" onclick="filterFestivalRoster('easter', this)">✝️ Easter</button>
-      <button type="button" class="festival-filter-btn ${currentFilter === 'miracle' ? 'active' : ''}" data-filter="miracle" onclick="filterFestivalRoster('miracle', this)">🔥 Miracle Nights</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'christmas' ? 'active' : ''}" data-filter="christmas" onclick="filterFestivalRoster('christmas', this)">${vIcon('star', 'v-icon-sm')} Christmas</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'newyear' ? 'active' : ''}" data-filter="newyear" onclick="filterFestivalRoster('newyear', this)">${vIcon('calendar', 'v-icon-sm')} New Year</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'easter' ? 'active' : ''}" data-filter="easter" onclick="filterFestivalRoster('easter', this)">${vIcon('cross', 'v-icon-sm')} Easter</button>
+      <button type="button" class="festival-filter-btn ${currentFilter === 'miracle' ? 'active' : ''}" data-filter="miracle" onclick="filterFestivalRoster('miracle', this)">${vIcon('zap', 'v-icon-sm')} Miracle Nights</button>
     `;
     (appState.customFestivalCategories || []).forEach(cc => {
       const id = (typeof cc === 'string' ? cc : cc.id).toLowerCase();
       const label = typeof cc === 'string' ? cc : cc.label;
-      const icon = (typeof cc === 'object' && cc.icon) ? cc.icon : "✨";
-      chipsHtml += `<button type="button" class="festival-filter-btn ${currentFilter === id ? 'active' : ''}" data-filter="${escapeHtml(id)}" onclick="filterFestivalRoster('${escapeHtml(id)}', this)">${icon} ${escapeHtml(label)}</button>`;
+      const icon = (typeof cc === 'object' && cc.iconName) ? vIcon(cc.iconName, "v-icon-sm") : vIcon("sparkles", "v-icon-sm");
+      chipsHtml += `<button type="button" class="festival-filter-btn ${currentFilter === id ? 'active' : ''}" data-filter="${escapeHtml(id)}" onclick="filterFestivalRoster('${escapeHtml(id)}', this)">${vIcon(cc.iconName || 'sparkles', 'v-icon-sm')} ${escapeHtml(label)}</button>`;
     });
-    chipsHtml += `<button type="button" class="festival-filter-btn ${currentFilter === 'other' ? 'active' : ''}" data-filter="other" onclick="filterFestivalRoster('other', this)">✨ Other Specials</button>`;
+    chipsHtml += `<button type="button" class="festival-filter-btn ${currentFilter === 'other' ? 'active' : ''}" data-filter="other" onclick="filterFestivalRoster('other', this)">${vIcon('sparkles', 'v-icon-sm')} Other Specials</button>`;
     filterChipsContainer.innerHTML = chipsHtml;
   }
 
@@ -1684,7 +1759,7 @@ function renderPublicSchedule() {
     if (filteredEvents.length === 0) {
       const tr = document.createElement("tr");
       tr.innerHTML = `<td colspan="8" style="text-align: center; padding: 24px; color: var(--text-muted);">
-        ✨ No events under filter "<strong>${escapeHtml(currentFilter)}</strong>". Switch to <strong>All Events</strong> or load presets from Admin Console!
+        No events under filter "<strong>${escapeHtml(currentFilter)}</strong>". Switch to <strong>All Events</strong> or load presets from Admin Console!
       </td>`;
       ts.appendChild(tr);
     } else {
@@ -1698,17 +1773,17 @@ function renderPublicSchedule() {
             <div class="festival-title-cell">
               <span class="festival-badge ${meta.badgeClass}">${meta.icon} ${meta.label}</span>
               <strong class="festival-name-text">${escapeHtml(r.title || 'Special Event')}</strong>
-              ${r.notes ? `<span class="festival-notes-sub">📝 ${escapeHtml(r.notes)}</span>` : ''}
+              ${r.notes ? `<span class="festival-notes-sub">${vIcon("clipboard", "v-icon-sm")} ${escapeHtml(r.notes)}</span>` : ''}
             </div>
           </td>
           <td>
             <div class="festival-datetime-cell">
               <span class="date-chip date-chip-purple">${escapeHtml(r.date)}</span>
-              ${r.time ? `<span class="festival-time-sub">⏰ ${escapeHtml(r.time)}</span>` : ''}
+              ${r.time ? `<span class="festival-time-sub">${vIcon("clock", "v-icon-sm")} ${escapeHtml(r.time)}</span>` : ''}
             </div>
           </td>
           <td>
-            <span class="call-time-badge festival-call-time">🔔 ${escapeHtml(r.callTime || '45m prior')}</span>
+            <span class="call-time-badge festival-call-time">${vIcon("bell", "v-icon-sm")} Prayer: ${escapeHtml(r.callTime || '45m prior')}</span>
           </td>
           <td>${badgeForName(r.cam1, r.date)}</td>
           <td>${badgeForName(r.cam2, r.date)}</td>
@@ -1727,7 +1802,7 @@ function renderPublicSchedule() {
     cs.innerHTML = "";
     if (filteredEvents.length === 0) {
       cs.innerHTML = `<div class="card" style="text-align:center; padding: 20px; color: var(--text-muted);">
-        ✨ No events under filter "<strong>${escapeHtml(currentFilter)}</strong>".
+        No events under filter "<strong>${escapeHtml(currentFilter)}</strong>".
       </div>`;
     } else {
       filteredEvents.forEach(r => {
@@ -1742,31 +1817,31 @@ function renderPublicSchedule() {
               <div class="sched-card-date festival-card-title">${escapeHtml(r.title || 'Special Meeting')}</div>
             </div>
             <div class="festival-card-chips">
-              <span class="duty-badge-time">📅 ${escapeHtml(r.date)}</span>
-              ${r.time ? `<span class="festival-time-chip">⏰ ${escapeHtml(r.time)}</span>` : ''}
-              <span class="call-time-badge festival-call-badge">🔔 Call: ${escapeHtml(r.callTime || '45m prior')}</span>
+              <span class="duty-badge-time">${vIcon("calendar", "v-icon-sm")} ${escapeHtml(r.date)}</span>
+              ${r.time ? `<span class="festival-time-chip">${vIcon("clock", "v-icon-sm")} ${escapeHtml(r.time)}</span>` : ''}
+              <span class="call-time-badge festival-call-badge">${vIcon("bell", "v-icon-sm")} Prayer: ${escapeHtml(r.callTime || '45m prior')}</span>
             </div>
-            ${r.notes ? `<div class="festival-card-notes">📝 ${escapeHtml(r.notes)}</div>` : ''}
+            ${r.notes ? `<div class="festival-card-notes">${vIcon("clipboard", "v-icon-sm")} ${escapeHtml(r.notes)}</div>` : ''}
           </div>
           <div class="sched-card-roles">
             <div class="sched-role-row">
-              <span class="sched-role-label">🎥 1st Cam:</span>
+              <span class="sched-role-label">${vIcon("video", "v-icon-sm")} 1st Cam:</span>
               <div class="sched-role-val">${badgeForName(r.cam1, r.date)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">📹 2nd Cam:</span>
+              <span class="sched-role-label">${vIcon("camera", "v-icon-sm")} 2nd Cam:</span>
               <div class="sched-role-val">${badgeForName(r.cam2, r.date)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">🎯 Gimble:</span>
+              <span class="sched-role-label">${vIcon("target", "v-icon-sm")} Gimble:</span>
               <div class="sched-role-val">${badgeForName(r.gimble, r.date)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">💻 Live System:</span>
+              <span class="sched-role-label">${vIcon("monitor", "v-icon-sm")} Live System:</span>
               <div class="sched-role-val">${badgeForName(r.live, r.date)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">✂️ Spot Edit:</span>
+              <span class="sched-role-label">${vIcon("scissors", "v-icon-sm")} Spot Edit:</span>
               <div class="sched-role-val">${badgeForName(r.spot, r.date)}</div>
             </div>
           </div>
@@ -1793,28 +1868,28 @@ function renderPublicSchedule() {
         card.className = "schedule-service-card card-accent-morning";
         card.innerHTML = `
           <div class="sched-card-top">
-            <div class="sched-card-date">🌅 ${r.day}</div>
-            <span class="duty-badge-time">⏰ Call: 05:00 AM</span>
+            <div class="sched-card-date">${vIcon("sun", "v-icon-sm")} ${r.day}</div>
+            <span class="duty-badge-time">${vIcon("clock", "v-icon-sm")} Prayer: 05:00 AM</span>
           </div>
           <div class="sched-card-roles">
             <div class="sched-role-row">
-              <span class="sched-role-label">🎥 1st Cam:</span>
+              <span class="sched-role-label">${vIcon("video", "v-icon-sm")} 1st Cam:</span>
               <div class="sched-role-val">${badgeForName(r.cam1)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">📹 2nd Cam:</span>
+              <span class="sched-role-label">${vIcon("camera", "v-icon-sm")} 2nd Cam:</span>
               <div class="sched-role-val">${badgeForName(r.cam2)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">🎯 Gimble:</span>
+              <span class="sched-role-label">${vIcon("target", "v-icon-sm")} Gimble:</span>
               <div class="sched-role-val">${badgeForName(r.gimbal)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">💻 Live Editor:</span>
+              <span class="sched-role-label">${vIcon("monitor", "v-icon-sm")} Live Editor:</span>
               <div class="sched-role-val">${badgeForName(r.liveEditor)}</div>
             </div>
             <div class="sched-role-row">
-              <span class="sched-role-label">✂️ Social Media:</span>
+              <span class="sched-role-label">${vIcon("scissors", "v-icon-sm")} Social Media:</span>
               <div class="sched-role-val">${badgeForName(r.socialMedia)}</div>
             </div>
           </div>
@@ -1827,7 +1902,7 @@ function renderPublicSchedule() {
   const tm = document.getElementById("publicTbodyMorningPrayer");
   const publicMorningTitleEl = document.getElementById("publicMorningPrayerTitle");
   if (publicMorningTitleEl && appState.morningPrayer && appState.morningPrayer.title) {
-    publicMorningTitleEl.textContent = `🌅 ${appState.morningPrayer.title}`;
+    publicMorningTitleEl.innerHTML = `${vIcon("sun", "v-icon-sm")} ${escapeHtml(appState.morningPrayer.title)}`;
   }
   if (tm) {
     tm.innerHTML = "";
@@ -2241,22 +2316,22 @@ function renderAdminScheduleHealth() {
   if (errCount > 0) card.classList.add("health-error");
   else if (warnCount > 0) card.classList.add("health-warn");
 
-  let statusTitle = "✅ Schedule Health: Zero double-bookings or away-date conflicts";
+  let statusTitle = "Schedule Health: Zero double-bookings or away-date conflicts";
   let badgeHtml = `<span class="header-tag tag-emerald" style="font-size: 0.75rem;">Clean Roster</span>`;
 
   if (errCount > 0) {
-    statusTitle = `🚨 Schedule Conflict Alert (${errCount} ${errCount === 1 ? "issue" : "issues"}${warnCount > 0 ? `, ${warnCount} overload` : ""})`;
+    statusTitle = `Schedule Conflict Alert (${errCount} ${errCount === 1 ? "issue" : "issues"}${warnCount > 0 ? `, ${warnCount} overload` : ""})`;
     badgeHtml = `<span class="header-tag tag-amber" style="background: rgba(239, 68, 68, 0.2); color: #fca5a5; border-color: rgba(239, 68, 68, 0.45); font-size: 0.75rem;">Action Needed</span>`;
   } else if (warnCount > 0) {
-    statusTitle = `⚠️ Workload Advisory (${warnCount} multi-service Sunday ${warnCount === 1 ? "assignment" : "assignments"})`;
+    statusTitle = `Workload Advisory (${warnCount} multi-service Sunday ${warnCount === 1 ? "assignment" : "assignments"})`;
     badgeHtml = `<span class="header-tag tag-amber" style="font-size: 0.75rem;">Check Load</span>`;
   }
 
   let issuesHtml = "";
   if (errCount > 0 || warnCount > 0) {
     issuesHtml = `<div class="health-issues-list">` +
-      analysis.errors.map(e => `<div class="health-issue-item issue-error"><span>🔴</span><span>${escapeHtml(e.message)}</span></div>`).join("") +
-      analysis.warnings.map(w => `<div class="health-issue-item issue-warn"><span>⚠️</span><span>${escapeHtml(w.message)}</span></div>`).join("") +
+      analysis.errors.map(e => `<div class="health-issue-item issue-error"><span class="status-dot-indicator dot-red"></span><span>${escapeHtml(e.message)}</span></div>`).join("") +
+      analysis.warnings.map(w => `<div class="health-issue-item issue-warn"><span class="status-dot-indicator dot-yellow"></span><span>${escapeHtml(w.message)}</span></div>`).join("") +
       `</div>`;
   }
 
@@ -2264,7 +2339,7 @@ function renderAdminScheduleHealth() {
   if (awayEntries.length > 0) {
     awayHtml = `
       <div class="health-away-strip">
-        <strong>🚫 Away this month:</strong>
+        <strong>${vIcon("ban", "v-icon-sm")} Away this month:</strong>
         ${awayEntries.map(a => `<span class="health-chip-away">${escapeHtml(a.member)} (${escapeHtml(a.dateLabel)})</span>`).join("")}
       </div>
     `;
@@ -2290,7 +2365,7 @@ function notifyIfSlotHasConflict(serviceType, rowIndex, field) {
     }));
 
   if (target) {
-    showToast(`${target.level === "error" ? "🔴 Conflict" : "⚠️ Notice"}: ${target.message}`);
+    showToast(`${target.level === "error" ? " Conflict" : "️ Notice"}: ${target.message}`);
     return true;
   }
   return false;
@@ -2366,7 +2441,7 @@ function undoLastScheduleChange() {
   initCalendarSelectors();
   saveState();
   renderAll();
-  showToast(`↩️ Undid: ${snap.label}`);
+  showToast(`Undid: ${snap.label}`);
 }
 
 function updateAdminUndoButton() {
@@ -2375,12 +2450,12 @@ function updateAdminUndoButton() {
   const stack = loadUndoStack();
   if (stack.length === 0) {
     btn.disabled = true;
-    btn.textContent = "↩️ Undo";
+    btn.innerHTML = `${vIcon("refresh", "v-icon-sm")} Undo`;
     btn.title = "No recent schedule changes to undo";
   } else {
     const top = stack[stack.length - 1];
     btn.disabled = false;
-    btn.textContent = `↩️ Undo (${stack.length})`;
+    btn.innerHTML = `${vIcon("refresh", "v-icon-sm")} Undo (${stack.length})`;
     btn.title = `Undo last change: ${top.label}`;
   }
 }
@@ -2577,9 +2652,9 @@ function autoFillMonthSchedule(overwriteAll = false) {
   saveState();
   renderAll();
   if (filledCount === 0 && skippedUnavailableCount === 0) {
-    showToast("✅ All slots are already filled! Use 'Smart Rotate Full Month' to re-balance everything.");
+    showToast("All slots are already filled! Use 'Smart Rotate Full Month' to re-balance everything.");
   } else {
-    showToast(`✨ ${overwriteAll ? "Rotated" : "Auto-filled"} ${filledCount} slots fairly (respecting roles & Away dates)!`);
+    showToast(`${overwriteAll ? "Rotated" : "Auto-filled"} ${filledCount} slots fairly (respecting roles & Away dates)!`);
   }
 }
 
@@ -2593,7 +2668,7 @@ function openAvailabilityModal(memberName) {
 
   if (select) {
     select.innerHTML = members.map(m =>
-      `<option value="${escapeHtml(m.name)}" ${m.name === preferred ? "selected" : ""}>👤 ${escapeHtml(m.name)} (${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)})</option>`
+      `<option value="${escapeHtml(m.name)}" ${m.name === preferred ? "selected" : ""}>${escapeHtml(m.name)} (${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)})</option>`
     ).join("");
   }
   currentAvailabilityMember = preferred;
@@ -2622,9 +2697,9 @@ function toggleModalAwayDate(dateStr) {
     normalizeScheduleDateKey(d.date) === normalizeScheduleDateKey(dateStr)
   );
   if (markedAway && dutiesOnDate.length > 0) {
-    showToast(`🚫 Marked Away on ${dateStr}. Note: you are scheduled (${dutiesOnDate[0].serviceShort}) — tap Swap / Absence to notify the team!`);
+    showToast(`Marked Away on ${dateStr}. Note: you are scheduled (${dutiesOnDate[0].serviceShort}) — tap Swap / Absence to notify the team!`);
   } else {
-    showToast(markedAway ? `🚫 Marked ${currentAvailabilityMember} Away on ${dateStr}` : `✅ ${currentAvailabilityMember} marked Available on ${dateStr}`);
+    showToast(markedAway ? `Marked ${currentAvailabilityMember} Away on ${dateStr}` : `${currentAvailabilityMember} marked Available on ${dateStr}`);
   }
 }
 
@@ -2688,9 +2763,9 @@ function renderAvailabilityModalContent() {
       return `
         <button type="button" class="avail-date-pill ${isAway ? "is-away" : ""} ${assignedDuty ? "has-duty" : ""}"
           onclick="toggleModalAwayDate('${escapeQuotes(item.label)}')">
-          <span class="avail-pill-date">${isAway ? "🚫" : "✅"} ${escapeHtml(item.label)}</span>
+          <span class="avail-pill-date">${isAway ? vIcon("ban", "v-icon-sm") : vIcon("check", "v-icon-sm")} ${escapeHtml(item.label)}</span>
           <span class="avail-pill-sub">${escapeHtml(tagStr)} &bull; ${isAway ? "Away (Tap to clear)" : "Available"}</span>
-          ${assignedDuty ? `<span class="avail-pill-duty-warn">📋 Scheduled: ${escapeHtml(assignedDuty.serviceShort)}</span>` : ""}
+          ${assignedDuty ? `<span class="avail-pill-duty-warn">${vIcon("calendar", "v-icon-sm")} Scheduled: ${escapeHtml(assignedDuty.serviceShort)}</span>` : ""}
         </button>
       `;
     }).join("");
@@ -2720,7 +2795,7 @@ function renderAll() {
   
   const pill = document.getElementById("autoDatePill");
   if (pill) {
-    pill.textContent = `📅 ${mName} ${appState.selectedYear}: ${sundaysCount} Sundays • ${fridaysCount} Fridays`;
+    pill.innerHTML = `${vIcon("calendar", "v-icon-sm")} ${mName} ${appState.selectedYear}: ${sundaysCount} Sundays &bull; ${fridaysCount} Fridays`;
   }
 
   // Render both public view and admin dropdowns
@@ -2775,11 +2850,11 @@ function getMemberOptions(selectedVal, serviceType, rowIndex, field) {
     const isSel = (m.name === selectedVal) ? "selected" : "";
     let hint = "";
     if (ctx.dateStr && isMemberUnavailableOnDate(m.name, ctx.dateStr)) {
-      hint = " (🚫 Away)";
+      hint = " [Away]";
     } else if (ctx.sameRowOtherNames.has(m.name)) {
-      hint = " (🔴 In this service)";
+      hint = " [In this service]";
     } else if (ctx.sameDateNames.has(m.name)) {
-      hint = " (⚠️ Busy on date)";
+      hint = " [Busy on date]";
     }
     html += `<option value="${m.name}" ${isSel}>${m.name}${hint}</option>`;
   });
@@ -2788,13 +2863,13 @@ function getMemberOptions(selectedVal, serviceType, rowIndex, field) {
   const memberNames = appState.members.map(m => m.name);
   if (selectedVal && selectedVal !== '__custom_pair__' && !memberNames.includes(selectedVal)) {
     html += `<optgroup label="Assigned Pair">`;
-    html += `<option value="${selectedVal}" selected>👥 ${selectedVal}</option>`;
+    html += `<option value="${selectedVal}" selected>${selectedVal}</option>`;
     html += `</optgroup>`;
   }
 
   // 3. Option to pair two persons on demand
   html += `<optgroup label="Combine">`;
-  html += `<option value="__custom_pair__">➕ Pair Two Persons...</option>`;
+  html += `<option value="__custom_pair__">+ Pair Two Persons...</option>`;
   html += `</optgroup>`;
 
   return html;
@@ -2972,9 +3047,9 @@ function toggleSpecialMeetingsVisibility() {
   renderAll();
 
   if (appState.specialMeetingsEnabled) {
-    showToast("🟢 Special Event Services are now VISIBLE on the public schedule!");
+    showToast("Special Event Services are now VISIBLE on the public schedule!");
   } else {
-    showToast("🔴 Special Event Services are now HIDDEN from the public schedule.");
+    showToast("Special Event Services are now HIDDEN from the public schedule.");
   }
 }
 
@@ -2987,20 +3062,20 @@ function renderSpecialMeetings() {
   if (statusBadge) {
     if (isEnabled) {
       statusBadge.className = "header-tag tag-emerald";
-      statusBadge.textContent = "🟢 Active & Visible on Public Schedule";
+      statusBadge.innerHTML = `<span class="status-dot-indicator dot-green"></span> Active & Visible on Public Schedule`;
     } else {
       statusBadge.className = "header-tag tag-amber";
-      statusBadge.textContent = "🔴 Inactive (Hidden on Public Schedule)";
+      statusBadge.innerHTML = `<span class="status-dot-indicator dot-red"></span> Inactive (Hidden on Public Schedule)`;
     }
   }
 
   if (toggleBtn) {
     if (isEnabled) {
       toggleBtn.className = "btn btn-secondary";
-      toggleBtn.textContent = "🚫 Turn OFF (Hide from Schedule)";
+      toggleBtn.innerHTML = `${vIcon("ban", "v-icon-sm")} Turn OFF (Hide from Schedule)`;
     } else {
       toggleBtn.className = "btn btn-primary";
-      toggleBtn.textContent = "👁️ Enable & Show on Schedule";
+      toggleBtn.innerHTML = `${vIcon("eye", "v-icon-sm")} Enable & Show on Schedule`;
     }
   }
 
@@ -3014,8 +3089,8 @@ function renderSpecialMeetings() {
     tr.innerHTML = `
       <td colspan="11" style="text-align: center; padding: 28px 16px; color: var(--text-muted); font-size: 0.88rem;">
         <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <span>✨ <strong>No Special Events in Roster</strong></span>
-          <span style="font-size: 0.78rem;">Click <strong>+ Custom Event</strong> to add any special meeting, or <strong>✨ Quick-Load Festival Template</strong> to load holiday presets.</span>
+          <span><strong>No Special Events in Roster</strong></span>
+          <span style="font-size: 0.78rem;">Click <strong>+ Custom Event</strong> to add any special meeting, or <strong>Quick-Load Festival Template</strong> to load holiday presets.</span>
         </div>
       </td>
     `;
@@ -3029,7 +3104,7 @@ function renderSpecialMeetings() {
     const curCat = (row.category || inferFestivalCategory(row.title)).toLowerCase();
     const catOptsHtml = categoryOptions.map(c => 
       `<option value="${escapeHtml(c.val)}" ${c.val.toLowerCase() === curCat ? 'selected' : ''}>${escapeHtml(c.label)}</option>`
-    ).join("") + `<option value="__ADD_NEW_CATEGORY__">➕ + Add Custom Category...</option>`;
+    ).join("") + `<option value="__ADD_NEW_CATEGORY__">+ Add Custom Category...</option>`;
 
     const tr = document.createElement("tr");
     tr.innerHTML = `
@@ -3128,7 +3203,7 @@ function removeSpecialMeeting(index) {
   renderAll();
   populateWhatsAppDateSelect();
   updateWhatsAppPreview();
-  showToast(`🗑️ "${removedTitle}" removed. (Tap Undo to restore)`);
+  showToast(`️ "${removedTitle}" removed. (Tap Undo to restore)`);
 }
 
 function clearAllSpecialMeetings() {
@@ -3143,7 +3218,7 @@ function clearAllSpecialMeetings() {
   renderAll();
   populateWhatsAppDateSelect();
   updateWhatsAppPreview();
-  showToast(`🗑️ Cleared all ${count} special event(s). (Tap Undo to restore)`);
+  showToast(`️ Cleared all ${count} special event(s). (Tap Undo to restore)`);
 }
 
 // 1-Click Festival Template Inserter
@@ -3158,16 +3233,16 @@ function openFestivalTemplateModal() {
       <div class="festival-preset-card">
         <div class="preset-card-top">
           <span class="festival-badge ${meta.badgeClass}">${meta.icon} ${tpl.badgeText || meta.label}</span>
-          <span class="preset-date-chip">📅 ${escapeHtml(tpl.date)}</span>
+          <span class="preset-date-chip">${vIcon("calendar", "v-icon-sm")} ${escapeHtml(tpl.date)}</span>
         </div>
         <h4 class="preset-title">${escapeHtml(tpl.title)}</h4>
         <div class="preset-meta-row">
-          <span>⏰ <strong>Service:</strong> ${escapeHtml(tpl.time)}</span>
-          <span>🔔 <strong>Call:</strong> ${escapeHtml(tpl.callTime)}</span>
+          <span>${vIcon("clock", "v-icon-sm")} <strong>Service:</strong> ${escapeHtml(tpl.time)}</span>
+          <span>${vIcon("bell", "v-icon-sm")} <strong>Prayer:</strong> ${escapeHtml(tpl.callTime)}</span>
         </div>
         <p class="preset-notes">${escapeHtml(tpl.notes || '')}</p>
         <button type="button" class="btn btn-primary btn-sm preset-insert-btn" onclick="addFestivalFromTemplate(${idx})">
-          ➕ Insert into Roster
+          ${vIcon("plus", "v-icon-sm")} Insert into Roster
         </button>
       </div>
     `;
@@ -3213,13 +3288,13 @@ function addFestivalFromTemplate(idx) {
   populateWhatsAppDateSelect();
   updateWhatsAppPreview();
   closeFestivalTemplateModal();
-  showToast(`🎉 Added "${tpl.title}" to Festival Roster!`);
+  showToast(`Added "${tpl.title}" to Festival Roster!`);
 }
 
 function copyFestivalRosterWhatsApp() {
   const events = appState.specialMeetings || [];
   if (events.length === 0) {
-    showToast("ℹ️ No festival or special events scheduled yet.");
+    showToast("No festival or special events scheduled yet.");
     return;
   }
   let text = `🕊️ *FULL LIFE CENTRE AG CHURCH (FLAG)*\n`;
@@ -3243,21 +3318,21 @@ function copyFestivalRosterWhatsApp() {
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(() => {
-      showToast("📋 Festival Roster copied for WhatsApp!");
+      showToast("Festival Roster copied for WhatsApp!");
     }).catch(() => {
       fallbackCopyText(text);
-      showToast("📋 Festival Roster copied!");
+      showToast("Festival Roster copied!");
     });
   } else {
     fallbackCopyText(text);
-    showToast("📋 Festival Roster copied!");
+    showToast("Festival Roster copied!");
   }
 }
 
 function exportFestivalCalendar() {
   const events = appState.specialMeetings || [];
   if (events.length === 0) {
-    showToast("ℹ️ No festival events to export.");
+    showToast("No festival events to export.");
     return;
   }
   const nowStamp = formatIcsStampNow();
@@ -3265,7 +3340,7 @@ function exportFestivalCalendar() {
   events.forEach((r, idx) => {
     const dutyFake = {
       date: r.date,
-      service: `🌟 ${r.title || 'Festival Service'}`,
+      service: `${r.title || 'Festival Service'}`,
       role: 'Media Ministry Crew',
       callTime: r.callTime || (r.time ? r.time.split('-')[0].trim() : '06:00 PM'),
       serviceEnd: r.time && r.time.includes('-') ? r.time.split('-')[1].trim() : '',
@@ -3295,7 +3370,7 @@ function exportFestivalCalendar() {
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 2000);
-  showToast("📅 Festival Calendar (.ics) downloaded!");
+  showToast("Festival Calendar (.ics) downloaded!");
 }
 
 // ================= RENDER EARLY MORNING PRAYER (SEASONAL: MON - SAT) =================
@@ -3320,20 +3395,20 @@ function renderMorningPrayer() {
   if (statusBadge) {
     if (isEnabled) {
       statusBadge.className = "header-tag tag-emerald";
-      statusBadge.textContent = "🟢 Active & Visible on Public Schedule";
+      statusBadge.innerHTML = `<span class="status-dot-indicator dot-green"></span> Active & Visible on Public Schedule`;
     } else {
       statusBadge.className = "header-tag tag-amber";
-      statusBadge.textContent = "🔴 Inactive (Hidden on Public Schedule)";
+      statusBadge.innerHTML = `<span class="status-dot-indicator dot-red"></span> Inactive (Hidden on Public Schedule)`;
     }
   }
 
   if (toggleBtn) {
     if (isEnabled) {
       toggleBtn.className = "btn btn-secondary";
-      toggleBtn.textContent = "🚫 Turn OFF (Hide from Schedule)";
+      toggleBtn.innerHTML = `${vIcon("ban", "v-icon-sm")} Turn OFF (Hide from Schedule)`;
     } else {
       toggleBtn.className = "btn btn-primary";
-      toggleBtn.textContent = "👁️ Enable & Show on Schedule";
+      toggleBtn.innerHTML = `${vIcon("eye", "v-icon-sm")} Enable & Show on Schedule`;
     }
   }
 
@@ -3342,7 +3417,7 @@ function renderMorningPrayer() {
   }
   const publicTitle = document.getElementById("publicMorningPrayerTitle");
   if (publicTitle && appState.morningPrayer.title) {
-    publicTitle.textContent = "🌅 " + appState.morningPrayer.title;
+    publicTitle.innerHTML = `${vIcon("sun", "v-icon-sm")} ${escapeHtml(appState.morningPrayer.title)}`;
   }
 
   const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -3404,9 +3479,9 @@ function toggleMorningPrayerVisibility() {
   renderAll();
 
   if (appState.morningPrayer.enabled) {
-    showToast("🟢 Early Morning Prayer is now VISIBLE on the public schedule!");
+    showToast("Early Morning Prayer is now VISIBLE on the public schedule!");
   } else {
-    showToast("🔴 Early Morning Prayer is now HIDDEN from the public schedule.");
+    showToast("Early Morning Prayer is now HIDDEN from the public schedule.");
   }
 }
 
@@ -3415,7 +3490,7 @@ function updateMorningTitle(val) {
   appState.morningPrayer.title = val;
   const publicMorningTitleEl = document.getElementById("publicMorningPrayerTitle");
   if (publicMorningTitleEl) {
-    publicMorningTitleEl.textContent = `🌅 ${val || "Early Morning Prayer"}`;
+    publicMorningTitleEl.innerHTML = `${vIcon("sun", "v-icon-sm")} ${escapeHtml(val || "Early Morning Prayer")}`;
   }
   saveState();
   updateWhatsAppPreview();
@@ -3427,7 +3502,7 @@ function setMorningPrayerCampaign(name) {
   const titleInput = document.getElementById("morningPrayerTitle");
   if (titleInput) titleInput.value = name;
   const publicTitle = document.getElementById("publicMorningPrayerTitle");
-  if (publicTitle) publicTitle.textContent = "🌅 " + name;
+  if (publicTitle) publicTitle.innerHTML = `${vIcon("sun", "v-icon-sm")} ${escapeHtml(name)}`;
 
   saveState();
   updateWhatsAppPreview();
@@ -3679,13 +3754,13 @@ function renderMembers() {
         <div class="member-info" style="min-width: 0; flex: 1;">
           <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
             <h4 style="margin: 0;">${escapeHtml(m.name)}</h4>
-            ${isLeader ? `<span class="team-leader-tag-pill">👑 Team Leader</span>` : ""}
+            ${isLeader ? `<span class="team-leader-tag-pill">${vIcon("crown", "v-icon-sm")} Team Leader</span>` : ""}
           </div>
           <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">${escapeHtml(m.role || DEFAULT_MEMBER_ROLE)}</div>
           <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 5px;">
             ${m.phone ? `
               <span class="member-phone-pill">
-                📱 ${escapeHtml(m.phone)}
+                ${vIcon("smartphone", "v-icon-sm")} ${escapeHtml(m.phone)}
               </span>
             ` : ''}
             <span class="header-tag ${shiftBadgeClass}" style="font-size: 0.7rem; padding: 2px 8px; display: inline-block; white-space: nowrap;">
@@ -3696,10 +3771,10 @@ function renderMembers() {
       </div>
       <div class="member-card-actions">
         <button class="btn-icon-leader${isLeader ? ' active' : ''}" onclick="setTeamLeaderByName('${escapeQuotes(m.name)}')" title="${isLeader ? 'Active Team Leader' : 'Set ' + escapeQuotes(m.name) + ' as Team Leader'}">
-          <span>👑</span><span>${isLeader ? 'Team Leader' : 'Set Leader'}</span>
+          <span>${vIcon("crown", "v-icon-sm")}</span><span>${isLeader ? 'Team Leader' : 'Set Leader'}</span>
         </button>
         <button class="btn-icon-wa" onclick="openDirectReminderModal('${escapeQuotes(m.name)}')" title="Send WhatsApp Duty Reminder">
-          💬
+          ${vIcon("whatsapp", "v-icon-sm")}
         </button>
         <button class="btn-icon-edit" onclick="openEditMemberModal(${idx})" title="Edit Name & Role">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
@@ -3804,7 +3879,7 @@ function renderPublicTeamDirectory() {
   if (filtered.length === 0) {
     container.innerHTML = `
       <div style="grid-column: 1 / -1; text-align: center; padding: 40px 16px; background: rgba(15, 23, 42, 0.4); border-radius: 12px; color: var(--text-muted);">
-        <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🔍</span>
+        <div style="font-size: 1.8rem; margin-bottom: 8px; color: var(--text-muted);">${vIcon("search", "v-icon-xl")}</div>
         <strong style="font-size: 1rem;">No team members found</strong>
         <p style="font-size: 0.82rem; margin-top: 4px;">Try searching for another name or clearing the skill filter.</p>
       </div>
@@ -3875,7 +3950,7 @@ function renderPublicTeamDirectory() {
               <span class="team-role-pill" title="${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}">
                 ${escapeQuotes(m.role || DEFAULT_MEMBER_ROLE)}
               </span>
-              ${isLeader ? `<span class="team-leader-crown-pill">👑 Team Leader</span>` : ''}
+              ${isLeader ? `<span class="team-leader-crown-pill">${vIcon("crown", "v-icon-sm")} Team Leader</span>` : ''}
             </div>
           </div>
         </div>
@@ -3891,7 +3966,7 @@ function renderPublicTeamDirectory() {
             <div class="team-detail-row">
               <span class="team-detail-label">Contact</span>
               <span class="team-phone-value">
-                📱 ${escapeHtml(m.phone)}
+                ${vIcon("smartphone", "v-icon-sm")} ${escapeHtml(m.phone)}
               </span>
             </div>
           ` : ''}
@@ -3899,15 +3974,15 @@ function renderPublicTeamDirectory() {
 
         <div class="team-card-actions">
           <button class="btn btn-secondary btn-sm" style="flex: 1; justify-content: center;" onclick="selectVolunteerForSchedule('${escapeQuotes(rawName)}')">
-            👤 View Duties
+            ${vIcon("calendar", "v-icon-sm")} View Duties
           </button>
           ${intlDigits ? `
             <a href="tel:+${intlDigits}" class="btn btn-secondary btn-sm" style="text-decoration: none; padding: 6px 11px; gap: 4px;" title="Call ${escapeQuotes(rawName)} directly">
-              📞 Call
+              ${vIcon("phone", "v-icon-sm")} Call
             </a>
           ` : ''}
           <a href="${waUrl}" target="_blank" rel="noopener" class="btn btn-whatsapp btn-sm" style="text-decoration: none; gap: 5px;" title="Open WhatsApp Chat with pre-filled message for ${escapeQuotes(rawName)}">
-            💬 WhatsApp
+            ${vIcon("whatsapp", "v-icon-sm")} WhatsApp
           </a>
         </div>
       </div>
@@ -4333,7 +4408,7 @@ function requireChecklistActorThen(actionFn) {
     const memberNames = (appState.members || []).map(m => m.name).sort((a, b) => a.localeCompare(b));
     grid.innerHTML = memberNames.map(name => `
       <button type="button" class="btn actor-pick-btn" onclick="selectActorAndContinue('${escapeQuotes(name)}')">
-        👤 ${escapeHtml(name)}
+        ${vIcon("user", "v-icon-sm")} ${escapeHtml(name)}
       </button>
     `).join("");
   }
@@ -4431,9 +4506,9 @@ function toggleCategoryChecklistDone(clId) {
     const cleanTitle = cl.title.replace(/^\d+\.\s*/, '');
     if (newStatus) {
       const actor = getActiveChecklistActor();
-      showToast(`✅ "${cleanTitle}" marked complete by ${actor}!`);
+      showToast(`"${cleanTitle}" marked complete by ${actor}!`);
     } else {
-      showToast(`⏳ "${cleanTitle}" reopened & synced live!`);
+      showToast(`"${cleanTitle}" reopened & synced live!`);
     }
   };
 
@@ -4490,7 +4565,7 @@ function renderChecklists() {
   // 2. Update Public Weekly Banner DOM elements
   const bannerTitle = document.getElementById("activeWeekBannerTitle");
   if (bannerTitle) {
-    bannerTitle.textContent = `📋 Saturday Preparation Checklist – Sunday Service (${activeWeekObj.label})`;
+    bannerTitle.innerHTML = `${vIcon("clipboard", "v-icon-sm")} Saturday Preparation Checklist &ndash; Sunday Service (${escapeHtml(activeWeekObj.label)})`;
   }
 
   const liveBadgeText = document.getElementById("weekLiveBadgeText");
@@ -4500,7 +4575,7 @@ function renderChecklists() {
 
   const bannerSub = document.getElementById("activeWeekBannerSub");
   if (bannerSub) {
-    bannerSub.textContent = `FLAG Media Team – Saturday Preparation Checklist for Sunday Service (${activeWeekObj.label}). Any team member can complete and update tasks once done. 🙌`;
+    bannerSub.textContent = `FLAG Media Team – Saturday Preparation Checklist for Sunday Service (${activeWeekObj.label}). Any team member can complete and update tasks once done.`;
   }
 
   const weekProgText = document.getElementById("weekProgressText");
@@ -4527,15 +4602,15 @@ function renderChecklists() {
   const catGrid = document.getElementById("categoryReadinessGrid");
   if (catGrid && appState.checklists) {
     const catIcons = {
-      "cam-maint": "📷",
-      "sys-equip": "💻",
-      "charge-batt": "🔋",
-      "live-proc": "🎬",
-      "outside-tv": "📺"
+      "cam-maint": vIcon("camera", "v-icon-sm"),
+      "sys-equip": vIcon("monitor", "v-icon-sm"),
+      "charge-batt": vIcon("battery", "v-icon-sm"),
+      "live-proc": vIcon("video", "v-icon-sm"),
+      "outside-tv": vIcon("monitor", "v-icon-sm")
     };
 
     catGrid.innerHTML = appState.checklists.map(cl => {
-      const icon = catIcons[cl.id] || "📋";
+      const icon = catIcons[cl.id] || vIcon("clipboard", "v-icon-sm");
       const total = cl.items ? cl.items.length : 0;
       let completed = 0;
       const checkersSet = new Set();
@@ -4557,7 +4632,7 @@ function renderChecklists() {
             <div class="cat-icon-chip">${icon}</div>
             <div style="flex: 1; min-width: 0;">
               <h4 class="cat-card-title">${escapeHtml(cl.title)}</h4>
-              ${checkersList.length ? `<div class="cat-checked-by">👤 ${escapeHtml(checkersList.join(", "))}</div>` : ''}
+              ${checkersList.length ? `<div class="cat-checked-by">${vIcon("user", "v-icon-sm")} ${escapeHtml(checkersList.join(", "))}</div>` : ''}
             </div>
             <span class="cat-status-badge ${allDone ? 'badge-complete' : 'badge-pending'}">
               ${completed}/${total}
@@ -4571,7 +4646,7 @@ function renderChecklists() {
           <div class="cat-card-footer">
             <span class="cat-pct-label">${catPct}% Done</span>
             <button type="button" class="btn-cat-action ${allDone ? 'btn-reopen' : 'btn-mark-done'}" onclick="event.stopPropagation(); toggleCategoryChecklistDone('${cl.id}')" title="${allDone ? 'Click to reopen this section' : '1-Tap to mark all ' + total + ' tasks complete'}">
-              ${allDone ? '↩️ Reopen' : '✅ Mark Done'}
+              ${allDone ? `${vIcon('refresh', 'v-icon-sm')} Reopen` : `${vIcon('check', 'v-icon-sm')} Mark Done`}
             </button>
           </div>
         </div>
@@ -4586,7 +4661,7 @@ function renderChecklists() {
     weeks.forEach(w => {
       const opt = document.createElement("option");
       opt.value = w.date;
-      opt.textContent = `${w.label} ${w.date === activeDate ? '★ (Active)' : ''}`;
+      opt.textContent = `${w.label} ${w.date === activeDate ? "(Active)" : ""}`;
       if (w.date === activeDate) opt.selected = true;
       adminSelect.appendChild(opt);
     });
@@ -4629,7 +4704,7 @@ function renderChecklists() {
         const meta = checkMeta[item.id];
         const metaBadgeHtml = isDone
           ? (meta && meta.by
-              ? `<span class="task-checked-meta">👤 Checked by <strong>${escapeHtml(meta.by)}</strong>${meta.at ? ` • ${escapeHtml(meta.at)}` : ''}</span>`
+              ? `<span class="task-checked-meta">${vIcon("user", "v-icon-sm")} Checked by <strong>${escapeHtml(meta.by)}</strong>${meta.at ? ` &bull; ${escapeHtml(meta.at)}` : ''}</span>`
               : `<span class="task-checked-meta task-checked-meta-muted">✓ Completed</span>`)
           : '';
 
@@ -4649,7 +4724,7 @@ function renderChecklists() {
 
       if (visibleItemCount === 0) {
         if (filterMode === "pending") {
-          taskHtml = `<p style="font-size: 0.82rem; color: #10b981; padding: 8px 4px; font-weight: 700;">🎉 All tasks completed in this section!</p>`;
+          taskHtml = `<p style="font-size: 0.82rem; color: #10b981; padding: 8px 4px; font-weight: 700;">${vIcon("checkCircle", "v-icon-sm")} All tasks completed in this section!</p>`;
         } else if (filterMode === "done") {
           taskHtml = `<p style="font-size: 0.82rem; color: #94a3b8; padding: 8px 4px;">No tasks completed yet in this section.</p>`;
         }
@@ -4661,11 +4736,11 @@ function renderChecklists() {
         <div class="checklist-header">
           <div>
             <h3 class="checklist-title">${cl.title}</h3>
-            ${sectionCheckers.length ? `<div class="cat-checked-by-pill">👤 Checked by: <strong>${escapeHtml(sectionCheckers.join(", "))}</strong></div>` : ''}
+            ${sectionCheckers.length ? `<div class="cat-checked-by-pill">${vIcon("user", "v-icon-sm")} Checked by: <strong>${escapeHtml(sectionCheckers.join(", "))}</strong></div>` : ''}
           </div>
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <button type="button" class="btn-cat-complete ${allDone ? 'is-complete' : ''}" onclick="toggleCategoryChecklistDone('${cl.id}')" title="${allDone ? 'Click to reopen section' : '1-Tap to mark all ' + total + ' tasks complete'}">
-              ${allDone ? '✅ Complete (Undo)' : '⚡ Mark Section Complete'}
+              ${allDone ? `${vIcon('checkCircle', 'v-icon-sm')} Complete (Undo)` : `${vIcon('check', 'v-icon-sm')} Mark Section Complete`}
             </button>
             <span class="call-time-badge">${completed}/${total}</span>
             ${isAdmin ? `
@@ -4724,9 +4799,9 @@ function toggleCheckItem(clId, itemId) {
     applyChecklistItemStates(viewDate, { [itemId]: nextStatus });
     if (nextStatus) {
       const actor = getActiveChecklistActor();
-      showToast(`✅ Checked by ${actor} & synced live to all crew!`);
+      showToast(`Checked by ${actor} & synced live to all crew!`);
     } else {
-      showToast("⏳ Task marked pending & synced live!");
+      showToast("Task marked pending & synced live!");
     }
   };
 
@@ -4801,7 +4876,7 @@ function shareChecklistStatusWhatsApp() {
     const catDone = items.filter(i => !!checks[i.id]).length;
     total += items.length;
     done += catDone;
-    const icon = (items.length > 0 && catDone === items.length) ? "✅" : "⏳";
+    const icon = (items.length > 0 && catDone === items.length) ? "✓" : "•";
     const pendingList = items.filter(i => !checks[i.id]).map(i => `   • Pending: ${i.text}`);
     const lastBy = items.map(i => meta[i.id]?.by).filter(Boolean).pop();
     const headerLine = `${icon} *${cl.title}* (${catDone}/${items.length})${lastBy ? ` — _by ${lastBy}_` : ''}`;
@@ -4820,7 +4895,7 @@ function shareChecklistStatusWhatsApp() {
     `_Updated via FLAG Media Portal_ 🙌`;
 
   navigator.clipboard.writeText(msg).then(() => {
-    showToast("📋 Checklist report copied! Opening WhatsApp...");
+    showToast("Checklist report copied! Opening WhatsApp...");
   }).catch(() => {
     copyFallback(msg);
   });
@@ -4945,7 +5020,7 @@ function populateWhatsAppDateSelect() {
     });
   } else if (dayType === "special") {
     if (appState.specialMeetingsEnabled === false) {
-      dateSelect.innerHTML = `<option value="">⚠️ Special Event Services Inactive (Hidden)</option>`;
+      dateSelect.innerHTML = `<option value="">Special Event Services Inactive (Hidden)</option>`;
     } else {
       (appState.specialMeetings || []).forEach(r => {
         const catMeta = getFestivalCategoryMeta(r.category || inferFestivalCategory(r.title));
@@ -5089,7 +5164,7 @@ function generateWhatsAppText() {
     return text;
   } else if (dayType === "special") {
     if (appState.specialMeetingsEnabled === false) {
-      return "⚠️ Special Event Services schedule is currently inactive.\nYou can turn it ON anytime from the Admin Console.";
+      return "Special Event Services schedule is currently inactive.\nYou can turn it ON anytime from the Admin Console.";
     }
     // Special Meeting
     const spec = (appState.specialMeetings || []).find(r => (r.title + " - " + r.date) === selectedDate || r.title === selectedDate || r.date === selectedDate) || {};
@@ -5120,7 +5195,7 @@ function generateWhatsAppText() {
   } else if (dayType === "morning") {
     // Early Morning Prayer
     if (!appState.morningPrayer || !appState.morningPrayer.enabled) {
-      return "⚠️ Early Morning Prayer schedule is currently inactive.\nYou can turn it ON anytime from the Admin Console.";
+      return "Early Morning Prayer schedule is currently inactive.\nYou can turn it ON anytime from the Admin Console.";
     }
     const campaignTitle = (appState.morningPrayer && appState.morningPrayer.title) ? appState.morningPrayer.title : "Early Morning Prayer";
     const dayRow = (appState.morningPrayer && appState.morningPrayer.days ? appState.morningPrayer.days.find(r => r.day === selectedDate) : {}) || {};
@@ -5170,10 +5245,10 @@ function toggleWhatsAppPreview() {
   if (!drawer) return;
   if (drawer.style.display === "none" || drawer.style.display === "") {
     drawer.style.display = "block";
-    if (btn) btn.innerHTML = "🙈 Hide";
+    if (btn) btn.innerHTML = `${vIcon("eyeOff", "v-icon-sm")} Hide`;
   } else {
     drawer.style.display = "none";
-    if (btn) btn.innerHTML = "👁️ Preview";
+    if (btn) btn.innerHTML = `${vIcon("eye", "v-icon-sm")} Preview`;
   }
 }
 
@@ -5247,7 +5322,7 @@ function openSaturdayAlertModal() {
     const nextSunday = getNextUpcomingSundayDate();
     dateSelect.innerHTML = (appState.firstService || []).map(r => `
       <option value="${r.date}" ${r.date === nextSunday ? 'selected' : ''}>
-        📅 Sunday, ${r.date} ${r.date === nextSunday ? '★ (Next Service)' : ''}
+        Sunday, ${r.date} ${r.date === nextSunday ? "(Next Service)" : ""}
       </option>
     `).join('');
   }
@@ -5274,10 +5349,10 @@ function copySaturdayAlertText() {
   const preview = document.getElementById("saturdayAlertPreview");
   if (!preview) return;
   navigator.clipboard.writeText(preview.textContent).then(() => {
-    showToast("📋 Saturday reminder broadcast copied to clipboard!");
+    showToast("Saturday reminder broadcast copied to clipboard!");
   }).catch(() => {
     copyFallback(preview.textContent);
-    showToast("📋 Saturday reminder broadcast copied!");
+    showToast("Saturday reminder broadcast copied!");
   });
 }
 
@@ -5336,7 +5411,8 @@ function showToast(msg) {
   const toast = document.getElementById("toast");
   const msgEl = document.getElementById("toastMsg");
   if (!toast || !msgEl) return;
-  msgEl.textContent = msg;
+  const cleanMsg = String(msg || "").replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1FA00}-\u{1FAFF}]/gu, "").replace(/\s{2,}/g, " ").trim();
+  msgEl.textContent = cleanMsg;
   toast.classList.add("show");
 
   setTimeout(() => {
@@ -5390,12 +5466,12 @@ function getVolunteerDuties(name) {
   // 1st Service
   (appState.firstService || []).forEach(r => {
     const rolesMap = [
-      { key: 'cam1', label: '🎥 1st Camera' },
-      { key: 'cam2', label: '📹 2nd Camera' },
-      { key: 'gimble', label: '🎯 Gimble Operator' },
-      { key: 'live', label: '💻 Live in System' },
-      { key: 'spot', label: '✂️ Spot Editing' },
-      { key: 'charging', label: '🔋 Camera & Battery Charging' }
+      { key: 'cam1', label: '1st Camera' },
+      { key: 'cam2', label: '2nd Camera' },
+      { key: 'gimble', label: 'Gimble Operator' },
+      { key: 'live', label: 'Live in System' },
+      { key: 'spot', label: 'Spot Editing' },
+      { key: 'charging', label: 'Camera & Battery Charging' }
     ];
     rolesMap.forEach(rm => {
       if (matches(r[rm.key])) {
@@ -5427,7 +5503,7 @@ function getVolunteerDuties(name) {
         service: '2nd Service (08:30 AM – 10:30 AM)',
         serviceShort: '2nd Service',
         serviceType: 'secondService',
-        role: '🎥 Camera & Live System',
+        role: 'Camera & Live System',
         rawRole: 'operator',
         assignedText: r.operator,
         callTime: '08:00 AM',
@@ -5447,7 +5523,7 @@ function getVolunteerDuties(name) {
         service: '3rd Service (11:00 AM – 01:00 PM)',
         serviceShort: '3rd Service',
         serviceType: 'thirdService',
-        role: '🎥 Camera & Live System',
+        role: 'Camera & Live System',
         rawRole: 'operator',
         assignedText: r.operator,
         callTime: '10:30 AM',
@@ -5467,7 +5543,7 @@ function getVolunteerDuties(name) {
         service: 'Friday Fasting Prayer',
         serviceShort: 'Friday Prayer',
         serviceType: 'fridayPrayer',
-        role: '🎥 Camera Operator',
+        role: 'Camera Operator',
         rawRole: 'cam1',
         assignedText: r.cam1,
         callTime: '09:30 AM',
@@ -5483,7 +5559,7 @@ function getVolunteerDuties(name) {
         service: 'Friday Fasting Prayer',
         serviceShort: 'Friday Prayer',
         serviceType: 'fridayPrayer',
-        role: '💻 Live System',
+        role: 'Live System',
         rawRole: 'live',
         assignedText: r.live,
         callTime: '09:30 AM',
@@ -5499,11 +5575,11 @@ function getVolunteerDuties(name) {
   if (appState.specialMeetingsEnabled !== false) {
     (appState.specialMeetings || []).forEach(r => {
       const rolesMap = [
-        { key: 'cam1', label: '🎥 1st Camera' },
-        { key: 'cam2', label: '📹 2nd Camera' },
-        { key: 'gimble', label: '🎯 Gimble Operator' },
-        { key: 'live', label: '💻 Live in System' },
-        { key: 'spot', label: '✂️ Spot Editing' }
+        { key: 'cam1', label: '1st Camera' },
+        { key: 'cam2', label: '2nd Camera' },
+        { key: 'gimble', label: 'Gimble Operator' },
+        { key: 'live', label: 'Live in System' },
+        { key: 'spot', label: 'Spot Editing' }
       ];
       const cat = r.category || inferFestivalCategory(r.title);
       const catMeta = getFestivalCategoryMeta(cat);
@@ -5549,18 +5625,18 @@ function getVolunteerDuties(name) {
   // Early Morning Prayer (if seasonal schedule is active)
   if (appState.morningPrayer && appState.morningPrayer.enabled && appState.morningPrayer.days) {
     const rolesMap = [
-      { key: 'cam1', label: '🎥 1st Camera' },
-      { key: 'cam2', label: '📹 2nd Camera' },
-      { key: 'gimbal', label: '🎯 Gimbal Operator' },
-      { key: 'liveEditor', label: '💻 Live in System' },
-      { key: 'socialMedia', label: '📱 Social Media & Spot' }
+      { key: 'cam1', label: '1st Camera' },
+      { key: 'cam2', label: '2nd Camera' },
+      { key: 'gimbal', label: 'Gimbal Operator' },
+      { key: 'liveEditor', label: 'Live in System' },
+      { key: 'socialMedia', label: 'Social Media & Spot' }
     ];
     appState.morningPrayer.days.forEach(r => {
       rolesMap.forEach(rm => {
         if (matches(r[rm.key])) {
           duties.push({
             date: r.day,
-            service: `🌅 ${appState.morningPrayer.title || 'Morning Prayer'}`,
+            service: `${appState.morningPrayer.title || 'Morning Prayer'}`,
             serviceShort: 'Morning Prayer',
             serviceType: 'morningPrayer',
             role: rm.label,
@@ -5580,7 +5656,7 @@ function getVolunteerDuties(name) {
   return duties;
 }
 
-// ================= FEATURE 1: 👤 MY SERVING SCHEDULE PERSONAL FILTER =================
+// ================= FEATURE 1: MY SERVING SCHEDULE PERSONAL FILTER =================
 window.currentVolunteerFilter = "";
 
 function initVolunteerFilter() {
@@ -5600,7 +5676,7 @@ function initVolunteerFilter() {
     return html;
   };
 
-  if (select) select.innerHTML = buildOptions("👤 Select Your Name...");
+  if (select) select.innerHTML = buildOptions("Select Your Name...");
   if (actorSelect) actorSelect.innerHTML = buildOptions("Tap to pick your name...");
 }
 
@@ -5678,7 +5754,7 @@ function renderVolunteerPersonalBox(name, duties) {
   if (dutyCount === 0) {
     dutiesHtml = `
       <div style="padding: 16px; text-align: center; color: #94a3b8; background: rgba(15, 23, 42, 0.5); border-radius: 8px; margin-top: 14px; border: 1px dashed rgba(255,255,255,0.15);">
-        ℹ️ No duties scheduled for <strong>${escapeHtml(name)}</strong> in ${escapeHtml(appState.month || 'this month')}.
+        ${vIcon("info", "v-icon-sm")} No duties scheduled for <strong>${escapeHtml(name)}</strong> in ${escapeHtml(appState.month || 'this month')}.
       </div>
     `;
   } else {
@@ -5688,20 +5764,20 @@ function renderVolunteerPersonalBox(name, duties) {
           const isAwayDuty = isMemberUnavailableOnDate(memberObj.name, d.date);
           return `
           <div class="volunteer-duty-item">
-            <span class="duty-badge-time">⏰ Call: ${escapeHtml(d.callTime)} | Service: ${escapeHtml(d.serviceStart)}${d.serviceEnd && d.serviceEnd !== 'TBD' ? ' – ' + escapeHtml(d.serviceEnd) : ''}</span>
-            <div class="duty-date">📅 ${escapeHtml(d.date)} ${isAwayDuty ? '<span class="roster-away-flag">🚫 Marked Away</span>' : ''}</div>
+            <span class="duty-badge-time">${vIcon("clock", "v-icon-sm")} Prayer: ${escapeHtml(d.callTime)} | Service: ${escapeHtml(d.serviceStart)}${d.serviceEnd && d.serviceEnd !== 'TBD' ? ' – ' + escapeHtml(d.serviceEnd) : ''}</span>
+            <div class="duty-date">${vIcon("calendar", "v-icon-sm")} ${escapeHtml(d.date)} ${isAwayDuty ? `<span class="roster-away-flag">${vIcon("ban", "v-icon-sm")} Marked Away</span>` : ''}</div>
             <div class="duty-service">${escapeHtml(d.service)}</div>
             <div class="duty-role">${escapeHtml(d.role)}</div>
-            ${d.assignedText && d.assignedText.includes('&') ? `<div style="font-size: 0.76rem; opacity: 0.85; margin-top: 2px;">👥 Paired with: <strong>${escapeHtml(d.assignedText)}</strong></div>` : ''}
+            ${d.assignedText && d.assignedText.includes('&') ? `<div style="font-size: 0.76rem; opacity: 0.85; margin-top: 2px;">Paired with: <strong>${escapeHtml(d.assignedText)}</strong></div>` : ''}
             <div class="duty-actions-strip">
               <button type="button" class="btn-duty-action" onclick="addSingleDutyToGoogleCalendar('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Open this shift directly in Google Calendar">
-                📅 Google Cal
+                ${vIcon("calendar", "v-icon-sm")} Google Cal
               </button>
               <button type="button" class="btn-duty-action" onclick="downloadSingleDutyIcs('${escapeQuotes(d.date)}', '${escapeQuotes(d.service)}', '${escapeQuotes(d.role)}', '${escapeQuotes(d.callTime)}', '${escapeQuotes(d.prayerTime || '')}', '${escapeQuotes(memberObj.name)}', '${escapeQuotes(d.serviceEnd || '')}')" title="Add shift to Phone Calendar & reminders">
-                📱 Phone Cal
+                ${vIcon("smartphone", "v-icon-sm")} Phone Cal
               </button>
               <button type="button" class="btn-duty-action btn-duty-swap" onclick="openSwapForSpecificDuty('${escapeQuotes(memberObj.name)}', ${dIdx})" title="Request a swap or report absence for this specific shift">
-                🔄 Swap / Absent
+                ${vIcon("refresh", "v-icon-sm")} Swap / Absent
               </button>
             </div>
           </div>
@@ -5713,7 +5789,7 @@ function renderVolunteerPersonalBox(name, duties) {
 
   const awayStripHtml = awayInMonth.length > 0 ? `
     <div class="personal-away-strip">
-      <span>🚫 <strong>Marked Away (${awayInMonth.length}):</strong> ${awayInMonth.map(d => escapeHtml(d)).join(', ')}</span>
+      <span>${vIcon("ban", "v-icon-sm")} <strong>Marked Away (${awayInMonth.length}):</strong> ${awayInMonth.map(d => escapeHtml(d)).join(', ')}</span>
       <button type="button" class="btn-remember-switch" onclick="openAvailabilityModal('${escapeQuotes(memberObj.name)}')">Edit Away Dates</button>
     </div>
   ` : '';
@@ -5721,34 +5797,34 @@ function renderVolunteerPersonalBox(name, duties) {
   box.innerHTML = `
     <div class="volunteer-summary-header">
       <div class="volunteer-greeting">
-        <div class="greeting-avatar">👤</div>
+        <div class="greeting-avatar">${vIcon("user", "v-icon-lg")}</div>
         <div>
           <h3 class="greeting-title">Hello, <span class="highlight-name">${escapeHtml(memberObj.name)}</span></h3>
           <p class="greeting-sub">
             <span class="header-tag tag-purple" style="font-size: 0.74rem; padding: 2px 7px;">${escapeHtml(memberObj.role || DEFAULT_MEMBER_ROLE)}</span>
-            • 🎯 <strong>${dutyCount}</strong> ${dutyCount === 1 ? 'duty' : 'duties'} scheduled this month
+            • <strong>${dutyCount}</strong> ${dutyCount === 1 ? 'duty' : 'duties'} scheduled this month
           </p>
           <div class="device-remember-pill" title="Saved on your device for instant access">
-            <span>📌 Saved on this device</span>
+            <span>Saved on this device</span>
             <button type="button" class="btn-remember-switch" onclick="clearVolunteerFilter()">Switch</button>
           </div>
         </div>
       </div>
       <div class="volunteer-actions-row">
         <button class="btn btn-primary" style="padding: 8px 14px; font-size: 0.84rem; background: linear-gradient(135deg, #0284c7, #0369a1);" onclick="addVolunteerNextDutyToGoogleCalendar('${escapeQuotes(memberObj.name)}')">
-          📅 Add to Google Cal
+          ${vIcon("calendar", "v-icon-sm")} Add to Google Cal
         </button>
         <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.84rem;" onclick="downloadVolunteerCalendar('${escapeQuotes(memberObj.name)}')">
-          📱 Phone Calendar
+          ${vIcon("smartphone", "v-icon-sm")} Phone Calendar
         </button>
         <button class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.84rem; border-color: rgba(239, 68, 68, 0.4);" onclick="openAvailabilityModal('${escapeQuotes(memberObj.name)}')">
-          🚫 My Away Dates
+          ${vIcon("ban", "v-icon-sm")} My Away Dates
         </button>
         <button class="btn btn-warning" style="padding: 8px 14px; font-size: 0.84rem; background: linear-gradient(135deg, #d97706, #b45309);" onclick="openSwapRequestModal('${escapeQuotes(memberObj.name)}')">
-          🔄 Request Swap / Absence
+          ${vIcon("refresh", "v-icon-sm")} Request Swap / Absence
         </button>
         <button class="btn btn-whatsapp" style="padding: 8px 14px; font-size: 0.84rem;" onclick="shareMyScheduleWhatsApp('${escapeQuotes(memberObj.name)}')">
-          💬 Share My Schedule
+          ${vIcon("whatsapp", "v-icon-sm")} Share My Schedule
         </button>
       </div>
     </div>
@@ -5758,7 +5834,7 @@ function renderVolunteerPersonalBox(name, duties) {
   box.style.display = "block";
 }
 
-// ================= FEATURE 1: 📅 GOOGLE CALENDAR & PHONE (.ICS) EXPORTS =================
+// ================= FEATURE 1: GOOGLE CALENDAR & PHONE (.ICS) EXPORTS =================
 
 function parseClockMinutes(clockStr) {
   const tm = String(clockStr || "").match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
@@ -5781,7 +5857,7 @@ function inferServiceDurationHours(serviceHint, callTimeStr, serviceEndStr) {
   if (s.includes("saturday")) return SERVICE_DURATION_HOURS.saturdayPrep;
   if (s.includes("friday")) return SERVICE_DURATION_HOURS.fridayPrayer;
   if (s.includes("morning")) return SERVICE_DURATION_HOURS.morningPrayer;
-  if (s.includes("special") || s.includes("🌟")) return SERVICE_DURATION_HOURS.specialMeetings;
+  if (s.includes("special")) return SERVICE_DURATION_HOURS.specialMeetings;
   return SERVICE_DURATION_HOURS.firstService;
 }
 
@@ -5869,7 +5945,7 @@ function openCalendarUrl(url) {
 function addSingleDutyToGoogleCalendar(date, service, role, callTime, prayerTime, volunteerName, serviceEnd = "") {
   const gCalUrl = buildGoogleCalendarUrl(date, service, role, callTime, prayerTime, volunteerName, serviceEnd);
   openCalendarUrl(gCalUrl);
-  showToast(`📅 Opening Calendar for ${service} on ${date}...`);
+  showToast(`Opening Calendar for ${service} on ${date}...`);
 }
 
 function addVolunteerNextDutyToGoogleCalendar(name) {
@@ -5894,7 +5970,7 @@ function addVolunteerNextDutyToGoogleCalendar(name) {
     nextDuty.serviceEnd || ""
   );
   if (duties.length > 1) {
-    showToast(`📅 Opening duty 1 of ${duties.length} in Calendar. Tap "Phone Calendar" for all shifts!`);
+    showToast(`Opening duty 1 of ${duties.length} in Calendar. Tap "Phone Calendar" for all shifts!`);
   }
 }
 
@@ -6025,9 +6101,9 @@ function openMobileCalendarModal(volunteerName, duties) {
 
   if (noteEl) {
     if (isIosDevice() && !isIosSafariDirectCalendarSupported()) {
-      noteEl.innerHTML = '🍎 <strong>iPhone Tip:</strong> Tap <strong>Open in Calendar</strong> on each shift below, or open this portal in <strong>Safari</strong> to add all shifts into Apple Calendar at once.';
+      noteEl.innerHTML = '<strong>iPhone Tip:</strong> Tap <strong>Open in Calendar</strong> on each shift below, or open this portal in <strong>Safari</strong> to add all shifts into Apple Calendar at once.';
     } else {
-      noteEl.innerHTML = '📱 <strong>Tap any shift below</strong> to open it straight inside your phone’s Calendar app & set your reminder — no messy `.ics` download needed!';
+      noteEl.innerHTML = '<strong>Tap any shift below</strong> to open it straight inside your phone’s Calendar app & set your reminder — no messy `.ics` download needed!';
     }
   }
 
@@ -6038,12 +6114,12 @@ function openMobileCalendarModal(volunteerName, duties) {
   listEl.innerHTML = normalizedDuties.map((d, idx) => `
     <div class="mobile-cal-item">
       <div class="mobile-cal-meta">
-        <div class="mobile-cal-date">📅 ${escapeHtml(d.date)} • ${escapeHtml(d.serviceShort || d.service)}</div>
+        <div class="mobile-cal-date">${vIcon('calendar', 'v-icon-sm')} ${escapeHtml(d.date)} &bull; ${escapeHtml(d.serviceShort || d.service)}</div>
         <div class="mobile-cal-title">${escapeHtml(d.role)}</div>
-        <div class="mobile-cal-time">⏰ Call: ${escapeHtml(d.callTime)}${d.serviceEnd && d.serviceEnd !== 'TBD' ? ` (Ends ${escapeHtml(d.serviceEnd)})` : ''}</div>
+        <div class="mobile-cal-time">${vIcon("clock", "v-icon-sm")} Prayer: ${escapeHtml(d.callTime)}${d.serviceEnd && d.serviceEnd !== 'TBD' ? ` (Ends ${escapeHtml(d.serviceEnd)})` : ''}</div>
       </div>
       <button type="button" class="btn btn-primary btn-sm" onclick="openMobileCalendarDutyAtIndex(${idx})">
-        📅 Open in Calendar
+        ${vIcon("calendar", "v-icon-sm")} Open in Calendar
       </button>
     </div>
   `).join('');
@@ -6064,7 +6140,7 @@ async function shareCurrentVolunteerIcs() {
   const shared = await shareIcsViaNativeSheet(ctx.icsBody, ctx.filename, `FLAG Media Schedule - ${ctx.volunteerName || 'Duty'}`);
   if (!shared) {
     triggerIcsFileDownload(ctx.icsBody, ctx.filename);
-    showToast('📅 Calendar file saved! Tap it to import into Calendar.');
+    showToast('Calendar file saved! Tap it to import into Calendar.');
   }
 }
 
@@ -6072,7 +6148,7 @@ function downloadCurrentVolunteerIcsFile() {
   const ctx = window.__activeMobileCalendarContext;
   if (!ctx) return;
   triggerIcsFileDownload(ctx.icsBody, ctx.filename);
-  showToast('📅 .ics file saved! Open the file from Downloads if your phone supports importing .ics.');
+  showToast('.ics file saved! Open the file from Downloads if your phone supports importing .ics.');
 }
 
 function closeMobileCalendarModal() {
@@ -6098,7 +6174,7 @@ function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunt
 
   if (isIosSafariDirectCalendarSupported()) {
     openIcsDataUriForIos(icsBody);
-    showToast(`📅 Opening Apple Calendar for ${date}...`);
+    showToast(`Opening Apple Calendar for ${date}...`);
     return;
   }
 
@@ -6108,7 +6184,7 @@ function downloadSingleDutyIcs(date, service, role, callTime, prayerTime, volunt
   }
 
   triggerIcsFileDownload(icsBody, `FLAG_Media_${safeDate}.ics`);
-  showToast(`📅 Calendar event downloaded for ${date}!`);
+  showToast(`Calendar event downloaded for ${date}!`);
 }
 
 // Volunteer Month Calendar Handler: opens mobile Calendar chooser/iOS Calendar on phones, downloads .ics on desktop
@@ -6130,7 +6206,7 @@ function downloadVolunteerCalendar(name) {
 
   if (isIosSafariDirectCalendarSupported()) {
     openIcsDataUriForIos(icsBody);
-    showToast(`📅 Opening Apple Calendar with all ${duties.length} duties...`);
+    showToast(`Opening Apple Calendar with all ${duties.length} duties...`);
     return;
   }
 
@@ -6140,7 +6216,7 @@ function downloadVolunteerCalendar(name) {
   }
 
   triggerIcsFileDownload(icsBody, `FLAG_Media_${safeName}_${safeMonth}.ics`);
-  showToast(`📅 Calendar exported for ${volunteer}! Open file to import into phone calendar.`);
+  showToast(`Calendar exported for ${volunteer}! Open file to import into phone calendar.`);
 }
 
 function shareMyScheduleWhatsApp(name) {
@@ -6167,7 +6243,7 @@ function shareMyScheduleWhatsApp(name) {
   text += `\n\n📍 *Location:* Indoor Media Desk\n_"Whatever you do, work at it with all your heart as for the Lord." - Col 3:23_ 🙏✨`;
 
   navigator.clipboard.writeText(text).then(() => {
-    showToast(`📋 Schedule copied! Opening WhatsApp...`);
+    showToast(`Schedule copied! Opening WhatsApp...`);
   }).catch(() => {
     copyFallback(text);
   });
@@ -6176,7 +6252,7 @@ function shareMyScheduleWhatsApp(name) {
   window.open(`https://wa.me/?text=${encoded}`, '_blank');
 }
 
-// ================= FEATURE 2: 🔁 VOLUNTEER SWAP REQUEST / REPORT ABSENCE =================
+// ================= FEATURE 2: VOLUNTEER SWAP REQUEST / REPORT ABSENCE =================
 let currentSwapVolunteer = "";
 
 function openSwapRequestModal(name, preselectDutyIndex) {
@@ -6188,7 +6264,7 @@ function openSwapRequestModal(name, preselectDutyIndex) {
   if (volSelect) {
     volSelect.innerHTML = members.map(m => `
       <option value="${escapeHtml(m.name)}" ${m.name.toLowerCase() === (selectedName || '').toLowerCase() ? 'selected' : ''}>
-        👤 ${escapeHtml(m.name)} (${escapeHtml(m.role || 'Crew')})
+        ${escapeHtml(m.name)} (${escapeHtml(m.role || 'Crew')})
       </option>
     `).join('');
   }
@@ -6231,7 +6307,7 @@ function populateSwapDutiesDropdown(volunteerName, preselectIdx) {
   } else {
     duties.forEach((d, idx) => {
       const isSelected = (preselectIdx !== undefined && preselectIdx === idx) ? "selected" : "";
-      select.innerHTML += `<option value="${idx}" ${isSelected}>📅 ${d.date} - ${d.serviceShort} (${d.role})</option>`;
+      select.innerHTML += `<option value="${idx}" ${isSelected}>${d.date} - ${d.serviceShort} (${d.role})</option>`;
     });
   }
 }
@@ -6302,10 +6378,10 @@ function copySwapMessage() {
   const preview = document.getElementById("swapMessagePreview");
   if (!preview) return;
   navigator.clipboard.writeText(preview.textContent).then(() => {
-    showToast("📋 Swap request copied! Paste in Media WhatsApp group.");
+    showToast("Swap request copied! Paste in Media WhatsApp group.");
   }).catch(() => {
     copyFallback(preview.textContent);
-    showToast("📋 Swap request copied!");
+    showToast("Swap request copied!");
   });
 }
 
@@ -6403,12 +6479,12 @@ function claimCoverRequest(reqId) {
   const sel = document.getElementById(`claimSelect_${reqId}`);
   let claimer = (sel && sel.value) ? sel.value.trim() : (window.currentVolunteerFilter || "").trim();
   if (!claimer) {
-    showToast("👤 Please pick your name in the Cover dropdown first.");
+    showToast("Please pick your name in the Cover dropdown first.");
     if (sel) sel.focus();
     return;
   }
   if (isAliasMatch(claimer, req.volunteer)) {
-    showToast("⚠️ Please choose a teammate to cover this shift.");
+    showToast("️ Please choose a teammate to cover this shift.");
     return;
   }
 
@@ -6418,7 +6494,7 @@ function claimCoverRequest(reqId) {
 
   saveState(false, { swapRequests: appState.swapRequests });
   renderOpenCoverBoard();
-  showToast(`🤝 Thank you ${claimer}! Marked as covering ${req.volunteer}'s shift.`);
+  showToast(`Thank you ${claimer}! Marked as covering ${req.volunteer}'s shift.`);
 }
 
 function notifyLeaderClaimWhatsApp(reqId) {
@@ -6443,7 +6519,7 @@ function applyCoverRequestToRoster(reqId) {
   }
   const req = (appState.swapRequests || []).find(r => r.id === reqId);
   if (!req || !req.coveredBy || !req.serviceType || !req.rawRole) {
-    showToast("⚠️ This general request cannot be auto-applied. Update manually in Admin.");
+    showToast("️ This general request cannot be auto-applied. Update manually in Admin.");
     return;
   }
 
@@ -6463,21 +6539,21 @@ function applyCoverRequestToRoster(reqId) {
   }
 
   if (!updated) {
-    showToast("⚠️ Shift row not found in active month. Please update manually in Admin.");
+    showToast("️ Shift row not found in active month. Please update manually in Admin.");
     return;
   }
 
   appState.swapRequests = (appState.swapRequests || []).filter(r => r.id !== reqId);
   saveState();
   renderAll();
-  showToast(`✅ Applied cover: ${req.coveredBy} replaced ${req.volunteer} (${req.serviceShort} on ${req.date})!`);
+  showToast(`Applied cover: ${req.coveredBy} replaced ${req.volunteer} (${req.serviceShort} on ${req.date})!`);
 }
 
 function dismissCoverRequest(reqId) {
   appState.swapRequests = (appState.swapRequests || []).filter(r => r.id !== reqId);
   saveState(false, { swapRequests: appState.swapRequests });
   renderOpenCoverBoard();
-  showToast("🗑️ Cover request removed from board.");
+  showToast("️ Cover request removed from board.");
 }
 
 /**
@@ -6502,8 +6578,7 @@ function renderOpenCoverBoard() {
     const isAbsence = req.type === "absence";
     const badgeClass = isClaimed ? "cover-status-claimed" : (isAbsence ? "cover-status-absence" : "cover-status-open");
     const badgeLabel = isClaimed
-      ? `🟢 COVERED BY ${escapeHtml(req.coveredBy)}`
-      : (isAbsence ? "🔴 ABSENCE REPORTED" : "🟠 NEEDS COVER");
+      ? `<span class="status-dot-indicator dot-green"></span> COVERED BY ${escapeHtml(req.coveredBy)}` : (isAbsence ? `<span class="status-dot-indicator dot-red"></span> ABSENCE REPORTED` : `<span class="status-dot-indicator dot-yellow"></span> NEEDS COVER`);
 
     const canManage = isAdminLoggedIn || isAliasMatch(req.volunteer, window.currentVolunteerFilter);
 
@@ -6525,9 +6600,9 @@ function renderOpenCoverBoard() {
             ${optionsHtml}
           </select>
           <button type="button" class="btn btn-primary btn-sm" onclick="claimCoverRequest('${escapeQuotes(req.id)}')">
-            🙋 I Can Cover
+            ${vIcon('check', 'v-icon-sm')} I Can Cover
           </button>
-          ${canManage ? `<button type="button" class="btn btn-secondary btn-sm" onclick="dismissCoverRequest('${escapeQuotes(req.id)}')" title="Cancel this request">✕ Cancel</button>` : ''}
+          ${canManage ? `<button type="button" class="btn btn-secondary btn-sm" onclick="dismissCoverRequest('${escapeQuotes(req.id)}')" title="Cancel this request">${vIcon("trash", "v-icon-sm")} Cancel</button>` : ''}
         </div>
       `;
     } else {
@@ -6535,10 +6610,10 @@ function renderOpenCoverBoard() {
       actionArea = `
         <div class="cover-req-actions">
           <button type="button" class="btn btn-whatsapp btn-sm" onclick="notifyLeaderClaimWhatsApp('${escapeQuotes(req.id)}')" title="Send confirmation to Leader ${escapeQuotes(getLeaderName())}">
-            💬 Notify Leader
+            ${vIcon('whatsapp', 'v-icon-sm')} Notify Leader
           </button>
-          ${canAutoApply ? `<button type="button" class="btn btn-primary btn-sm" onclick="applyCoverRequestToRoster('${escapeQuotes(req.id)}')" title="Replace ${escapeQuotes(req.volunteer)} with ${escapeQuotes(req.coveredBy)} in the active roster">✅ Apply to Roster</button>` : ''}
-          ${canManage ? `<button type="button" class="btn btn-secondary btn-sm" onclick="dismissCoverRequest('${escapeQuotes(req.id)}')" title="Remove resolved notice">🗑️ Dismiss</button>` : ''}
+          ${canAutoApply ? `<button type="button" class="btn btn-primary btn-sm" onclick="applyCoverRequestToRoster('${escapeQuotes(req.id)}')" title="Replace ${escapeQuotes(req.volunteer)} with ${escapeQuotes(req.coveredBy)} in the active roster">${vIcon("check", "v-icon-sm")} Apply to Roster</button>` : ''}
+          ${canManage ? `<button type="button" class="btn btn-secondary btn-sm" onclick="dismissCoverRequest('${escapeQuotes(req.id)}')" title="Remove resolved notice">${vIcon("trash", "v-icon-sm")} Dismiss</button>` : ''}
         </div>
       `;
     }
@@ -6553,8 +6628,8 @@ function renderOpenCoverBoard() {
           <strong>${escapeHtml(req.volunteer)}</strong> needs cover for
           <span class="cover-highlight">${escapeHtml(req.date)} • ${escapeHtml(req.serviceShort)} (${escapeHtml(req.roleLabel)})</span>
         </div>
-        <div class="cover-req-reason">📝 ${escapeHtml(req.reason || 'Schedule cover requested')}</div>
-        ${isClaimed ? `<div class="cover-req-claimed-note">🤝 <strong>${escapeHtml(req.coveredBy)}</strong> volunteered to cover${req.claimedAt ? ` • ${escapeHtml(req.claimedAt)}` : ''}.</div>` : ''}
+        <div class="cover-req-reason">${vIcon('clipboard', 'v-icon-sm')} ${escapeHtml(req.reason || 'Schedule cover requested')}</div>
+        ${isClaimed ? `<div class="cover-req-claimed-note">${vIcon('users', 'v-icon-sm')} <strong>${escapeHtml(req.coveredBy)}</strong> volunteered to cover${req.claimedAt ? ` • ${escapeHtml(req.claimedAt)}` : ''}.</div>` : ''}
         ${actionArea}
       </div>
     `;
@@ -6563,7 +6638,7 @@ function renderOpenCoverBoard() {
   card.innerHTML = `
     <div class="cover-board-header">
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-        <span class="cover-board-icon">🔁</span>
+        <span class="cover-board-icon">${vIcon('refresh', 'v-icon-lg')}</span>
         <div>
           <h3 class="cover-board-title">Live Shift Cover Requests (${activeReqs.length})</h3>
           <p class="cover-board-sub">
@@ -6582,7 +6657,7 @@ function renderOpenCoverBoard() {
   card.style.display = "block";
 }
 
-// ================= FEATURE 3: 📲 INDIVIDUAL WHATSAPP DIRECT REMINDER =================
+// ================= FEATURE 3: INDIVIDUAL WHATSAPP DIRECT REMINDER =================
 let currentReminderVolunteer = "";
 
 function openDirectReminderModal(name) {
@@ -6669,10 +6744,10 @@ function copyDirectReminderMessage() {
   const preview = document.getElementById("directReminderPreview");
   if (!preview) return;
   navigator.clipboard.writeText(preview.textContent).then(() => {
-    showToast(`📋 Reminder message for ${currentReminderVolunteer} copied!`);
+    showToast(`Reminder message for ${currentReminderVolunteer} copied!`);
   }).catch(() => {
     copyFallback(preview.textContent);
-    showToast("📋 Reminder copied!");
+    showToast("Reminder copied!");
   });
 }
 
@@ -6695,7 +6770,7 @@ function sendDirectReminderWhatsApp() {
   }
 }
 
-// ================= FEATURE 4: 📱 MOBILE APP EXPERIENCE (PWA) =================
+// ================= FEATURE 4: MOBILE APP EXPERIENCE (PWA) =================
 function showPwaUpdateBanner() {
   const banner = document.getElementById("pwaUpdateBanner");
   if (banner) banner.style.display = "flex";
@@ -6822,7 +6897,7 @@ window.addEventListener('appinstalled', () => {
   window.__deferredPwaPrompt = null;
   closePwaDownloadModal();
   syncPwaInstallUi();
-  showToast('🎉 FLAG Media App installed to your device!');
+  showToast('FLAG Media App installed to your device!');
 });
 
 async function triggerPWAInstall() {
@@ -6834,7 +6909,7 @@ async function triggerPWAInstall() {
       await promptEvent.prompt();
       const choiceResult = await promptEvent.userChoice;
       if (choiceResult && choiceResult.outcome === 'accepted') {
-        showToast('🎉 Installing FLAG Media App...');
+        showToast('Installing FLAG Media App...');
         closePwaDownloadModal();
         const banner = document.getElementById('pwaInstallBanner');
         if (banner) banner.style.display = 'none';
@@ -6875,19 +6950,17 @@ function openPwaDownloadModal() {
 
   if (statusEl) {
     if (isPwaInstalled()) {
-      statusEl.innerHTML = '✅ <strong>App Already Installed!</strong> Share the link below with other crew members so they can add it to their phone Home Screen too.';
+      statusEl.innerHTML = '<strong>App Already Installed!</strong> Share the link below with other crew members so they can add it to their phone Home Screen too.';
     } else if (hasPrompt) {
-      statusEl.innerHTML = '🚀 <strong>Ready to Install!</strong> Tap <strong>📲 Install App Now</strong> below to add FLAG Media directly to your phone Home Screen.';
+      statusEl.innerHTML = '<strong>Ready to Install!</strong> Tap <strong>Install App Now</strong> below to add FLAG Media directly to your phone Home Screen.';
     } else if (inApp) {
-      statusEl.innerHTML = isIos
-        ? '⚠️ <strong>Opened Inside App Browser:</strong> Tap the browser/Safari icon or copy link below and open it in <strong>Safari</strong> to install the app.'
-        : '⚠️ <strong>Opened Inside App Browser:</strong> Tap <strong>🌐 Open in Chrome</strong> below (or tap <strong>⋮</strong> → <strong>Open in Chrome</strong>) so your phone can download the app.';
+      statusEl.innerHTML = isIos ? '<strong>Opened Inside App Browser:</strong> Tap the browser/Safari icon or copy link below and open it in <strong>Safari</strong> to install the app.' : '<strong>Opened Inside App Browser:</strong> Tap <strong>Open in Chrome</strong> below (or tap corner menu &rarr; <strong>Open in Chrome</strong>) so your phone can download the app.';
     } else if (iosNonSafari) {
-      statusEl.innerHTML = '🍎 <strong>Open in Safari Required on iPhone/iPad:</strong> Copy the link below and open it in Apple <strong>Safari</strong> to install to your Home Screen.';
+      statusEl.innerHTML = '<strong>Open in Safari Required on iPhone/iPad:</strong> Copy the link below and open it in Apple <strong>Safari</strong> to install to your Home Screen.';
     } else if (isIos) {
-      statusEl.innerHTML = '🍎 <strong>iPhone / iPad (Safari):</strong> Follow these 3 quick steps to install FLAG Media onto your Home Screen.';
+      statusEl.innerHTML = '<strong>iPhone / iPad (Safari):</strong> Follow these 3 quick steps to install FLAG Media onto your Home Screen.';
     } else {
-      statusEl.innerHTML = '📱 <strong>Android / Mobile Chrome:</strong> Install FLAG Media to your Home Screen using the browser menu for 1-tap offline & live-sync access.';
+      statusEl.innerHTML = '<strong>Android / Mobile Chrome:</strong> Install FLAG Media to your Home Screen using the browser menu for 1-tap offline & live-sync access.';
     }
   }
 
@@ -6896,19 +6969,19 @@ function openPwaDownloadModal() {
     if (isIos) {
       steps = (inApp || iosNonSafari)
         ? [
-            'Tap <strong>📋 Copy Link</strong> below or tap <strong>Open in Safari</strong> from the corner menu.',
+            'Tap <strong>Copy Link</strong> below or tap <strong>Open in Safari</strong> from the corner menu.',
             'Paste and open the link inside <strong>Safari</strong>.',
-            'Tap <strong>Share</strong> <span class="ios-icon-pill">📤</span> → <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">➕</span> → <strong>Add</strong>.'
+            `Tap <strong>Share</strong> <span class="ios-icon-pill">${vIcon('share', 'v-icon-sm')}</span> &rarr; <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">${vIcon('plus', 'v-icon-sm')}</span> &rarr; <strong>Add</strong>.`
           ]
         : [
             'Stay on this page in <strong>Safari</strong>.',
-            'Tap the <strong>Share</strong> button <span class="ios-icon-pill">📤</span> at the bottom (or top-right) bar.',
-            'Scroll down and tap <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">➕</span> → <strong>Add</strong>.'
+            `Tap the <strong>Share</strong> button <span class="ios-icon-pill">${vIcon('share', 'v-icon-sm')}</span> at the bottom (or top-right) bar.`,
+            `Scroll down and tap <strong style="color: #38bdf8;">"Add to Home Screen"</strong> <span class="ios-icon-pill">${vIcon('plus', 'v-icon-sm')}</span> &rarr; <strong>Add</strong>.`
           ];
     } else if (inApp) {
       steps = [
-            'Tap <strong>🌐 Open in Chrome</strong> below (or tap <strong>⋮</strong> at top-right → <strong>Open in Chrome</strong>).',
-            'Once opened in Chrome, tap <strong>📲 Install App</strong> on the banner or header.',
+            `Tap <strong>Open in Chrome</strong> below (or tap corner menu &rarr; <strong>Open in Chrome</strong>).`,
+            'Once opened in Chrome, tap <strong>Install App</strong> on the banner or header.',
             'Tap <strong style="color: #34d399;">"Install"</strong> when Android asks to add <strong>FLAG Media</strong>.'
           ];
     } else {
@@ -6943,7 +7016,7 @@ function copyPortalAppLink() {
   const url = getCleanPortalUrl();
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(url).then(() => {
-      showToast('📋 App link copied! Open in Chrome/Safari or paste in WhatsApp.');
+      showToast('App link copied! Open in Chrome/Safari or paste in WhatsApp.');
     }).catch(() => {
       copyFallback(url);
     });
@@ -6972,12 +7045,12 @@ function dismissPWABanner() {
   sessionStorage.setItem('flag_pwa_dismissed', 'true');
 }
 
-// ================= FEATURE 5: 📸 1-CLICK HIGH-RES SCHEDULE IMAGE EXPORT (PNG) =================
+// ================= FEATURE 5: 1-CLICK HIGH-RES SCHEDULE IMAGE EXPORT (PNG) =================
 function exportScheduleImagePNG() {
   const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
   const isLight = currentTheme === "light";
 
-  showToast(isLight ? "📸 Generating 2X high-resolution Light Theme schedule image..." : "📸 Generating 2X high-resolution schedule image...");
+  showToast(isLight ? "Generating 2X high-resolution Light Theme schedule image..." : "Generating 2X high-resolution schedule image...");
 
   const mName = getMonthName(appState.selectedMonth) || (appState.month ? appState.month.split(' ')[0] : 'Current');
   const year = appState.selectedYear || (appState.month ? appState.month.split(' ')[1] : '2026');
@@ -7079,18 +7152,20 @@ function exportScheduleImagePNG() {
       if (logoImg.complete && logoImg.naturalWidth !== 0) {
         ctx.drawImage(logoImg, padding, curY, 68, 68);
       } else {
-        ctx.font = "48px sans-serif";
-        ctx.fillText("🕊️", padding + 5, curY + 54);
+        ctx.fillStyle = isLight ? "#0284c7" : "#38bdf8";
+        ctx.fillRect(padding + 28, curY + 6, 12, 56);
+        ctx.fillRect(padding + 12, curY + 20, 44, 12);
       }
     } catch (e) {
-      ctx.font = "48px sans-serif";
-      ctx.fillText("🕊️", padding + 5, curY + 54);
+      ctx.fillStyle = isLight ? "#0284c7" : "#38bdf8";
+      ctx.fillRect(padding + 28, curY + 6, 12, 56);
+      ctx.fillRect(padding + 12, curY + 20, 44, 12);
     }
 
     const textLeft = padding + 85;
     ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
     ctx.font = "900 24px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
-    ctx.fillText("FULL LIFE CENTRE ASSEMBLY OF GOD CHURCH 🕊️", textLeft, curY + 28);
+    ctx.fillText("FULL LIFE CENTRE ASSEMBLY OF GOD CHURCH", textLeft, curY + 28);
 
     ctx.fillStyle = isLight ? "#0284c7" : "#38bdf8";
     ctx.font = "800 14px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
@@ -7114,7 +7189,7 @@ function exportScheduleImagePNG() {
     }
     ctx.font = "900 16px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(`📅 ${monthTitle.toUpperCase()}`, badgeX + (badgeW / 2), curY + 36);
+    ctx.fillText(`${monthTitle.toUpperCase()}`, badgeX + (badgeW / 2), curY + 36);
     ctx.textAlign = "left";
     ctx.restore();
 
@@ -7145,7 +7220,7 @@ function exportScheduleImagePNG() {
 
     ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
     ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
-    ctx.fillText("🙏 Prayer: 05:30 AM  |  Service: 06:00 AM – 08:00 AM", padding + 230, curY + 34);
+    ctx.fillText("PRAYER: 05:30 AM  |  SERVICE: 06:00 AM – 08:00 AM", padding + 230, curY + 34);
 
     const colX = [
       padding + 16,
@@ -7164,12 +7239,12 @@ function exportScheduleImagePNG() {
     ctx.fillStyle = isLight ? "#0f172a" : "#cbd5e1";
     ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", colX[0], tHeaderY);
-    ctx.fillText("🎥 1ST CAM", colX[1], tHeaderY);
-    ctx.fillText("📹 2ND CAM", colX[2], tHeaderY);
-    ctx.fillText("🎯 GIMBLE", colX[3], tHeaderY);
-    ctx.fillText("💻 LIVE SYSTEM", colX[4], tHeaderY);
-    ctx.fillText("✂️ SPOT EDIT", colX[5], tHeaderY);
-    ctx.fillText("🔋 CHARGING", colX[6], tHeaderY);
+    ctx.fillText("1ST CAM", colX[1], tHeaderY);
+    ctx.fillText("2ND CAM", colX[2], tHeaderY);
+    ctx.fillText("GIMBLE", colX[3], tHeaderY);
+    ctx.fillText("LIVE SYSTEM", colX[4], tHeaderY);
+    ctx.fillText("SPOT EDIT", colX[5], tHeaderY);
+    ctx.fillText("CHARGING", colX[6], tHeaderY);
 
     let rowY = tHeaderY + 28;
     (appState.firstService || []).forEach((r, idx) => {
@@ -7221,7 +7296,7 @@ function exportScheduleImagePNG() {
     ctx.fillText("2ND SERVICE (TAMIL)", padding + 18, curY + 30);
     ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
     ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
-    ctx.fillText("🙏 Prayer: 08:00 AM  |  Service: 08:30 AM – 10:30 AM", padding + 18, curY + 52);
+    ctx.fillText("PRAYER: 08:00 AM  |  SERVICE: 08:30 AM – 10:30 AM", padding + 18, curY + 52);
 
     const tHeader2Y = curY + 76;
     ctx.fillStyle = isLight ? "#fef3c7" : "rgba(245, 158, 11, 0.15)";
@@ -7229,7 +7304,7 @@ function exportScheduleImagePNG() {
     ctx.fillStyle = isLight ? "#92400e" : "#fde68a";
     ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", padding + 22, tHeader2Y);
-    ctx.fillText("🎥 CAM & LIVE OPERATOR", padding + 140, tHeader2Y);
+    ctx.fillText("CAM & LIVE OPERATOR", padding + 140, tHeader2Y);
 
     let r2Y = tHeader2Y + 28;
     (appState.secondService || []).forEach((r, idx) => {
@@ -7261,7 +7336,7 @@ function exportScheduleImagePNG() {
     ctx.fillText("3RD SERVICE (TAMIL)", col2X + 18, curY + 30);
     ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
     ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
-    ctx.fillText("🙏 Prayer: 10:30 AM  |  Service: 11:00 AM – 01:00 PM", col2X + 18, curY + 52);
+    ctx.fillText("PRAYER: 10:30 AM  |  SERVICE: 11:00 AM – 01:00 PM", col2X + 18, curY + 52);
 
     const tHeader3Y = curY + 76;
     ctx.fillStyle = isLight ? "#f3e8ff" : "rgba(168, 85, 247, 0.15)";
@@ -7269,7 +7344,7 @@ function exportScheduleImagePNG() {
     ctx.fillStyle = isLight ? "#6b21a8" : "#e9d5ff";
     ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", col2X + 22, tHeader3Y);
-    ctx.fillText("🎥 CAM & LIVE OPERATOR", col2X + 140, tHeader3Y);
+    ctx.fillText("CAM & LIVE OPERATOR", col2X + 140, tHeader3Y);
 
     let r3Y = tHeader3Y + 28;
     (appState.thirdService || []).forEach((r, idx) => {
@@ -7305,7 +7380,7 @@ function exportScheduleImagePNG() {
     ctx.fillText("FRIDAY FASTING PRAYER", padding + 18, curY + 34);
     ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
     ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
-    ctx.fillText("🙏 Prayer: 09:30 AM  |  Service: 10:00 AM – 01:00 PM", padding + 260, curY + 34);
+    ctx.fillText("PRAYER: 09:30 AM  |  SERVICE: 10:00 AM – 01:00 PM", padding + 260, curY + 34);
 
     const fHeaderY = curY + 64;
     ctx.fillStyle = isLight ? "#f0fdf4" : "rgba(16, 185, 129, 0.15)";
@@ -7313,8 +7388,8 @@ function exportScheduleImagePNG() {
     ctx.fillStyle = isLight ? "#166534" : "#a7f3d0";
     ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", padding + 24, fHeaderY);
-    ctx.fillText("🎥 CAMERA OPERATOR", padding + 240, fHeaderY);
-    ctx.fillText("💻 LIVE IN SYSTEM", padding + 600, fHeaderY);
+    ctx.fillText("CAMERA OPERATOR", padding + 240, fHeaderY);
+    ctx.fillText("LIVE IN SYSTEM", padding + 600, fHeaderY);
 
     let rfY = fHeaderY + 28;
     (appState.fridayPrayer || []).forEach((r, idx) => {
@@ -7345,17 +7420,17 @@ function exportScheduleImagePNG() {
 
       ctx.fillStyle = isLight ? "#7e22ce" : "#c084fc";
       ctx.font = "900 16px 'Plus Jakarta Sans', sans-serif";
-      ctx.fillText("🌟 SPECIAL MEETINGS & CONFERENCES", padding + 18, curY + 30);
+      ctx.fillText("SPECIAL MEETINGS & CONFERENCES", padding + 18, curY + 30);
 
       let spY = curY + 60;
       (appState.specialMeetings || []).forEach(r => {
         ctx.fillStyle = isLight ? "#92400e" : "#fef08a";
         ctx.font = "800 13px 'Plus Jakarta Sans', sans-serif";
-        ctx.fillText(`🌟 ${r.title || 'Meeting'} (${r.date})`, padding + 24, spY);
+        ctx.fillText(`${r.title || 'Meeting'} (${r.date})`, padding + 24, spY);
 
         ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
         ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
-        ctx.fillText(`🎥 Cam 1: ${r.cam1 || '—'}  |  📹 Cam 2: ${r.cam2 || '—'}  |  🎯 Gimble: ${r.gimble || '—'}  |  💻 Live: ${r.live || '—'}`, padding + 320, spY);
+        ctx.fillText(`Cam 1: ${r.cam1 || '—'}  |  Cam 2: ${r.cam2 || '—'}  |  Gimble: ${r.gimble || '—'}  |  Live: ${r.live || '—'}`, padding + 320, spY);
         spY += 42;
       });
       ctx.restore();
@@ -7374,17 +7449,17 @@ function exportScheduleImagePNG() {
       ctx.fillStyle = isLight ? "#c2410c" : "#fb923c";
       ctx.font = "900 16px 'Plus Jakarta Sans', sans-serif";
       const mTitle = (appState.morningPrayer && appState.morningPrayer.title) ? appState.morningPrayer.title.toUpperCase() : "EARLY MORNING PRAYER";
-      ctx.fillText(`🌅 ${mTitle}`, padding + 18, curY + 30);
+      ctx.fillText(`${mTitle}`, padding + 18, curY + 30);
 
       let mpY = curY + 60;
       (appState.morningPrayer.days || []).forEach(r => {
         ctx.fillStyle = isLight ? "#c2410c" : "#fed7aa";
         ctx.font = "800 13px 'Plus Jakarta Sans', sans-serif";
-        ctx.fillText(`🌅 ${r.day || 'Day'}`, padding + 24, mpY);
+        ctx.fillText(`${r.day || 'Day'}`, padding + 24, mpY);
 
         ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
         ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
-        ctx.fillText(`🎥 Cam 1: ${r.cam1 || '—'}  |  📹 Cam 2: ${r.cam2 || '—'}  |  🎯 Gimble: ${r.gimbal || '—'}  |  💻 Live: ${r.liveEditor || '—'}  |  📱 Social: ${r.socialMedia || '—'}`, padding + 160, mpY);
+        ctx.fillText(`Cam 1: ${r.cam1 || '—'}  |  Cam 2: ${r.cam2 || '—'}  |  Gimbal: ${r.gimbal || '—'}  |  Live: ${r.liveEditor || '—'}  |  Social: ${r.socialMedia || '—'}`, padding + 160, mpY);
         mpY += 42;
       });
       ctx.restore();
@@ -7425,7 +7500,7 @@ function exportScheduleImagePNG() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      showToast(isLight ? "📸 High-Resolution Light Theme Schedule PNG exported! Ready for WhatsApp Status." : "📸 High-Resolution Dark Theme Schedule PNG exported! Ready for WhatsApp Status.");
+      showToast(isLight ? "High-Resolution Light Theme Schedule PNG exported! Ready for WhatsApp Status." : "High-Resolution Dark Theme Schedule PNG exported! Ready for WhatsApp Status.");
     }, "image/png");
   };
 
@@ -7517,7 +7592,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
     ref.on("value", snapshot => {
       const cloudState = snapshot.val();
       if (cloudState && !isSyncingFromCloud) {
-        console.log("☁️ Real-time cloud sync received:", cloudState);
+        console.log("Real-time cloud sync received:", cloudState);
         const needsCloudCleanup = cloudState.checklistTemplateVersion !== 3
           || !cloudState.memberRolesVersion
           || cloudState.memberRolesVersion < CURRENT_MEMBER_ROLES_VERSION
@@ -7538,7 +7613,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
         if (needsCloudCleanup) {
           saveToCloud(appState, false);
         }
-        showToast("☁️ Real-time schedule updated from Cloud!");
+        showToast("️ Real-time schedule updated from Cloud!");
       } else if (!cloudState) {
         // First time cloud initialization - push current local state to cloud!
         ensureStateIntegrity(appState);
@@ -7552,7 +7627,7 @@ function connectFirebaseWithUrl(rawUrl, showToastNotice = true) {
     cloudSyncConnected = true;
     updateCloudSyncUI(true);
     if (showToastNotice) {
-      showToast("🟢 Connected to Firebase! Cloud Sync is now active across all devices.");
+      showToast("Connected to Firebase! Cloud Sync is now active across all devices.");
     }
   } catch (err) {
     console.error("Firebase init failed:", err);
@@ -7581,7 +7656,7 @@ function syncLocalToCloudNow() {
     return;
   }
   saveToCloud(appState);
-  showToast("☁️ Pushed local schedule to Cloud! All volunteers will see this immediately.");
+  showToast("️ Pushed local schedule to Cloud! All volunteers will see this immediately.");
 }
 
 function disconnectFirebase() {
@@ -7597,7 +7672,7 @@ function disconnectFirebase() {
     const inputEl = document.getElementById("firebaseDbUrlInput");
     if (inputEl) inputEl.value = "";
     updateCloudSyncUI(false);
-    showToast("🔌 Cloud Sync disconnected. Running in Local Mode.");
+    showToast("Cloud Sync disconnected. Running in Local Mode.");
   }
 }
 
@@ -7612,9 +7687,9 @@ function saveToCloud(stateOrPatch, isPatch = false) {
       ? ref.update(stateOrPatch)
       : ref.set(sanitizeCloudState(stateOrPatch));
     writePromise.then(() => {
-      console.log(isPatch ? "☁️ Granular update saved to Firebase Cloud!" : "☁️ Successfully saved to Firebase Cloud!");
+      console.log(isPatch ? "Granular update saved to Firebase Cloud!" : "Successfully saved to Firebase Cloud!");
     }).catch(err => {
-      console.warn("☁️ Failed to push to Firebase Cloud:", err);
+      console.warn("Failed to push to Firebase Cloud:", err);
     });
   } catch (e) {
     console.warn("saveToCloud error:", e);
@@ -7633,22 +7708,22 @@ function updateCloudSyncUI(isConnected, errorMsg) {
     if (badge) {
       badge.className = "header-tag tag-emerald";
     }
-    if (text) text.textContent = "🟢 Live Cloud Connected & Syncing";
+    if (text) text.innerHTML = `<span class="status-dot-indicator dot-green"></span> Live Cloud Connected & Syncing`;
     if (navBadge) {
       navBadge.classList.add("connected");
     }
-    if (navText) navText.textContent = "☁️ Synced";
+    if (navText) navText.innerHTML = `${vIcon("cloud", "v-icon-sm")} Synced`;
     if (btnSync) btnSync.style.display = "inline-flex";
     if (btnDisc) btnDisc.style.display = "inline-flex";
   } else {
     if (badge) {
       badge.className = "header-tag tag-amber";
     }
-    if (text) text.textContent = errorMsg ? `⚠️ Error: ${errorMsg}` : "🟡 Local Mode (Ready to Connect)";
+    if (text) text.innerHTML = errorMsg ? `<span class="status-dot-indicator dot-red"></span> Error: ${errorMsg}` : `<span class="status-dot-indicator dot-amber"></span> Local Mode (Ready to Connect)`;
     if (navBadge) {
       navBadge.classList.remove("connected");
     }
-    if (navText) navText.textContent = "☁️ Local";
+    if (navText) navText.innerHTML = `${vIcon("cloud", "v-icon-sm")} Local`;
     if (btnSync) btnSync.style.display = "none";
     if (btnDisc) btnDisc.style.display = "none";
   }
@@ -7696,7 +7771,7 @@ function getRosterSyncUrl() {
 function copyRosterSyncLink() {
   const url = getRosterSyncUrl();
   navigator.clipboard.writeText(url).then(() => {
-    showToast("📋 1-Click Team Sync Link copied to clipboard!");
+    showToast("1-Click Team Sync Link copied to clipboard!");
   }).catch(() => {
     prompt("Copy this 1-click sync link:", url);
   });
@@ -7719,7 +7794,7 @@ function checkUrlForRosterSync() {
       localStorage.setItem("FLAG_MEDIA_PORTAL_STATE", JSON.stringify(appState));
       // Clean up hash from URL bar cleanly
       history.replaceState(null, "", window.location.pathname);
-      showToast(`🎉 Successfully synced latest schedule from Admin ${getLeaderName()}!`);
+      showToast(`Successfully synced latest schedule from Admin ${getLeaderName()}!`);
     }
   }
 }
@@ -7999,7 +8074,7 @@ function submitGearIssue() {
   if (itemSelect) itemSelect.value = "Main Camera 1 (Sony A7 / FX3)";
   checkGearCustomItem("Main Camera 1 (Sony A7 / FX3)");
 
-  showToast(`🛠️ Equipment issue logged! Click "Alert Yashwanth" to send WhatsApp message.`);
+  showToast(`️ Equipment issue logged! Click "Alert Yashwanth" to send WhatsApp message.`);
 }
 
 function setGearFilter(filter, btn) {
@@ -8042,7 +8117,7 @@ function sendGearIssueWhatsApp(id) {
   if (!issue) return;
 
   const phone = "917010368793"; // Yashwanth
-  const urgencyIcon = issue.urgency === "Critical" ? "🚨 CRITICAL FAULT" : (issue.urgency === "Medium" ? "⚠️ MEDIUM ATTENTION" : "ℹ️ ROUTINE MAINTENANCE");
+  const urgencyIcon = issue.urgency === "Critical" ? "CRITICAL FAULT" : (issue.urgency === "Medium" ? "MEDIUM ATTENTION" : "ROUTINE MAINTENANCE");
 
   const msg = `🛠️ *FLAG CHURCH MEDIA — GEAR MAINTENANCE ALERT*\n\n` +
     `To: *Yashwanth & Sam Joshua* (Equipment Incharge)\n` +
@@ -8086,7 +8161,7 @@ function renderGearIssues() {
   if (filtered.length === 0) {
     container.innerHTML = `
       <div style="text-align: center; padding: 32px 16px; color: var(--text-muted); background: rgba(15, 23, 42, 0.4); border-radius: 8px;">
-        <span style="font-size: 2rem; display: block; margin-bottom: 8px;">🎉</span>
+        <div style="margin-bottom: 8px; color: var(--color-success, #10b981); font-size: 1.5rem;">${vIcon('checkCircle', 'v-icon-xl')}</div>
         <strong style="font-size: 0.95rem;">No equipment issues logged in this view!</strong>
         <p style="font-size: 0.8rem; margin-top: 4px;">All media gear is in top shape or no matching issues found.</p>
       </div>
@@ -8123,7 +8198,7 @@ function renderGearIssues() {
             <span class="gear-status-chip" style="${statusChipStyle}">${issue.status}</span>
           </div>
           <div class="gear-card-meta">
-            📅 ${issue.date} &bull; Reported by <strong class="gear-reporter-name">${issue.reporter}</strong>
+            ${vIcon("calendar", "v-icon-sm")} ${issue.date} &bull; Reported by <strong class="gear-reporter-name">${issue.reporter}</strong>
           </div>
         </div>
 
@@ -8134,14 +8209,14 @@ function renderGearIssues() {
         <div class="gear-card-actions">
           <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="btn btn-secondary btn-sm" onclick="toggleGearIssueStatus(${issue.id})" title="Click to cycle status: Open -> In Progress -> Resolved">
-              🔄 Status: <strong>${issue.status}</strong>
+              ${vIcon("refresh", "v-icon-sm")} Status: <strong>${issue.status}</strong>
             </button>
             <button class="btn btn-whatsapp btn-sm" onclick="sendGearIssueWhatsApp(${issue.id})" title="Send WhatsApp alert to Yashwanth (7010368793)">
-              💬 Alert Incharge (Yashwanth)
+              ${vIcon("whatsapp", "v-icon-sm")} Alert Incharge (Yashwanth)
             </button>
           </div>
           <button class="btn btn-secondary btn-sm" style="color: #ef4444;" onclick="deleteGearIssue(${issue.id})" title="Delete issue">
-            🗑️ Delete
+            ${vIcon("trash", "v-icon-sm")} Delete
           </button>
         </div>
       </div>
