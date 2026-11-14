@@ -1486,7 +1486,7 @@ function renderPublicSchedule() {
       card.innerHTML = `
         <div class="sched-card-top">
           <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">⏰ Call: 05:30 AM | Service: 06:00 AM &ndash; 08:00 AM</span>
+          <span class="duty-badge-time">🙏 Prayer: 05:30 AM | Service: 06:00 AM &ndash; 08:00 AM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
@@ -1543,7 +1543,7 @@ function renderPublicSchedule() {
       card.innerHTML = `
         <div class="sched-card-top">
           <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">⏰ Call: 08:00 AM | Service: 08:30 AM &ndash; 10:30 AM</span>
+          <span class="duty-badge-time">🙏 Prayer: 08:00 AM | Service: 08:30 AM &ndash; 10:30 AM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
@@ -1580,7 +1580,7 @@ function renderPublicSchedule() {
       card.innerHTML = `
         <div class="sched-card-top">
           <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">⏰ Call: 10:30 AM | Service: 11:00 AM &ndash; 01:00 PM</span>
+          <span class="duty-badge-time">🙏 Prayer: 10:30 AM | Service: 11:00 AM &ndash; 01:00 PM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
@@ -1618,7 +1618,7 @@ function renderPublicSchedule() {
       card.innerHTML = `
         <div class="sched-card-top">
           <div class="sched-card-date">📅 ${r.date}</div>
-          <span class="duty-badge-time">⏰ Call: 09:30 AM</span>
+          <span class="duty-badge-time">🙏 Prayer: 09:30 AM | Service: 10:00 AM &ndash; 01:00 PM</span>
         </div>
         <div class="sched-card-roles">
           <div class="sched-role-row">
@@ -4986,7 +4986,7 @@ function generateWhatsAppText() {
     text += `🎥 INDOOR MEDIA TEAM - ${m.toUpperCase()} SCHEDULE\n\n`;
 
     text += `══════════════════════════════\n`;
-    text += `📅 1ST SERVICE SCHEDULE (06:00 AM – 08:00 AM | Call: 05:30 AM)\n`;
+    text += `📅 1ST SERVICE (TAMIL) (06:00 AM – 08:00 AM | Prayer: 05:30 AM)\n`;
     text += `══════════════════════════════\n`;
 
     appState.firstService.forEach(r => {
@@ -5000,13 +5000,13 @@ function generateWhatsAppText() {
     });
 
     text += `══════════════════════════════\n`;
-    text += `📅 2ND SERVICE (08:30 AM) & 3RD SERVICE (11:00 AM)\n`;
+    text += `📅 2ND & 3RD SERVICE (TAMIL) (Prayer: 30 Mins Before Service)\n`;
     text += `══════════════════════════════\n`;
     appState.secondService.forEach((r, idx) => {
       const r3 = appState.thirdService[idx] || {};
       text += `• ${r.date}:\n`;
-      text += `  - 2nd Service: ${r.operator || '-'}\n`;
-      text += `  - 3rd Service: ${r3.operator || '-'}\n\n`;
+      text += `  - 2nd Service (Tamil): ${r.operator || '-'}\n`;
+      text += `  - 3rd Service (Tamil): ${r3.operator || '-'}\n\n`;
     });
 
     text += `══════════════════════════════\n`;
@@ -5054,7 +5054,7 @@ function generateWhatsAppText() {
     text += `📅 Date: ${selectedDate}\n\n`;
 
     text += `══════════════════════════════\n`;
-    text += `🌅 1ST SERVICE (06:00 AM – 08:00 AM | Call: 05:30 AM)\n`;
+    text += `🌅 1ST SERVICE (TAMIL) (06:00 AM – 08:00 AM | Prayer: 05:30 AM)\n`;
     text += `══════════════════════════════\n`;
     text += `• 1st Cam: ${s1.cam1 || '-'}\n`;
     text += `• 2nd Cam: ${s1.cam2 || '-'}\n`;
@@ -5064,10 +5064,10 @@ function generateWhatsAppText() {
     text += `• Camera & Battery Incharge: ${s1.charging || '-'}\n\n`;
 
     text += `══════════════════════════════\n`;
-    text += `☀️ 2ND & 3RD SERVICE\n`;
+    text += `☀️ 2ND & 3RD SERVICE (TAMIL)\n`;
     text += `══════════════════════════════\n`;
-    text += `• 2nd Service (08:30 AM – 10:30 AM | Call: 08:00 AM): ${s2.operator || '-'}\n`;
-    text += `• 3rd Service (11:00 AM – 01:00 PM | Call: 10:30 AM): ${s3.operator || '-'}\n\n`;
+    text += `• 2nd Service (Tamil) (08:30 AM – 10:30 AM | Prayer: 08:00 AM): ${s2.operator || '-'}\n`;
+    text += `• 3rd Service (Tamil) (11:00 AM – 01:00 PM | Prayer: 10:30 AM): ${s3.operator || '-'}\n\n`;
 
     text += `Let's serve with excellence and honor the Lord! 🙌`;
     return text;
@@ -5211,12 +5211,12 @@ Shalom Media Team! 👋
 *REMINDER: TOMORROW'S SUNDAY MEDIA SERVING CREW*
 
 📅 *Service Date:* ${activeDateStr}
-⏰ *1st Service:* Starts 06:00 AM (Call: 05:30 AM Sharp | Prayer: 05:45 AM)
-⏰ *2nd Service:* Starts 08:30 AM (Call: 08:00 AM)
-⏰ *3rd Service:* Starts 11:00 AM (Call: 10:30 AM)
+🙏 *1st Service (Tamil):* Starts 06:00 AM (Prayer: 05:30 AM)
+🙏 *2nd Service (Tamil):* Starts 08:30 AM (Prayer: 08:00 AM)
+🙏 *3rd Service (Tamil):* Starts 11:00 AM (Prayer: 10:30 AM)
 📍 *Location:* Indoor Media Control Desk
 
-*🎬 1ST SERVICE SERVING CREW (05:30 AM Call | Starts 06:00 AM):*
+*🎬 1ST SERVICE (TAMIL) (Prayer: 05:30 AM | Starts 06:00 AM):*
 • 🎥 1st Camera: *${s1.cam1 || '-'}*
 • 📹 2nd Camera: *${s1.cam2 || '-'}*
 • 🎯 Gimble: *${s1.gimble || '-'}*
@@ -5224,10 +5224,10 @@ Shalom Media Team! 👋
 • ✂️ Spot Editing: *${s1.spot || '-'}*
 • 🔋 Camera & Battery Charging: *${s1.charging || 'Yashwanth & Sam Joshua'}*
 
-*🎬 2ND SERVICE (08:00 AM Call | Starts 08:30 AM):*
+*🎬 2ND SERVICE (TAMIL) (Prayer: 08:00 AM | Starts 08:30 AM):*
 • 🎥 Cam & Live Operator: *${s2.operator || '-'}*
 
-*🎬 3RD SERVICE (10:30 AM Call | Starts 11:00 AM):*
+*🎬 3RD SERVICE (TAMIL) (Prayer: 10:30 AM | Starts 11:00 AM):*
 • 🎥 Cam & Live Operator: *${s3.operator || '-'}*
 
 ━━━━━━━━━━━━━━━━━━━━━
@@ -6977,7 +6977,7 @@ function exportScheduleImagePNG() {
   const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
   const isLight = currentTheme === "light";
 
-  showToast(isLight ? "📸 Generating high-resolution Light Theme schedule image..." : "📸 Generating high-resolution schedule image...");
+  showToast(isLight ? "📸 Generating 2X high-resolution Light Theme schedule image..." : "📸 Generating 2X high-resolution schedule image...");
 
   const mName = getMonthName(appState.selectedMonth) || (appState.month ? appState.month.split(' ')[0] : 'Current');
   const year = appState.selectedYear || (appState.month ? appState.month.split(' ')[1] : '2026');
@@ -6995,18 +6995,24 @@ function exportScheduleImagePNG() {
   const specialCount = (appState.specialMeetings || []).length;
   const morningCount = (appState.morningPrayer && appState.morningPrayer.enabled && appState.morningPrayer.days) ? appState.morningPrayer.days.length : 0;
 
-  const headerH = 120;
-  const firstServiceH = 75 + (sundayCount * 46) + 15;
-  const secondThirdH = 75 + (Math.max(sundayCount, 1) * 44) + 15;
-  const fridayH = 75 + (fridayCount * 44) + 15;
-  const specialH = specialCount > 0 ? (65 + specialCount * 44 + 15) : 0;
-  const morningH = morningCount > 0 ? (65 + morningCount * 44 + 15) : 0;
-  const footerH = 100;
-  const sectionGaps = 20 * 4;
+  const headerH = 125;
+  const firstServiceH = 85 + (sundayCount * 46) + 15;
+  const secondThirdH = 95 + (Math.max(sundayCount, 1) * 46) + 15;
+  const fridayH = 85 + (fridayCount * 46) + 15;
+  const specialH = specialCount > 0 ? (75 + specialCount * 46 + 15) : 0;
+  const morningH = morningCount > 0 ? (75 + morningCount * 46 + 15) : 0;
+  const footerH = 105;
+  const sectionGaps = 22 * 4;
 
   const height = headerH + firstServiceH + secondThirdH + fridayH + specialH + morningH + footerH + sectionGaps + 40;
-  canvas.width = width;
-  canvas.height = height;
+
+  // 2X Hi-DPI crisp super-sampling for crystal clear viewing on smartphones & WhatsApp
+  const dpr = 2;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
 
   // Background gradient (Theme-Aware)
   const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
@@ -7083,15 +7089,15 @@ function exportScheduleImagePNG() {
 
     const textLeft = padding + 85;
     ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
-    ctx.font = "800 24px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+    ctx.font = "900 24px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
     ctx.fillText("FULL LIFE CENTRE ASSEMBLY OF GOD CHURCH 🕊️", textLeft, curY + 28);
 
     ctx.fillStyle = isLight ? "#0284c7" : "#38bdf8";
-    ctx.font = "700 14px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
-    ctx.fillText("INDOOR MEDIA TEAM • OFFICIAL BROADCAST SERVING SCHEDULE", textLeft, curY + 52);
+    ctx.font = "800 14px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+    ctx.fillText("INDOOR MEDIA TEAM • OFFICIAL BROADCAST SERVING SCHEDULE", textLeft, curY + 54);
 
     // Month Badge
-    const badgeW = 210;
+    const badgeW = 220;
     const badgeX = width - padding - badgeW;
     if (isLight) {
       ctx.fillStyle = "#fffbeb";
@@ -7106,7 +7112,7 @@ function exportScheduleImagePNG() {
       roundRect(ctx, badgeX, curY + 8, badgeW, 46, 8, true, true, "#f59e0b");
       ctx.fillStyle = "#fef08a";
     }
-    ctx.font = "800 16px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
+    ctx.font = "900 16px 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
     ctx.fillText(`📅 ${monthTitle.toUpperCase()}`, badgeX + (badgeW / 2), curY + 36);
     ctx.textAlign = "left";
@@ -7124,7 +7130,7 @@ function exportScheduleImagePNG() {
 
     curY += 22;
 
-    // Section 1: 1st Service Card
+    // Section 1: 1st Service Card (Tamil)
     ctx.save();
     ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
     const stroke1 = isLight ? "#bae6fd" : "rgba(59, 130, 246, 0.4)";
@@ -7134,12 +7140,12 @@ function exportScheduleImagePNG() {
     ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
 
     ctx.fillStyle = isLight ? "#0369a1" : "#60a5fa";
-    ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("1ST SERVICE (ENGLISH/TAMIL)", padding + 18, curY + 32);
+    ctx.font = "900 16px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("1ST SERVICE (TAMIL)", padding + 18, curY + 34);
 
-    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
-    ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("⏰ Call Time: 05:30 AM  |  Prayer: 05:45 AM  |  Service: 06:00 AM – 08:00 AM", padding + 265, curY + 32);
+    ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
+    ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("🙏 Prayer: 05:30 AM  |  Service: 06:00 AM – 08:00 AM", padding + 230, curY + 34);
 
     const colX = [
       padding + 16,
@@ -7151,12 +7157,12 @@ function exportScheduleImagePNG() {
       padding + 925
     ];
 
-    const tHeaderY = curY + 60;
+    const tHeaderY = curY + 64;
     ctx.fillStyle = isLight ? "#f1f5f9" : "rgba(30, 41, 59, 0.7)";
     ctx.fillRect(padding + 12, tHeaderY - 18, innerWidth - 24, 26);
 
     ctx.fillStyle = isLight ? "#0f172a" : "#cbd5e1";
-    ctx.font = "800 11px 'Plus Jakarta Sans', sans-serif";
+    ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", colX[0], tHeaderY);
     ctx.fillText("🎥 1ST CAM", colX[1], tHeaderY);
     ctx.fillText("📹 2ND CAM", colX[2], tHeaderY);
@@ -7174,25 +7180,25 @@ function exportScheduleImagePNG() {
 
       ctx.fillStyle = isLight ? "#eff6ff" : "rgba(59, 130, 246, 0.2)";
       ctx.strokeStyle = isLight ? "#93c5fd" : "rgba(59, 130, 246, 0.4)";
-      roundRect(ctx, colX[0] - 4, rowY - 16, 95, 24, 5, true, true);
+      roundRect(ctx, colX[0] - 4, rowY - 16, 95, 26, 5, true, true);
       ctx.fillStyle = isLight ? "#1d4ed8" : "#93c5fd";
-      ctx.font = "800 11px 'JetBrains Mono', monospace";
-      ctx.fillText(r.date, colX[0] + 4, rowY);
+      ctx.font = "800 12px 'JetBrains Mono', monospace";
+      ctx.fillText(r.date, colX[0] + 4, rowY + 2);
 
-      ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
+      ctx.font = "800 13px 'Plus Jakarta Sans', sans-serif";
       const names = [r.cam1, r.cam2, r.gimble, r.live, r.spot, r.charging];
       names.forEach((name, nIdx) => {
         if (!name || name === "—") {
           ctx.fillStyle = isLight ? "#94a3b8" : "#64748b";
         } else if (name.includes("&")) {
-          ctx.fillStyle = isLight ? "#92400e" : "#fef08a";
+          ctx.fillStyle = isLight ? "#b45309" : "#fef08a";
         } else {
           ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
         }
-        ctx.fillText(name || "—", colX[nIdx + 1], rowY);
+        ctx.fillText(name || "—", colX[nIdx + 1], rowY + 2);
       });
 
-      rowY += 44;
+      rowY += 46;
     });
 
     ctx.restore();
@@ -7211,27 +7217,39 @@ function exportScheduleImagePNG() {
     ctx.fillRect(padding + 12, curY, colW - 24, 3);
 
     ctx.fillStyle = isLight ? "#b45309" : "#fbbf24";
-    ctx.font = "800 14px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("2ND SERVICE (TAMIL)", padding + 18, curY + 28);
-    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
-    ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("⏰ Call: 08:00 AM | Service: 08:30 – 10:30 AM", padding + 18, curY + 46);
+    ctx.font = "900 16px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("2ND SERVICE (TAMIL)", padding + 18, curY + 30);
+    ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
+    ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("🙏 Prayer: 08:00 AM  |  Service: 08:30 AM – 10:30 AM", padding + 18, curY + 52);
 
-    let r2Y = curY + 76;
+    const tHeader2Y = curY + 76;
+    ctx.fillStyle = isLight ? "#fef3c7" : "rgba(245, 158, 11, 0.15)";
+    ctx.fillRect(padding + 12, tHeader2Y - 18, colW - 24, 26);
+    ctx.fillStyle = isLight ? "#92400e" : "#fde68a";
+    ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillText("DATE", padding + 22, tHeader2Y);
+    ctx.fillText("🎥 CAM & LIVE OPERATOR", padding + 140, tHeader2Y);
+
+    let r2Y = tHeader2Y + 28;
     (appState.secondService || []).forEach((r, idx) => {
-      ctx.fillStyle = isLight ? "#fffbeb" : "rgba(245, 158, 11, 0.18)";
-      roundRect(ctx, padding + 18, r2Y - 16, 95, 24, 5, true, true, isLight ? "#fcd34d" : "rgba(245, 158, 11, 0.35)");
+      if (idx % 2 === 1) {
+        ctx.fillStyle = isLight ? "#fffdf5" : "rgba(255, 255, 255, 0.02)";
+        ctx.fillRect(padding + 12, r2Y - 18, colW - 24, 38);
+      }
+      ctx.fillStyle = isLight ? "#fffbeb" : "rgba(245, 158, 11, 0.2)";
+      roundRect(ctx, padding + 18, r2Y - 16, 95, 26, 5, true, true, isLight ? "#fcd34d" : "rgba(245, 158, 11, 0.35)");
       ctx.fillStyle = isLight ? "#92400e" : "#fde68a";
-      ctx.font = "800 11px 'JetBrains Mono', monospace";
-      ctx.fillText(r.date, padding + 26, r2Y);
+      ctx.font = "800 12px 'JetBrains Mono', monospace";
+      ctx.fillText(r.date, padding + 26, r2Y + 2);
 
       ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
-      ctx.font = "700 13px 'Plus Jakarta Sans', sans-serif";
-      ctx.fillText(r.operator || "—", padding + 130, r2Y);
-      r2Y += 42;
+      ctx.font = "800 14px 'Plus Jakarta Sans', sans-serif";
+      ctx.fillText(r.operator || "—", padding + 140, r2Y + 2);
+      r2Y += 46;
     });
 
-    // 3rd Service
+    // 3rd Service (Tamil)
     ctx.fillStyle = isLight ? "#ffffff" : "rgba(15, 23, 42, 0.85)";
     const stroke3 = isLight ? "#e9d5ff" : "rgba(168, 85, 247, 0.4)";
     roundRect(ctx, col2X, curY, colW, secondThirdH, 12, true, true, stroke3);
@@ -7239,24 +7257,36 @@ function exportScheduleImagePNG() {
     ctx.fillRect(col2X + 12, curY, colW - 24, 3);
 
     ctx.fillStyle = isLight ? "#7e22ce" : "#c084fc";
-    ctx.font = "800 14px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("3RD SERVICE (ENGLISH)", col2X + 18, curY + 28);
-    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
-    ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("⏰ Call: 10:30 AM | Service: 11:00 AM – 01:00 PM", col2X + 18, curY + 46);
+    ctx.font = "900 16px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("3RD SERVICE (TAMIL)", col2X + 18, curY + 30);
+    ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
+    ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("🙏 Prayer: 10:30 AM  |  Service: 11:00 AM – 01:00 PM", col2X + 18, curY + 52);
 
-    let r3Y = curY + 76;
+    const tHeader3Y = curY + 76;
+    ctx.fillStyle = isLight ? "#f3e8ff" : "rgba(168, 85, 247, 0.15)";
+    ctx.fillRect(col2X + 12, tHeader3Y - 18, colW - 24, 26);
+    ctx.fillStyle = isLight ? "#6b21a8" : "#e9d5ff";
+    ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillText("DATE", col2X + 22, tHeader3Y);
+    ctx.fillText("🎥 CAM & LIVE OPERATOR", col2X + 140, tHeader3Y);
+
+    let r3Y = tHeader3Y + 28;
     (appState.thirdService || []).forEach((r, idx) => {
-      ctx.fillStyle = isLight ? "#faf5ff" : "rgba(168, 85, 247, 0.18)";
-      roundRect(ctx, col2X + 18, r3Y - 16, 95, 24, 5, true, true, isLight ? "#d8b4fe" : "rgba(168, 85, 247, 0.35)");
+      if (idx % 2 === 1) {
+        ctx.fillStyle = isLight ? "#fdfaff" : "rgba(255, 255, 255, 0.02)";
+        ctx.fillRect(col2X + 12, r3Y - 18, colW - 24, 38);
+      }
+      ctx.fillStyle = isLight ? "#faf5ff" : "rgba(168, 85, 247, 0.2)";
+      roundRect(ctx, col2X + 18, r3Y - 16, 95, 26, 5, true, true, isLight ? "#d8b4fe" : "rgba(168, 85, 247, 0.35)");
       ctx.fillStyle = isLight ? "#6b21a8" : "#e9d5ff";
-      ctx.font = "800 11px 'JetBrains Mono', monospace";
-      ctx.fillText(r.date, col2X + 26, r3Y);
+      ctx.font = "800 12px 'JetBrains Mono', monospace";
+      ctx.fillText(r.date, col2X + 26, r3Y + 2);
 
       ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
-      ctx.font = "700 13px 'Plus Jakarta Sans', sans-serif";
-      ctx.fillText(r.operator || "—", col2X + 130, r3Y);
-      r3Y += 42;
+      ctx.font = "800 14px 'Plus Jakarta Sans', sans-serif";
+      ctx.fillText(r.operator || "—", col2X + 140, r3Y + 2);
+      r3Y += 46;
     });
     ctx.restore();
 
@@ -7271,17 +7301,17 @@ function exportScheduleImagePNG() {
     ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
 
     ctx.fillStyle = isLight ? "#15803d" : "#34d399";
-    ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("FRIDAY FASTING PRAYER", padding + 18, curY + 30);
-    ctx.fillStyle = isLight ? "#475569" : "#94a3b8";
-    ctx.font = "600 12px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillText("⏰ Call Time: 09:30 AM  |  Service: 10:00 AM – 01:00 PM", padding + 225, curY + 30);
+    ctx.font = "900 16px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("FRIDAY FASTING PRAYER", padding + 18, curY + 34);
+    ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
+    ctx.font = "700 13px 'Plus Jakarta Sans', system-ui, sans-serif";
+    ctx.fillText("🙏 Prayer: 09:30 AM  |  Service: 10:00 AM – 01:00 PM", padding + 260, curY + 34);
 
-    const fHeaderY = curY + 58;
-    ctx.fillStyle = isLight ? "#f1f5f9" : "#cbd5e1";
+    const fHeaderY = curY + 64;
+    ctx.fillStyle = isLight ? "#f0fdf4" : "rgba(16, 185, 129, 0.15)";
     ctx.fillRect(padding + 12, fHeaderY - 18, innerWidth - 24, 26);
-    ctx.fillStyle = isLight ? "#0f172a" : "#cbd5e1";
-    ctx.font = "800 11px 'Plus Jakarta Sans', sans-serif";
+    ctx.fillStyle = isLight ? "#166534" : "#a7f3d0";
+    ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("DATE", padding + 24, fHeaderY);
     ctx.fillText("🎥 CAMERA OPERATOR", padding + 240, fHeaderY);
     ctx.fillText("💻 LIVE IN SYSTEM", padding + 600, fHeaderY);
@@ -7289,16 +7319,16 @@ function exportScheduleImagePNG() {
     let rfY = fHeaderY + 28;
     (appState.fridayPrayer || []).forEach((r, idx) => {
       ctx.fillStyle = isLight ? "#f0fdf4" : "rgba(16, 185, 129, 0.18)";
-      roundRect(ctx, padding + 24, rfY - 16, 95, 24, 5, true, true, isLight ? "#86efac" : "rgba(16, 185, 129, 0.35)");
+      roundRect(ctx, padding + 24, rfY - 16, 95, 26, 5, true, true, isLight ? "#86efac" : "rgba(16, 185, 129, 0.35)");
       ctx.fillStyle = isLight ? "#166534" : "#a7f3d0";
-      ctx.font = "800 11px 'JetBrains Mono', monospace";
-      ctx.fillText(r.date, padding + 32, rfY);
+      ctx.font = "800 12px 'JetBrains Mono', monospace";
+      ctx.fillText(r.date, padding + 32, rfY + 2);
 
       ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
-      ctx.font = "700 13px 'Plus Jakarta Sans', sans-serif";
-      ctx.fillText(r.cam1 || "—", padding + 240, rfY);
-      ctx.fillText(r.live || "—", padding + 600, rfY);
-      rfY += 40;
+      ctx.font = "800 14px 'Plus Jakarta Sans', sans-serif";
+      ctx.fillText(r.cam1 || "—", padding + 240, rfY + 2);
+      ctx.fillText(r.live || "—", padding + 600, rfY + 2);
+      rfY += 46;
     });
     ctx.restore();
 
@@ -7314,19 +7344,19 @@ function exportScheduleImagePNG() {
       ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
 
       ctx.fillStyle = isLight ? "#7e22ce" : "#c084fc";
-      ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
+      ctx.font = "900 16px 'Plus Jakarta Sans', sans-serif";
       ctx.fillText("🌟 SPECIAL MEETINGS & CONFERENCES", padding + 18, curY + 30);
 
       let spY = curY + 60;
       (appState.specialMeetings || []).forEach(r => {
         ctx.fillStyle = isLight ? "#92400e" : "#fef08a";
-        ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
+        ctx.font = "800 13px 'Plus Jakarta Sans', sans-serif";
         ctx.fillText(`🌟 ${r.title || 'Meeting'} (${r.date})`, padding + 24, spY);
 
         ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
-        ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
+        ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
         ctx.fillText(`🎥 Cam 1: ${r.cam1 || '—'}  |  📹 Cam 2: ${r.cam2 || '—'}  |  🎯 Gimble: ${r.gimble || '—'}  |  💻 Live: ${r.live || '—'}`, padding + 320, spY);
-        spY += 40;
+        spY += 42;
       });
       ctx.restore();
       curY += specialH + 20;
@@ -7342,20 +7372,20 @@ function exportScheduleImagePNG() {
       ctx.fillRect(padding + 12, curY, innerWidth - 24, 3);
 
       ctx.fillStyle = isLight ? "#c2410c" : "#fb923c";
-      ctx.font = "800 15px 'Plus Jakarta Sans', sans-serif";
+      ctx.font = "900 16px 'Plus Jakarta Sans', sans-serif";
       const mTitle = (appState.morningPrayer && appState.morningPrayer.title) ? appState.morningPrayer.title.toUpperCase() : "EARLY MORNING PRAYER";
       ctx.fillText(`🌅 ${mTitle}`, padding + 18, curY + 30);
 
       let mpY = curY + 60;
       (appState.morningPrayer.days || []).forEach(r => {
         ctx.fillStyle = isLight ? "#c2410c" : "#fed7aa";
-        ctx.font = "800 12px 'Plus Jakarta Sans', sans-serif";
+        ctx.font = "800 13px 'Plus Jakarta Sans', sans-serif";
         ctx.fillText(`🌅 ${r.day || 'Day'}`, padding + 24, mpY);
 
         ctx.fillStyle = isLight ? "#0f172a" : "#ffffff";
-        ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
+        ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
         ctx.fillText(`🎥 Cam 1: ${r.cam1 || '—'}  |  📹 Cam 2: ${r.cam2 || '—'}  |  🎯 Gimble: ${r.gimbal || '—'}  |  💻 Live: ${r.liveEditor || '—'}  |  📱 Social: ${r.socialMedia || '—'}`, padding + 160, mpY);
-        mpY += 40;
+        mpY += 42;
       });
       ctx.restore();
       curY += morningH + 20;
@@ -7371,13 +7401,13 @@ function exportScheduleImagePNG() {
 
     curY += 28;
     ctx.fillStyle = isLight ? "#334155" : "#cbd5e1";
-    ctx.font = "italic 600 13px 'Plus Jakarta Sans', sans-serif";
+    ctx.font = "italic 700 13px 'Plus Jakarta Sans', sans-serif";
     ctx.textAlign = "center";
     ctx.fillText('"Whatever you do, work at it with all your heart, as working for the Lord." — Colossians 3:23', width / 2, curY);
 
     curY += 22;
     ctx.fillStyle = isLight ? "#64748b" : "#64748b";
-    ctx.font = "600 11px 'Plus Jakarta Sans', sans-serif";
+    ctx.font = "700 12px 'Plus Jakarta Sans', sans-serif";
     ctx.fillText("Full Life Centre AG Church • Indoor Media Portal • Media Desk Command Center", width / 2, curY);
 
     // Export Canvas to Blob
